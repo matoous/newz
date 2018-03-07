@@ -1,0 +1,36 @@
+import os
+from pathlib import Path
+
+from flask import Blueprint, render_template, redirect
+from flask_login import login_user, logout_user, login_required
+
+from news.models.user import SignUpForm, LoginForm
+
+auth = Blueprint('auth', __name__, template_folder=Path(os.path.dirname(os.path.realpath(__file__))).parent.__str__() + "/templates")
+
+
+@auth.route("/signup", methods=['GET', 'POST'])
+def signup():
+    form = SignUpForm()
+    if form.validate():
+        user = form.user
+        user.save()
+        return redirect('/')
+    return render_template("signup.html", form=form)
+
+
+@auth.route("/login", methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    if form.validate():
+        login_user(form.user)
+        return redirect('/')
+    return render_template("login.html", form=form)
+
+
+@auth.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect('/')
+

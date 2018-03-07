@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+    New Link
+{% endblock %}
+
+{% block body %}
+<form action="/f/{{ feed.slug }}/add" method="POST">
+    {{ form.title }}
+    {{ form.summary }}
+    {{ form.url }}
+    {{ form.csrf_token }}
+    <input type="submit" value="Create link">
+</form>
+{% endblock %}

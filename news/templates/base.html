@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css?family=Lora|Roboto+Condensed:300,400,700" rel="stylesheet">
+    <link rel="stylesheet" href="/static/stylesheets/main.css">
+</head>
+
+<body>
+    {% block body %}
+    {% endblock %}
+
+    <footer>
+        <div class="options">
+            <a href="/terms">Terms</a>
+            -
+            <a href="/privacy">Privacy policy</a>
+            -
+            <a href="/ads">Ads</a>
+            -
+            <a href="/jobs">Jobs</a>
+        </div>
+        <div class="container copyright">
+            © Copyright 2017 - 2018, Matouš Dzivjak.
+        </div>
+    </footer>
+</body>
+</html>

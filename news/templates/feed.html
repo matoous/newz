@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ feed.name }}
+{% endblock %}
+
+{% block body %}
+<section>
+    <div class="container">
+        <div class="feed">
+            <div class="feed-head">
+                <div class="feed-logo">
+                    <img src="/static/images/testimg.png">
+                </div>
+                <div class="feed-info">
+                    <h1>{{ feed.name }}</h1>
+                    <div class="feed-description">
+                        {{ feed.description }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="links">
+            <div class="menu">
+                <div class="sorting">
+                    New
+                    <ul>
+                        <li>
+                            <a href="?s=new">
+                                New
+                            </a>
+                        </li>
+                        <li>
+                            <a href="?s=trending">
+                                Trending
+                            </a>
+                        </li>
+                        <li>
+                            <a href="?s=best">
+                                Best
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="submit">
+                    <a href="/f/{{feed.slug}}/add">Submit</a>
+                </div>
+            </div>
+            {% for link in feed.links %}
+            <div class="link">
+                <div class="link-body">
+                    <h2>
+                        <a href="{{ link.url }}">
+                            {{ link.title }}
+                        </a>
+                    </h2>
+                    <div>
+                        {{link.summary}}
+                    </div>
+                    <div class="bottom-line">
+                        <div class="date">
+                            {{ link.time_ago() }}
+                        </div>
+                        <div class="author">
+                            by <a href="/u/">{{ link.posted_by.name() }}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="link-rating">
+                    <div class="up">
+
+                    </div>
+                    <div class="score">
+                        174
+                    </div>
+                    <div class="down">
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            </div>
+    </div>
+</section>
+{% endblock %}
