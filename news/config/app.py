@@ -21,7 +21,7 @@ def make_app():
     env = DotEnv()
 
     app = Flask(__name__, static_url_path='/static', static_folder="../static")
-    app.config['SECRET_KEY'] = urandom(16)
+    app.config['SECRET_KEY'] = 'secretpico'
     app.config['ORATOR_DATABASES'] = {
         'development': {
             'driver': 'sqlite',
@@ -40,9 +40,10 @@ def make_app():
     login_manager.init_app(app)
 
     with app.app_context():
-        Feed.create_table()
-        User.create_table()
-        Link.create_table()
-        Vote.create_table()
+        pass
+        #Feed.create_table()
+        #User.create_table()
+        #Link.create_table()
+        #Vote.create_table()
 
     return app

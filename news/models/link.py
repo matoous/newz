@@ -1,5 +1,6 @@
 from flask_wtf import Form
-from orator.orm import belongs_to
+from orator.orm import belongs_to, has_many
+from slugify import slugify
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length, URL
 
@@ -22,6 +23,8 @@ class Link(db.Model):
             table.char('summary', 256)
             table.char('url', 128)
             table.big_integer('user_id')
+            table.datetime('created_at')
+            table.datetime('updated_at')
             table.foreign('user_id').references('id').on('users')
             table.big_integer('feed_id')
             table.foreign('feed_id').references('id').on('feeds')
@@ -35,12 +38,22 @@ class Link(db.Model):
         from news.models.feed import Feed
         return Feed
 
+    @belongs_to
+    def user(self):
+        from news.models.user import User
+        return User
+
+    @has_many
+    def votes(self):
+        from news.models.vote import Vote
+        return Vote
+
     @classmethod
     def _cache_prefix(cls):
         return "l:"
 
     def time_ago(self):
-        return time_ago(self.posted)
+        return time_ago(self.created_at)
 
 
 class LinkForm(Form):
@@ -56,5 +69,10 @@ class LinkForm(Form):
         rv = Form.validate(self)
         if not rv:
             return False
-        self.link = Link(self.title.data, self.summary.data, self.url.data, feed, user)
+        self.link = Link(title=self.title.data,
+                         slug=slugify(self.title.data),
+                         summary=self.summary.data,
+                         url=self.url.data,
+                         feed_id=feed.id,
+                         user_id=user.id)
         return True

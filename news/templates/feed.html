@@ -62,19 +62,35 @@
                             {{ link.time_ago() }}
                         </div>
                         <div class="author">
-                            by <a href="/u/">{{ link.posted_by.name() }}</a>
+                            by <a href="/u/">{{ link.user.name() }}</a>
                         </div>
                     </div>
                 </div>
                 <div class="link-rating">
                     <div class="up">
-
+                        {% if link.votes|length > 0 %}
+                            {% if link.votes[0].is_upvote() %}
+                            <a href="/f/{{feed.slug}}/{{link.slug}}/unvote">Up</a>
+                            {% else %}
+                            <a href="/f/{{feed.slug}}/{{link.slug}}/upvote">Up</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="/f/{{feed.slug}}/{{link.slug}}/upvote">Up</a>
+                        {% endif %}
                     </div>
                     <div class="score">
-                        174
+                        {{link.score}}
                     </div>
                     <div class="down">
-
+                        {% if link.votes|length > 0 %}
+                            {% if link.votes[0].is_downvote() %}
+                            <a href="/f/{{feed.slug}}/{{link.slug}}/unvote">Up</a>
+                            {% else %}
+                            <a href="/f/{{feed.slug}}/{{link.slug}}/downvote">Up</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="/f/{{feed.slug}}/{{link.slug}}/downvote">Up</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
