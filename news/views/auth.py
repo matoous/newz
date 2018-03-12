@@ -6,7 +6,7 @@ from flask_login import login_user, logout_user, login_required
 
 from news.models.user import SignUpForm, LoginForm
 
-auth = Blueprint('auth', __name__, template_folder=Path(os.path.dirname(os.path.realpath(__file__))).parent.__str__() + "/templates")
+auth = Blueprint('auth', __name__, template_folder='/templates')
 
 
 @auth.route("/join", methods=['GET', 'POST'])

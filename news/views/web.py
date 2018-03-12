@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
-from flask_login import login_required
+from flask_login import login_required, current_user
 
+from news.lib.sorts import trending_links
 from news.models.link import Link
 
 web = Blueprint('web', __name__, template_folder='/templates')
@@ -12,7 +13,9 @@ def home():
     return render_template("index.html", links=links)
 
 
-@web.route('/hello')
+@web.route('/my')
 @login_required
-def hello_world():
-    return 'Hello World!'
+def my_feeds():
+    fids = current_user.subscribed_feed_ids()
+    links = trending_links(fids)
+    return render_template("index.html", links=links)

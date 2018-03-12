@@ -3,9 +3,16 @@ from flask_orator import Orator
 from orator import Schema, DatabaseManager
 
 db = Orator()
-manager = DatabaseManager({'development': {
-            'driver': 'sqlite',
-            'database': '/tmp/test.db'
-        }})
+manager = DatabaseManager({
+    'default': 'postgres',
+    'postgres': {
+        'driver': 'postgres',
+        'host': 'localhost',
+        'database': 'newsfeed',
+        'user': 'postgres',
+        'password': '',
+        'prefix': ''
+    },
+})
 schema = Schema(manager)
 

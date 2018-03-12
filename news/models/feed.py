@@ -22,15 +22,15 @@ class Feed(db.Model):
         schema.drop_if_exists('feeds')
         with schema.create('feeds') as table:
             table.big_increments('id')
-            table.char('name', 64)
-            table.char('slug', 80).unique()
+            table.string('name', 64)
+            table.string('slug', 80).unique()
             table.string('description').nullable()
-            table.char('default_sorting', 12).default('new')
+            table.string('default_sorting', 12).default('new')
             table.datetime('created_at')
             table.datetime('updated_at')
-            table.char('lang', 12).default('en')
+            table.string('lang', 12).default('en')
             table.boolean('over_18').default(False)
-            table.char('logo', 128).nullable()
+            table.string('logo', 128).nullable()
             table.boolean('reported').default(False)
             table.index('slug')
 
@@ -38,31 +38,28 @@ class Feed(db.Model):
     def links(self):
         return Link
 
-    @classmethod
-    def by_slug(cls, slug, sorting='trending'):
-        if current_user.is_authenticated:
-            votes_query = {'votes': Vote.query().where('user_id', current_user.id)}
-            feed = Feed.where('slug', slug).with_({
-                'links': Link.with_(votes_query).order_by('created_at', 'desc').limit(10)
-            }).first()
-        else:
-            feed = Feed.where('slug', slug).with_({
-                'links': Link.order_by('created_at', 'desc').limit(10)
-            }).first()
+    def links_query(self, sort='trending', time='day'):
+        return Link.by_feed(self, sort, time)
 
-        feed.links = sorted(feed.links, key=lambda x: hot(x.score(), x.created_at), reverse=True)
+    @classmethod
+    def by_slug(cls, slug, sort='trending'):
+        feed = Feed.where('slug', slug).first()
         return feed
+        #votes_query = {'votes': Vote.query().where('user_id', current_user.id)}
+        #feed = Feed.where('slug', slug).with_({
+        #    'links': Link.with_(votes_query).order_by('created_at', 'desc').limit(10)
+        #}).first()
 
     @property
     def path(self):
         return "/f/%s/" % self.slug
 
     @classmethod
-    def _cache_prefix(cls):
+    def cache_prefix(cls):
         return "f:"
 
     @classmethod
-    def _by_id(cls, id):
+    def by_id(cls, id):
         return Feed.where('id', id).first()
 
     @belongs_to_many('feeds_users')

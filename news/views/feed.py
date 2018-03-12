@@ -73,3 +73,14 @@ def subscribe(slug=None):
     if not subscribed:
         return "Subscribe NOT OK"
     return "Subscribed"
+
+
+@feed_blueprint.route("/f/<path:slug>/unsubscribe")
+@login_required
+def unsubscribe(slug=None):
+    feed = Feed.where('slug', slug).first()
+    if feed is None:
+        abort(404)
+
+    current_user.unsubscribe(feed)
+    return "Unsubscribed"

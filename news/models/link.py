@@ -1,11 +1,14 @@
 from flask_wtf import Form
-from orator.orm import belongs_to, has_many
+from orator.orm import belongs_to, has_many, morph_many
 from slugify import slugify
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length, URL
 
+from news.lib.cache import cache
 from news.lib.db.db import db, schema
+from news.lib.db.time_filters import time_filters
 from news.lib.utils.time_utils import time_ago
+from news.models.report import Report
 
 
 class Link(db.Model):
@@ -18,10 +21,10 @@ class Link(db.Model):
         schema.drop_if_exists('links')
         with schema.create('links') as table:
             table.big_increments('id')
-            table.char('title', 128)
-            table.char('slug', 150).unique()
-            table.char('summary', 256)
-            table.char('url', 128)
+            table.string('title', 128)
+            table.string('slug', 150).unique()
+            table.string('summary', 256)
+            table.string('url', 128)
             table.big_integer('user_id')
             table.datetime('created_at')
             table.datetime('updated_at')
@@ -49,9 +52,36 @@ class Link(db.Model):
         from news.models.vote import Vote
         return Vote
 
+    @morph_many('reportable')
+    def reports(self):
+        return Report
+
     @classmethod
     def _cache_prefix(cls):
         return "l:"
+
+    @classmethod
+    def by_feed(cls, feed, sort, time):
+        return Link.get_by_feed_id(feed.id, sort, time)
+
+    @classmethod
+    @cache.memoize()
+    def get_by_feed_id(cls, feed_id, sort, time='all'):
+        """
+        Get's links by feed id and caches the result for future use
+        :param feed_id: feed_id
+        :param sort: sorting type: trending/new/best
+        :param time: time filtering: day/week/month/year/all
+        :return: list of links
+        """
+        q = Link.where('feed_id', feed_id)
+
+        if time != 'all':
+            q.where_raw(time_filters[time])
+
+        # cache needs array of objects, not a orator collection
+        res = [f for f in q.limit(1000).get()]
+        return res
 
     def time_ago(self):
         return time_ago(self.created_at)

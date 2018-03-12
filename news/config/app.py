@@ -15,27 +15,32 @@ from news.views.auth import auth
 from news.views.feed import feed_blueprint
 from news.views.settings import settings
 from news.views.web import web
-import news.models
 from flask import Flask
 
 
 def make_app():
     env = DotEnv()
-
     app = Flask(__name__, static_url_path='/static', static_folder="../static")
     app.config['SECRET_KEY'] = 'secretpico'
-    app.config['ORATOR_DATABASES'] = {
-        'development': {
-            'driver': 'sqlite',
-            'database': '/tmp/test.db'
-        }
-    }
     app.register_blueprint(web)
     app.register_blueprint(auth)
     app.register_blueprint(feed_blueprint)
     app.register_blueprint(settings)
 
     env.init_app(app)
+
+    app.config['ORATOR_DATABASES'] = {
+        'default': 'postgres',
+        'postgres': {
+            'driver': 'postgres',
+            'host': 'localhost',
+            'database': 'newsfeed',
+            'user': 'postgres',
+            'password': '',
+            'prefix': ''
+        },
+    }
+
     db.init_app(app)
     csrf.init_app(app)
     limiter.init_app(app)
@@ -43,7 +48,7 @@ def make_app():
     login_manager.init_app(app)
 
     with app.app_context():
-        #create_subscriptions_table()
+        create_subscriptions_table()
         pass
         #Feed.create_table()
         #User.create_table()

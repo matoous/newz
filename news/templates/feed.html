@@ -14,14 +14,16 @@
                 </div>
                 <div class="feed-info">
                     <h1>{{ feed.name }}</h1>
-                    {% if current_user.subscribed_to(feed) %}
-                    <a href="/f/{{feed.slug}}/unsubscribe">Unsubscribe</a>
-                    {% else %}
-                    <a href="/f/{{feed.slug}}/subscribe">Subscribe</a>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.subscribed_to(feed) %}
+                        <a href="/f/{{feed.slug}}/unsubscribe">Unsubscribe</a>
+                        {% else %}
+                        <a href="/f/{{feed.slug}}/subscribe">Subscribe</a>
+                        {% endif %}
+                        <div class="feed-description">
+                            {{ feed.description }}
+                        </div>
                     {% endif %}
-                    <div class="feed-description">
-                        {{ feed.description }}
-                    </div>
                 </div>
             </div>
         </div>

@@ -71,7 +71,7 @@ class Vote(db.Model):
 
     def commit(self):
         self.apply()
-        # update thing in cache if self.thing.num_votes < 20 or self.thing.num_votes % 10 == 0:
+        # update thing in cache if self.thing.num_votes < 20 or self.thing.num_votes % 8 == 0:
         # that's what reddit does
 
     def apply(self):

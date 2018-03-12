@@ -14,7 +14,7 @@ from news.lib.db.db import db, schema
 class User(db.Model):
     __table__ = 'users'
     __fillable__ = ['username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sorting', 'bio', 'url',
-                    'p_show_images', 'p_min_link_score']
+                    'profile_pic', 'p_show_images', 'p_min_link_score']
     __guarded__ = ['id', 'password', 'reported', 'spammer']
 
     @classmethod
@@ -22,26 +22,38 @@ class User(db.Model):
         schema.drop_if_exists('users')
         with schema.create('users') as table:
             table.big_increments('id')
-            table.char('username', 32).unique()
-            table.char('full_name', 64).nullable()
-            table.char('email', 128).unique()
+            table.string('username', 32).unique()
+            table.string('full_name', 64).nullable()
+            table.string('email', 128).unique()
             table.boolean('email_verified').default(False)
             table.boolean('subscribed').default(False)
-            table.char('password', 128)
-            table.boolean('reported').default(False)
+            table.string('password', 128)
+            table.integer('reported').default(0)
             table.boolean('spammer').default(False)
             table.datetime('created_at')
             table.datetime('updated_at')
-            table.char('preferred_sorting', 10).default('trending')
+            table.string('preferred_sorting', 10).default('trending')
             table.string('bio').nullable()
             table.string('url').nullable()
+            table.string('profile_pic').nullable()
             table.integer('feed_subs').default(0)
             # preferences
-            table.char('p_show_images', 1).default('y')
+            table.string('p_show_images', 1).default('y')
             table.integer('p_min_link_score').default(-3)
             # indexes
             table.index('username')
             table.index('email')
+
+    def __repr__(self):
+        return '<User %r>' % self.username
+
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+
+    def __eq__(self, other):
+        if not isinstance(other, User):
+            return False
+        return self.id == other.id
 
     @property
     def is_active(self):
@@ -55,11 +67,11 @@ class User(db.Model):
     def is_anonymous(self):
         return False
 
-    def __repr__(self):
-        return '<User %r>' % self.username
+    def set_password(self, password):
+        self.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-    def __init__(self, **kwargs):
-        super(User, self).__init__(**kwargs)
+    def check_password(self, password):
+        return bcrypt.checkpw(password, self.password)
 
     def get_id(self):
         return self.username
@@ -76,12 +88,6 @@ class User(db.Model):
     @login_manager.user_loader
     def load_user(session_id):
         return User.by_name(session_id)
-
-    def set_password(self, password):
-        self.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
-    def check_password(self, password):
-        return bcrypt.checkpw(password, self.password)
 
     @classmethod
     def _cache_prefix(cls):
@@ -109,9 +115,15 @@ class User(db.Model):
             return False
 
         self.feeds().attach(feed)
+        User.where('id', self.id).increment('feed_subs', 1) # todo update cache too
         cache.delete_memoized(self.subscribed_feed_ids)
         return True
 
+    def unsubscribe(self, feed):
+        self.feeds().detach(feed.id)
+        User.where('id', self.id).decrement('feed_subs', 1) # todo update cache too
+        cache.delete_memoized(self.subscribed_feed_ids)
+        return True
 
 
 class SignUpForm(Form):
