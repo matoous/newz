@@ -227,11 +227,17 @@ section {
 .links .link .bottom-line div {
   display: inline-block;
 }
-.links .link .bottom-line .author {
-  margin-left: 32px;
-}
-.links .link .bottom-line .author a {
+.links .link .bottom-line a {
   color: black;
+}
+.links .link .bottom-line .comments {
+  font-weight: bold;
+}
+.links .link .bottom-line .comments a {
+  color: #555;
+}
+.links .link .bottom-line .date {
+  margin-left: 32px;
 }
 .links h2 {
   margin: 0 0 6px 0;
@@ -241,4 +247,39 @@ section {
   font-family: 'DualisLite', sans-serif;
   font-weight: 300;
   letter-spacing: -1px;
+}
+.link-card .link-head {
+  max-width: 720px;
+}
+.link-card .link-feed {
+  margin-bottom: 8px;
+  border-left: 2px solid #555;
+  line-height: 1;
+}
+.link-card .link-feed a {
+  margin: 0 8px;
+  color: #555555;
+}
+.link-card .link-title {
+  font-weight: bold;
+  font-size: 46px;
+  margin-bottom: 12px;
+}
+.link-card .link-title a {
+  color: black;
+}
+.link-card .link-summary {
+  font-size: 20px;
+  margin: 20px 0 32px;
+}
+.link-card .link-info {
+  margin: 12px 0;
+  font-family: 'Roboto Condensed', sans-serif;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap-reverse;
+  justify-content: space-between;
+}
+.link-card .link-info div {
+  position: relative;
 }

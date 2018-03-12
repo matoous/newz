@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Home
+    {{ user.name }}
 {% endblock %}
 
 {% block body %}
@@ -9,16 +9,12 @@
     <div class="container">
         <div class="feed">
             <div class="feed-head">
-                <div class="feed-info">
-                    <h1>
-                        The Globalfeed
-                    </h1>
+                <div class="feed-logo">
+                    <img src="/static/images/testimg.png">
                 </div>
-            </div>
-            <div>
-                <a href="/all">Trending</a>
-                <a href="/my">My Feeds</a>
-                <a href="/f/world-news">World News</a>
+                <div class="feed-info">
+                    <h1>{{ user.name }}</h1>
+                </div>
             </div>
         </div>
         <div class="links">
@@ -44,14 +40,9 @@
                     </ul>
                 </div>
             </div>
-            {% for link in links %}
+            {% for link in user.links %}
             <div class="link">
                 <div class="link-body">
-                    <div class="link-feed">
-                        <a href="/f/{{link.feed.slug}}">
-                            {{ link.feed.name }}
-                        </a>
-                    </div>
                     <h2>
                         <a href="{{ link.url }}">
                             {{ link.title }}
@@ -61,14 +52,8 @@
                         {{link.summary}}
                     </div>
                     <div class="bottom-line">
-                        <div class="comments">
-                            <a href="/f/{{feed.slug}}/{{link.slug}}">{{ link.comments_count }} comments</a>
-                        </div>
                         <div class="date">
                             {{ link.time_ago() }}
-                        </div>
-                        <div class="author">
-                            by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
                         </div>
                     </div>
                 </div>

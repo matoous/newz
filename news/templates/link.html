@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ link.title }}
+{% endblock %}
+
+{% block body %}
+<section>
+    <div class="container">
+        <div class="link-card">
+            <div class="link-head">
+                <div class="link-feed">
+                    <a href="/f/{{ link.feed.slug }}">{{ link.feed.name }}</a>
+                </div>
+                <div class="link-title">
+                        <a href="{{link.url}}">
+                            {{ link.title }}
+                        </a>
+                </div>
+                <div class="link-summary">
+                    {{link.summary}}
+                </div>
+                <div class="link-info">
+                    <div class="rating">
+                        <a href="/l/{{ link.slug }}/vote/upvote">Upvote</a>
+                        {{ link.score() }}
+                        <a href="/l/{{ link.slug }}/vote/downvote">Downvote</a>
+                    </div>
+                    <div class="author">
+                        {{ link.time_ago() }} by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
+                        {% if link.user.profile_pic %}
+                        <img src="{{ link.user.profile_pic }}" class="profile-pic-small">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="link-comments">
+                <form method="post" action="/l/{{ link.slug }}/comment">
+                    <textarea rows="6" cols="60" name="comment"></textarea>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

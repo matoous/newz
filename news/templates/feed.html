@@ -65,11 +65,14 @@
                         {{link.summary}}
                     </div>
                     <div class="bottom-line">
+                        <div class="comments">
+                            <a href="/f/{{feed.slug}}/{{link.slug}}">{{ link.comments_count }} comments</a>
+                        </div>
                         <div class="date">
                             {{ link.time_ago() }}
                         </div>
                         <div class="author">
-                            by <a href="/u/">{{ link.user.name() }}</a>
+                            by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
                         </div>
                     </div>
                 </div>
@@ -86,7 +89,7 @@
                         {% endif %}
                     </div>
                     <div class="score">
-                        {{link.score()}}
+                        {{ link.score() }}
                     </div>
                     <div class="down">
                         {% if link.votes|length > 0 %}

@@ -278,11 +278,19 @@ section {
         display: inline-block;
       }
 
-      .author {
-        margin-left: 32px;
+      a {
+        color: black;
+      }
+
+      .comments {
+        font-weight: bold;
         a {
-          color: black;
+        color: #555;
         }
+      }
+
+      .date {
+        margin-left: 32px;
       }
     }
   }
@@ -293,6 +301,45 @@ section {
       font-family: 'DualisLite', sans-serif;
       font-weight: 300;
       letter-spacing: -1px;
+    }
+  }
+}
+
+.link-card {
+  .link-head {
+    max-width: 720px;
+  }
+  .link-feed {
+    margin-bottom: 8px;
+    border-left: 2px solid #555;
+    line-height: 1;
+    a {
+      margin: 0 8px;
+      color: #555555;
+    }
+  }
+  .link-title {
+    font-weight: bold;
+    font-size: 46px;
+    margin-bottom: 12px;
+    a {
+      color: black;
+    }
+  }
+  .link-summary {
+    font-size: 20px;
+    margin: 20px 0 32px;
+  }
+  .link-info {
+    margin: 12px 0;
+    font-family: 'Roboto Condensed', sans-serif;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+    justify-content: space-between;
+
+    div {
+      position: relative;
     }
   }
 }

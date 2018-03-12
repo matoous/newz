@@ -1,9 +1,10 @@
 from flask import Blueprint, redirect, render_template, Response, request, abort
 from flask_login import login_required, current_user
 
+from news.lib.sorts import trending_links
 from news.models.feed import FeedForm, Feed
 from news.models.link import LinkForm, Link
-from news.models.vote import Vote, VoteType
+from news.models.vote import Vote, vote_type_from_string
 
 feed_blueprint = Blueprint('feed', __name__, template_folder='/templates')
 
@@ -28,6 +29,7 @@ def get_feed(slug=None):
     if feed is None:
         abort(404)
 
+    feed.links = trending_links([feed.id])
     return render_template("feed.html", feed=feed)
 
 
@@ -43,6 +45,7 @@ def add_link(slug=None):
         if form.validate(feed, current_user):
             link = form.link
             link.save()
+
             return redirect('/f/{feed}'.format(feed=feed.slug))
 
     return render_template("new_link.html", form=form, feed=feed)
@@ -52,7 +55,7 @@ def add_link(slug=None):
 @login_required
 def do_vote(link=None, vote_str=None):
     link = Link.where('slug', link).first()
-    vote = VoteType.from_string(vote_str)
+    vote = vote_type_from_string(vote_str)
     if link is None or vote is None:
         abort(404)
 
@@ -84,3 +87,16 @@ def unsubscribe(slug=None):
 
     current_user.unsubscribe(feed)
     return "Unsubscribed"
+
+
+@feed_blueprint.route("/f/<path:feed_slug>/<link_slug>")
+def link_view(feed_slug=None, link_slug=None):
+    feed = Feed.where('slug', feed_slug).first()
+    if feed is None or link_slug is None:
+        abort(404)
+
+    link = Link.where('slug', link_slug).first()
+    if link is None:
+        abort(404)
+
+    return render_template('link.html', link=link, feed=feed)

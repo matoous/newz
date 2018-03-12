@@ -7,27 +7,25 @@ from news.models.link import Link
 from news.models.user import User
 
 
-class VoteType(IntEnum):
-    UPVOTE = 1
-    UNVOTE = 0
-    DOWNVOTE = -1
+UPVOTE = 1
+UNVOTE = 0
+DOWNVOTE = -1
 
-    @classmethod
-    def from_string(cls, str):
-        str = str.upper()
-        if str == 'UPVOTE':
-            return VoteType.UPVOTE
-        if str == "DOWNVOTE":
-            return VoteType.DOWNVOTE
-        if str == "UNVOTE":
-            return VoteType.UNVOTE
-        return None
+
+def vote_type_from_string(str):
+    str = str.upper()
+    if str == "UPVOTE":
+        return 1
+    if str == "DOWNVOTE":
+        return -1
+    return 0
 
 
 class Vote(db.Model):
     __table__ = 'votes'
     __fillable__ = ['vote_type', 'user_id', 'link_id']
     __timestamps__ = False
+    __incrementing__ = False
 
     @classmethod
     def create_table(cls):
@@ -57,10 +55,10 @@ class Vote(db.Model):
         return "{}_{}".format(self.user_id, self.link_id)
 
     def is_downvote(self):
-        return self.vote_type == VoteType.DOWNVOTE
+        return self.vote_type == -1
 
     def is_upvote(self):
-        return self.vote_type == VoteType.UPVOTE
+        return self.vote_type == 1
 
     def affected_attribute(self):
         if self.is_downvote():

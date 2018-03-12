@@ -20,8 +20,28 @@ def hot(score, date):
 def trending_links(ids):
     all_links = []
     for lid in ids:
-        all_links.extend(Link.get_by_feed_id(lid, 'trending', 'day'))
+        all_links.extend(Link.get_by_feed_id(lid, 'trending', 'all'))
 
     links = sorted(all_links, key=lambda x: hot(x.score(), x.created_at), reverse=True)
+
+    return links
+
+
+def new_links(ids):
+    all_links = []
+    for lid in ids:
+        all_links.extend(Link.get_by_feed_id(lid, 'new', 'all'))
+
+    links = sorted(all_links, key=lambda x: x.created_at)
+
+    return links
+
+
+def best_links(ids):
+    all_links = []
+    for lid in ids:
+        all_links.extend(Link.get_by_feed_id(lid, 'best', 'all'))
+
+    links = sorted(all_links, key=lambda x: x.score(), reverse=True)
 
     return links

@@ -14,7 +14,7 @@ from news.models.report import Report
 class Link(db.Model):
     __table__ = 'links'
     __fillable__ = ['title', 'slug', 'summary', 'user_id','url','feed_id']
-    __guarded__ = ['id', 'reported','spam','archived','ups','downs']
+    __guarded__ = ['id', 'reported','spam','archived','ups','downs','comments_count']
 
     @classmethod
     def create_table(cls):
@@ -33,6 +33,7 @@ class Link(db.Model):
             table.foreign('feed_id').references('id').on('feeds')
             table.integer('ups').default(0)
             table.integer('downs').default(0)
+            table.integer('comments_count').default(0)
             table.boolean('archived').default(False)
             table.integer('reported').default(0)
             table.boolean('spam').default(False)

@@ -1,7 +1,7 @@
 import bcrypt
 from flask_login import current_user
 from flask_wtf import Form
-from orator.orm import belongs_to_many
+from orator.orm import belongs_to_many, has_many
 from wtforms import StringField, PasswordField, SelectField, IntegerField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
@@ -67,6 +67,12 @@ class User(db.Model):
     def is_anonymous(self):
         return False
 
+    @property
+    def name(self):
+        if self.full_name is not None:
+            return self.full_name
+        return self.username
+
     def set_password(self, password):
         self.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
@@ -81,7 +87,7 @@ class User(db.Model):
     def by_name(cls, name):
         user = User.where('username', name).first()
         if user is not None:
-            user.password = ''  #  don't save password in cache
+            user.password = ''  # don't save password in cache
         return user
 
     @staticmethod
@@ -98,6 +104,11 @@ class User(db.Model):
         from news.models.feed import Feed
         return Feed
 
+    @has_many
+    def links(self):
+        from news.models.link import Link
+        return Link
+
     @cache.memoize()
     def subscribed_feed_ids(self):
         return [feed.id for feed in self.feeds]
@@ -105,25 +116,24 @@ class User(db.Model):
     def subscribed_to(self, feed):
         return feed.id in self.subscribed_feed_ids()
 
-    def name(self):
-        if self.full_name is not None:
-            return self.full_name
-        return self.username
-
     def subscribe(self, feed):
         if self.feed_subs >= 50:  # todo move to config, allow paying users to subscribe to more
             return False
 
         self.feeds().attach(feed)
-        User.where('id', self.id).increment('feed_subs', 1) # todo update cache too
+        User.where('id', self.id).increment('feed_subs', 1)  # todo update cache too
         cache.delete_memoized(self.subscribed_feed_ids)
         return True
 
     def unsubscribe(self, feed):
         self.feeds().detach(feed.id)
-        User.where('id', self.id).decrement('feed_subs', 1) # todo update cache too
+        User.where('id', self.id).decrement('feed_subs', 1)  # todo update cache too
         cache.delete_memoized(self.subscribed_feed_ids)
         return True
+
+    @classmethod
+    def by_username(cls, username):
+        return User.where('username', username).first()
 
 
 class SignUpForm(Form):
