@@ -11,7 +11,7 @@ from news.lib.utils.time_utils import time_ago
 class Link(db.Model):
     __table__ = 'links'
     __fillable__ = ['title', 'slug', 'summary', 'user_id','url','feed_id']
-    __guarded__ = ['id', 'reported','spam','archived','score']
+    __guarded__ = ['id', 'reported','spam','archived','ups','downs']
 
     @classmethod
     def create_table(cls):
@@ -28,9 +28,10 @@ class Link(db.Model):
             table.foreign('user_id').references('id').on('users')
             table.big_integer('feed_id')
             table.foreign('feed_id').references('id').on('feeds')
-            table.integer('score').default(0)
+            table.integer('ups').default(0)
+            table.integer('downs').default(0)
             table.boolean('archived').default(False)
-            table.boolean('reported').default(False)
+            table.integer('reported').default(0)
             table.boolean('spam').default(False)
 
     @belongs_to
@@ -54,6 +55,9 @@ class Link(db.Model):
 
     def time_ago(self):
         return time_ago(self.created_at)
+
+    def score(self):
+        return self.ups - self.downs
 
 
 class LinkForm(Form):

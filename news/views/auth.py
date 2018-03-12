@@ -9,7 +9,7 @@ from news.models.user import SignUpForm, LoginForm
 auth = Blueprint('auth', __name__, template_folder=Path(os.path.dirname(os.path.realpath(__file__))).parent.__str__() + "/templates")
 
 
-@auth.route("/signup", methods=['GET', 'POST'])
+@auth.route("/join", methods=['GET', 'POST'])
 def signup():
     form = SignUpForm()
     if form.validate():

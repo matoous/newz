@@ -1,9 +1,9 @@
-from flask import Blueprint, redirect, render_template, Response, request
+from flask import Blueprint, redirect, render_template, Response, request, abort
 from flask_login import login_required, current_user
 
 from news.models.feed import FeedForm, Feed
 from news.models.link import LinkForm, Link
-from news.models.vote import Vote
+from news.models.vote import Vote, VoteType
 
 feed_blueprint = Blueprint('feed', __name__, template_folder='/templates')
 
@@ -19,69 +19,57 @@ def new_feed():
     return render_template("new_feed.html", form=form)
 
 
-@feed_blueprint.route("/f/<path:slug>")
+@feed_blueprint.route("/f/<slug>")
 def get_feed(slug=None):
     if slug is None:
-        return Response("Feed not found", status=404)
-    else:
-        feed = Feed.by_slug(slug)
-        if feed is None:
-            return Response("Feed not found", status=404)
-        return render_template("feed.html", feed=feed)
+        abort(404)
+
+    feed = Feed.by_slug(slug)
+    if feed is None:
+        abort(404)
+
+    return render_template("feed.html", feed=feed)
 
 
 @feed_blueprint.route("/f/<path:slug>/add", methods=['POST', 'GET'])
 @login_required
 def add_link(slug=None):
-    form = LinkForm()
     feed = Feed.where('slug', slug).first()
     if feed is None:
-        return Response("Feed not found", status=404)
+        abort(404)
+
+    form = LinkForm()
     if request.method == 'POST':
         if form.validate(feed, current_user):
             link = form.link
             link.save()
             return redirect('/f/{feed}'.format(feed=feed.slug))
+
     return render_template("new_link.html", form=form, feed=feed)
 
 
-@feed_blueprint.route("/f/<path:slug>/<path:link>/upvote")
+@feed_blueprint.route("/l/<link>/vote/<vote_str>")
 @login_required
-def upvote(slug=None, link=None):
-    feed = Feed.where('slug', slug).first()
-    if feed is None:
-        return Response("Not found", status=404)
+def do_vote(link=None, vote_str=None):
     link = Link.where('slug', link).first()
-    if link is None:
-        return Response("Not found", status=404)
-    vote = Vote(user_id=current_user.id, link_id=link.id, vote_type=1)
+    vote = VoteType.from_string(vote_str)
+    if link is None or vote is None:
+        abort(404)
+
+    vote = Vote(user_id=current_user.id, link_id=link.id, vote_type=vote)
     vote.apply()
-    return redirect('/f/{feed}'.format(feed=feed.slug))
+
+    return "voted"
 
 
-@feed_blueprint.route("/f/<path:slug>/<path:link>/downvote")
+@feed_blueprint.route("/f/<path:slug>/subscribe")
 @login_required
-def downvote(slug=None, link=None):
+def subscribe(slug=None):
     feed = Feed.where('slug', slug).first()
     if feed is None:
-        return Response("Not found", status=404)
-    link = Link.where('slug', link).first()
-    if link is None:
-        return Response("Not found", status=404)
-    vote = Vote(user_id=current_user.id, link_id=link.id, vote_type=-1)
-    vote.apply()
-    return redirect('/f/{feed}'.format(feed=feed.slug))
+        abort(404)
 
-
-@feed_blueprint.route("/f/<path:slug>/<path:link>/unvote")
-@login_required
-def unvote(slug=None, link=None):
-    feed = Feed.where('slug', slug).first()
-    if feed is None:
-        return Response("Not found", status=404)
-    link = Link.where('slug', link).first()
-    if link is None:
-        return Response("Not found", status=404)
-    vote = Vote(user_id=current_user.id, link_id=link.id)
-    vote.unvote()
-    return redirect('/f/{feed}'.format(feed=feed.slug))
+    subscribed = current_user.subscribe(feed)
+    if not subscribed:
+        return "Subscribe NOT OK"
+    return "Subscribed"

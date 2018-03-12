@@ -1,6 +1,8 @@
 import bcrypt
+from flask_login import current_user
 from flask_wtf import Form
-from wtforms import StringField, PasswordField
+from orator.orm import belongs_to_many
+from wtforms import StringField, PasswordField, SelectField, IntegerField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 
@@ -11,8 +13,9 @@ from news.lib.db.db import db, schema
 
 class User(db.Model):
     __table__ = 'users'
-    __fillable__ = ['username', 'full_name', 'email', 'email_verified', 'subscribed']
-    __guarded__ = ['id', 'password','reported','spammer']
+    __fillable__ = ['username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sorting', 'bio', 'url',
+                    'p_show_images', 'p_min_link_score']
+    __guarded__ = ['id', 'password', 'reported', 'spammer']
 
     @classmethod
     def create_table(cls):
@@ -29,6 +32,14 @@ class User(db.Model):
             table.boolean('spammer').default(False)
             table.datetime('created_at')
             table.datetime('updated_at')
+            table.char('preferred_sorting', 10).default('trending')
+            table.string('bio').nullable()
+            table.string('url').nullable()
+            table.integer('feed_subs').default(0)
+            # preferences
+            table.char('p_show_images', 1).default('y')
+            table.integer('p_min_link_score').default(-3)
+            # indexes
             table.index('username')
             table.index('email')
 
@@ -56,7 +67,10 @@ class User(db.Model):
     @classmethod
     @cache.memoize()
     def by_name(cls, name):
-        return User.where('username', name).first()
+        user = User.where('username', name).first()
+        if user is not None:
+            user.password = ''  #  don't save password in cache
+        return user
 
     @staticmethod
     @login_manager.user_loader
@@ -73,10 +87,31 @@ class User(db.Model):
     def _cache_prefix(cls):
         return "u:"
 
+    @belongs_to_many('feeds_users')
+    def feeds(self):
+        from news.models.feed import Feed
+        return Feed
+
+    @cache.memoize()
+    def subscribed_feed_ids(self):
+        return [feed.id for feed in self.feeds]
+
+    def subscribed_to(self, feed):
+        return feed.id in self.subscribed_feed_ids()
+
     def name(self):
         if self.full_name is not None:
             return self.full_name
         return self.username
+
+    def subscribe(self, feed):
+        if self.feed_subs >= 50:  # todo move to config, allow paying users to subscribe to more
+            return False
+
+        self.feeds().attach(feed)
+        cache.delete_memoized(self.subscribed_feed_ids)
+        return True
+
 
 
 class SignUpForm(Form):
@@ -133,4 +168,21 @@ class LoginForm(Form):
         if self.user is None:
             self.errors['general'] = "Invalid username or password"
             return False
+        return True
+
+
+class SettingsForm(Form):
+    show_images = SelectField('Show Images', choices=[('y', 'Always'), ('m', 'Homepage only'), ('n', 'Never')])
+    min_link_score = IntegerField('Minimal link score')
+
+    def __init__(self, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        self.user = None
+
+    def validate(self):
+        changes = {}
+        if self.show_images.data != current_user.p_show_images:
+            changes['p_show_images'] = self.show_images.data
+        if self.min_link_score != current_user.p_min_link_score:
+            changes['p_min_link_score'] = self.min_link_score.data
         return True

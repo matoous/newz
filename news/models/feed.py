@@ -1,6 +1,6 @@
 from flask_login import current_user
 from flask_wtf import Form
-from orator.orm import has_many
+from orator.orm import has_many, belongs_to_many
 from slugify import slugify
 
 from wtforms import StringField
@@ -39,13 +39,18 @@ class Feed(db.Model):
         return Link
 
     @classmethod
-    def by_slug(cls, slug, sorting='hot'):
-        feed = Feed.where('slug',slug).with_({
-                    'links': Link.with_({
-                        'votes': Vote.query().where('user_id', current_user.id)
-                    }).order_by('created_at','desc').limit(10)
-                }).first()
-        feed.links = sorted(feed.links, key=lambda x: hot(x.score, x.created_at), reverse=True)
+    def by_slug(cls, slug, sorting='trending'):
+        if current_user.is_authenticated:
+            votes_query = {'votes': Vote.query().where('user_id', current_user.id)}
+            feed = Feed.where('slug', slug).with_({
+                'links': Link.with_(votes_query).order_by('created_at', 'desc').limit(10)
+            }).first()
+        else:
+            feed = Feed.where('slug', slug).with_({
+                'links': Link.order_by('created_at', 'desc').limit(10)
+            }).first()
+
+        feed.links = sorted(feed.links, key=lambda x: hot(x.score(), x.created_at), reverse=True)
         return feed
 
     @property
@@ -55,6 +60,15 @@ class Feed(db.Model):
     @classmethod
     def _cache_prefix(cls):
         return "f:"
+
+    @classmethod
+    def _by_id(cls, id):
+        return Feed.where('id', id).first()
+
+    @belongs_to_many('feeds_users')
+    def users(self):
+        from news.models.user import User
+        return User
 
 
 class FeedForm(Form):
