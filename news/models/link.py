@@ -4,9 +4,11 @@ from slugify import slugify
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length, URL
 
+from news.lib.adding import add_to_queries
 from news.lib.cache import cache
 from news.lib.db.db import db, schema
-from news.lib.db.time_filters import time_filters
+from news.lib.db.sorts import sorts
+from news.lib.queue import q
 from news.lib.utils.time_utils import time_ago
 from news.models.report import Report
 
@@ -38,6 +40,14 @@ class Link(db.Model):
             table.integer('reported').default(0)
             table.boolean('spam').default(False)
 
+    def __eq__(self, other):
+        if not isinstance(other, Link):
+            return False
+        return other.id == self.id
+
+    def __repr__(self):
+        return '<Link {}>'.format(self.id)
+
     @belongs_to
     def feed(self):
         from news.models.feed import Feed
@@ -53,6 +63,10 @@ class Link(db.Model):
         from news.models.vote import Vote
         return Vote
 
+    @property
+    def num_votes(self):
+        return self.ups + self.downs
+
     @morph_many('reportable')
     def reports(self):
         return Report
@@ -62,33 +76,42 @@ class Link(db.Model):
         return "l:"
 
     @classmethod
-    def by_feed(cls, feed, sort, time):
-        return Link.get_by_feed_id(feed.id, sort, time)
+    def by_feed(cls, feed, sort):
+        return Link.get_by_feed_id(feed.id, sort)
 
     @classmethod
-    @cache.memoize()
-    def get_by_feed_id(cls, feed_id, sort, time='all'):
+    def get_by_feed_id(cls, feed_id, sort):
         """
         Get's links by feed id and caches the result for future use
         :param feed_id: feed_id
         :param sort: sorting type: trending/new/best
-        :param time: time filtering: day/week/month/year/all
         :return: list of links
         """
-        q = Link.where('feed_id', feed_id)
+        cache_key = 'fs:{}.{}'.format(feed_id.to_bytes(8, 'big'), sort)
 
-        if time != 'all':
-            q.where_raw(time_filters[time])
+        r = cache.get(cache_key)
+        if r is not None:
+            return r
+
+        # todo get links sorted from DB
+        q = Link.where('feed_id', feed_id).order_by_raw(sorts[sort])
 
         # cache needs array of objects, not a orator collection
         res = [f for f in q.limit(1000).get()]
+        cache.set(cache_key, res)
         return res
 
     def time_ago(self):
         return time_ago(self.created_at)
 
+    @property
     def score(self):
         return self.ups - self.downs
+
+    def commit(self):
+        self.save()
+        self.ups = self.downs = 0
+        q.enqueue(add_to_queries, self, result_ttl=0)
 
 
 class LinkForm(Form):

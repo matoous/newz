@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, Response, request, abort
 from flask_login import login_required, current_user
 
-from news.lib.sorts import trending_links
+from news.lib.normalized_trending import trending_links
 from news.models.feed import FeedForm, Feed
 from news.models.link import LinkForm, Link
 from news.models.vote import Vote, vote_type_from_string
@@ -44,7 +44,7 @@ def add_link(slug=None):
     if request.method == 'POST':
         if form.validate(feed, current_user):
             link = form.link
-            link.save()
+            link.commit()
 
             return redirect('/f/{feed}'.format(feed=feed.slug))
 

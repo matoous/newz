@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 
-from news.lib.sorts import trending_links
+from news.lib.normalized_trending import trending_links
 from news.models.link import Link
 
 web = Blueprint('web', __name__, template_folder='/templates')

@@ -62,7 +62,7 @@
                     </div>
                     <div class="bottom-line">
                         <div class="comments">
-                            <a href="/f/{{feed.slug}}/{{link.slug}}">{{ link.comments_count }} comments</a>
+                            <a href="/f/todo/{{link.slug}}">{{ link.comments_count }} comments</a>
                         </div>
                         <div class="date">
                             {{ link.time_ago() }}
@@ -75,7 +75,7 @@
                 <div class="link-rating">
                     <div class="up">
                         {% if link.votes|length > 0 %}
-                            {% if link.votes[0].is_upvote() %}
+                            {% if link.votes[0].is_upvote %}
                             <a href="/l/{{link.slug}}/vote/unvote">Up</a>
                             {% else %}
                             <a href="/l/{{link.slug}}/vote/upvote">Up</a>
@@ -85,11 +85,11 @@
                         {% endif %}
                     </div>
                     <div class="score">
-                        {{link.score()}}
+                        {{ link.score }}
                     </div>
                     <div class="down">
                         {% if link.votes|length > 0 %}
-                            {% if link.votes[0].is_downvote() %}
+                            {% if link.votes[0].is_downvote %}
                             <a href="/l/{{link.slug}}/vote/unvote">Down</a>
                             {% else %}
                             <a href="/l/{{link.slug}}/vote/downvote">Down</a>

@@ -10,6 +10,8 @@ from news.lib.cache import cache
 from news.lib.login import login_manager
 from news.lib.db.db import db, schema
 
+MAX_SUBSCRIPTIONS_FREE = 50
+
 
 class User(db.Model):
     __table__ = 'users'
@@ -117,7 +119,7 @@ class User(db.Model):
         return feed.id in self.subscribed_feed_ids()
 
     def subscribe(self, feed):
-        if self.feed_subs >= 50:  # todo move to config, allow paying users to subscribe to more
+        if self.feed_subs >= MAX_SUBSCRIPTIONS_FREE:
             return False
 
         self.feeds().attach(feed)

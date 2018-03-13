@@ -38,17 +38,17 @@ class Feed(db.Model):
     def links(self):
         return Link
 
-    def links_query(self, sort='trending', time='day'):
-        return Link.by_feed(self, sort, time)
+    @property
+    def b_id(self):
+        return self.id.to_bytes(8, 'big')
+
+    def links_query(self, sort='trending'):
+        return Link.by_feed(self, sort)
 
     @classmethod
-    def by_slug(cls, slug, sort='trending'):
+    def by_slug(cls, slug):
         feed = Feed.where('slug', slug).first()
         return feed
-        #votes_query = {'votes': Vote.query().where('user_id', current_user.id)}
-        #feed = Feed.where('slug', slug).with_({
-        #    'links': Link.with_(votes_query).order_by('created_at', 'desc').limit(10)
-        #}).first()
 
     @property
     def path(self):
