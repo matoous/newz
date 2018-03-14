@@ -34,9 +34,9 @@ class Vote(Model):
     def create_table(cls):
         schema.drop_if_exists('votes')
         with schema.create('votes') as table:
-            table.big_integer('user_id')
+            table.integer('user_id').unsigned()
             table.foreign('user_id').references('id').on('users').on_delete('cascade')
-            table.big_integer('link_id')
+            table.big_integer('link_id').unsigned()
             table.foreign('link_id').references('id').on('links')
             table.integer('vote_type')
             table.primary(['user_id', 'link_id'])
@@ -83,7 +83,6 @@ class Vote(Model):
         cache.set(cache_key, v)
         return v
 
-
     def apply(self):
         previous_vote = Vote.where('user_id', self.user_id).where('link_id', self.link_id).first()
 
@@ -98,5 +97,6 @@ class Vote(Model):
         else:
             Vote.where('user_id', self.user_id).where('link_id', self.link_id).update({'vote_type': self.vote_type})
 
+        # todo update link in redis, so user can see if he downvoted or upvoted
         if self.link.num_votes < 20 or self.link.num_votes % 8 == 0:
             q.enqueue(update_link, self.link, result_ttl=0)

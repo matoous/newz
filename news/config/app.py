@@ -11,6 +11,7 @@ from news.models.subscriptions import create_subscriptions_table
 from news.models.token import DisposableToken
 from news.models.user import User
 from news.models.vote import Vote
+from news.scripts.create_default_feeds import create_default_feeds
 from news.views.auth import auth
 from news.views.feed import feed_blueprint
 from news.views.settings import settings
@@ -55,5 +56,6 @@ def make_app():
         #Link.create_table()
         #Vote.create_table()
         #create_subscriptions_table()
+        #create_default_feeds()
         pass
     return app

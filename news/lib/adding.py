@@ -8,6 +8,8 @@ from news.lib.sorts import default_sorts
 @job('medium', connection=redis_conn)
 def add_to_queries(link):
     # for 'new' all we need is to prepend
+    if len(link.summary) > 300:
+        link.summary = link.summary[:300] + '...'
     cache_key = 'fs:{}.{}'.format(link.feed_id.to_bytes(8, 'big'), 'new')
     data = cache.get(cache_key)
     if data is not None:

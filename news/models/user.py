@@ -26,7 +26,7 @@ class User(Model):
     def create_table(cls):
         schema.drop_if_exists('users')
         with schema.create('users') as table:
-            table.big_increments('id')
+            table.increments('id').unsigned()
             table.string('username', 32).unique()
             table.string('full_name', 64).nullable()
             table.string('email', 128).unique()

@@ -143,8 +143,8 @@ section {
   color: #fff;
 }
 .t-nav .menu-section .user {
-  min-height: 64px;
   margin-bottom: 12px;
+  font-weight: 400;
 }
 .t-nav .menu-section .user .profile-pic {
   float: left;

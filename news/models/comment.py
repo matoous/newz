@@ -11,17 +11,22 @@ from news.models.report import Report
 class Comment(Model):
     __table__ = 'comments'
     __fillable__ = ['parent_id', 'text', 'user_id', 'link_id']
-    __guarded__ = ['id', 'reported', 'spam', 'archived', 'ups', 'downs']
+    __guarded__ = ['id', 'reported', 'spam', 'ups', 'downs']
     __hidden__ = ['reported', 'spam']
 
     @classmethod
     def create_table(cls):
         schema.drop_if_exists('links')
         with schema.create('links') as table:
-            table.big_increments('id')
-            table.string('title', 128)
-            table.string('slug', 150).unique()
-            table.string('summary', 256)
+            table.big_increments('id').unsigned()
+            table.big_integer('parent_id').unsigned().nullable()
+            table.text('text')
+            table.integer('user_id').unsigned()
+            table.integer('link_id').unsigned()
+            table.integer('reported').default(0)
+            table.boolean('spam').default(False)
+            table.integer('ups').default(0)
+            table.integer('downs').default(0)
 
     def __eq__(self, other):
         if not isinstance(other, Comment):

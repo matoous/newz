@@ -24,7 +24,7 @@ class Feed(Model):
     def create_table(cls):
         schema.drop_if_exists('feeds')
         with schema.create('feeds') as table:
-            table.big_increments('id')
+            table.increments('id').unsigned()
             table.string('name', 64)
             table.string('slug', 80).unique()
             table.string('description').nullable()

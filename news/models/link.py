@@ -24,16 +24,16 @@ class Link(Model):
     def create_table(cls):
         schema.drop_if_exists('links')
         with schema.create('links') as table:
-            table.big_increments('id')
+            table.big_increments('id').unsigned()
             table.string('title', 128)
             table.string('slug', 150).unique()
-            table.string('summary', 256)
-            table.string('url', 128)
-            table.big_integer('user_id')
+            table.text('summary')
+            table.text('url')
+            table.integer('user_id').unsigned()
             table.datetime('created_at')
             table.datetime('updated_at')
             table.foreign('user_id').references('id').on('users')
-            table.big_integer('feed_id')
+            table.integer('feed_id').unsigned()
             table.foreign('feed_id').references('id').on('feeds')
             table.integer('ups').default(0)
             table.integer('downs').default(0)
@@ -101,11 +101,13 @@ class Link(Model):
         if r is not None:
             return r
 
-        # todo get links sorted from DB
         q = Link.where('feed_id', feed_id).order_by_raw(sorts[sort])
 
         # cache needs array of objects, not a orator collection
         res = [f for f in q.limit(1000).get()]
+        for l in res:
+            if len(l.summary) > 300:
+                l.summary = l.summary[:300] + '...'
         cache.set(cache_key, res)
         return res
 
@@ -124,8 +126,8 @@ class Link(Model):
 
 class LinkForm(Form):
     title = StringField('Title', [DataRequired(), Length(max=128, min=6)])
-    summary = StringField('Summary')
-    url = StringField('Url', [DataRequired(), URL()])
+    summary = StringField('Summary', [Length(max=8192)])
+    url = StringField('Url', [DataRequired(), URL(), Length(max=256)])
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
