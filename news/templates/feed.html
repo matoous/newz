@@ -20,10 +20,10 @@
                         {% else %}
                         <a href="/f/{{feed.slug}}/subscribe">Subscribe</a>
                         {% endif %}
-                        <div class="feed-description">
-                            {{ feed.description }}
-                        </div>
                     {% endif %}
+                    <div class="feed-description">
+                        {{ feed.description }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -54,56 +54,9 @@
                 </div>
             </div>
             {% for link in feed.links %}
-            <div class="link">
-                <div class="link-body">
-                    <h2>
-                        <a href="{{ link.url }}">
-                            {{ link.title }}
-                        </a>
-                    </h2>
-                    <div>
-                        {{link.summary}}
-                    </div>
-                    <div class="bottom-line">
-                        <div class="comments">
-                            <a href="/f/{{feed.slug}}/{{link.slug}}">{{ link.comments_count }} comments</a>
-                        </div>
-                        <div class="date">
-                            {{ link.time_ago() }}
-                        </div>
-                        <div class="author">
-                            by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="link-rating">
-                    <div class="up">
-                        {% if link.votes|length > 0 %}
-                            {% if link.votes[0].is_upvote %}
-                            <a href="/l/{{link.slug}}/vote/unvote">Up</a>
-                            {% else %}
-                            <a href="/l/{{link.slug}}/vote/upvote">Up</a>
-                            {% endif %}
-                        {% else %}
-                            <a href="/l/{{link.slug}}/vote/upvote">Up</a>
-                        {% endif %}
-                    </div>
-                    <div class="score">
-                        {{ link.score }}
-                    </div>
-                    <div class="down">
-                        {% if link.votes|length > 0 %}
-                            {% if link.votes[0].is_downvote %}
-                            <a href="/l/{{link.slug}}/vote/unvote">Down</a>
-                            {% else %}
-                            <a href="/l/{{link.slug}}/vote/downvote">Down</a>
-                            {% endif %}
-                        {% else %}
-                            <a href="/l/{{link.slug}}/vote/downvote">Down</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+                {% with link=link %}
+                    {% include 'link_listing.html' %}
+                {% endwith %}
             {% endfor %}
             </div>
     </div>

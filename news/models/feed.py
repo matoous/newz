@@ -1,21 +1,24 @@
 from flask_login import current_user
 from flask_wtf import Form
+from orator import Model
 from orator.orm import has_many, belongs_to_many
 from slugify import slugify
 
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length, URL
 
+from news.lib.cache import cache
 from news.lib.db.db import db, schema
 from news.lib.sorts import hot
 from news.models.link import Link
 from news.models.vote import Vote
 
 
-class Feed(db.Model):
+class Feed(Model):
     __table__ = 'feeds'
-    __fillable__ = ['name', 'slug', 'description', 'default_sorting', 'lang','over_18','logo']
+    __fillable__ = ['name', 'slug', 'description', 'default_sort', 'lang','over_18','logo']
     __guarded__ = ['id','reported']
+    __hidden__ = ['reported']
 
     @classmethod
     def create_table(cls):
@@ -25,7 +28,7 @@ class Feed(db.Model):
             table.string('name', 64)
             table.string('slug', 80).unique()
             table.string('description').nullable()
-            table.string('default_sorting', 12).default('new')
+            table.string('default_sort', 12).default('trending')
             table.datetime('created_at')
             table.datetime('updated_at')
             table.string('lang', 12).default('en')
@@ -33,10 +36,6 @@ class Feed(db.Model):
             table.string('logo', 128).nullable()
             table.boolean('reported').default(False)
             table.index('slug')
-
-    @has_many
-    def links(self):
-        return Link
 
     @property
     def b_id(self):
@@ -49,6 +48,15 @@ class Feed(db.Model):
     def by_slug(cls, slug):
         feed = Feed.where('slug', slug).first()
         return feed
+
+    @classmethod
+    def by_id(cls, id):
+        f = cache.get('f:{}'.format(id))
+        if f is not None:
+            return f
+        f = Feed.where('id', id).first()
+        cache.set('f:{}'.format(id), f)
+        return f
 
     @property
     def path(self):

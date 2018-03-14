@@ -1,6 +1,7 @@
 import bcrypt
-from flask_login import current_user
+from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
+from orator import Model
 from orator.orm import belongs_to_many, has_many
 from wtforms import StringField, PasswordField, SelectField, IntegerField
 from wtforms.fields.html5 import EmailField
@@ -9,15 +10,17 @@ from wtforms.validators import DataRequired
 from news.lib.cache import cache
 from news.lib.login import login_manager
 from news.lib.db.db import db, schema
+from news.models.token import DisposableToken
 
 MAX_SUBSCRIPTIONS_FREE = 50
 
 
-class User(db.Model):
+class User(Model):
     __table__ = 'users'
-    __fillable__ = ['username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sorting', 'bio', 'url',
+    __fillable__ = ['username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sort', 'bio', 'url',
                     'profile_pic', 'p_show_images', 'p_min_link_score']
     __guarded__ = ['id', 'password', 'reported', 'spammer']
+    __hidden__ = ['password', 'reported', 'spammer', 'email_verified']
 
     @classmethod
     def create_table(cls):
@@ -34,7 +37,7 @@ class User(db.Model):
             table.boolean('spammer').default(False)
             table.datetime('created_at')
             table.datetime('updated_at')
-            table.string('preferred_sorting', 10).default('trending')
+            table.string('preferred_sort', 10).default('trending')
             table.string('bio').nullable()
             table.string('url').nullable()
             table.string('profile_pic').nullable()
@@ -82,20 +85,35 @@ class User(db.Model):
         return bcrypt.checkpw(password, self.password)
 
     def get_id(self):
-        return self.username
+        if self.session_token is not None:
+            return self.session_token
+        return ''
 
-    @classmethod
-    @cache.memoize()
-    def by_name(cls, name):
-        user = User.where('username', name).first()
-        if user is not None:
-            user.password = ''  # don't save password in cache
-        return user
+    def login(self):
+        token = DisposableToken.get()
+        self.session_token = token.id
+        cache.set('us:{}'.format(self.session_token), self)
+        login_user(self)
+
+    def logout(self):
+        cache.delete('us:{}'.format(self.session_token))
+        logout_user()
 
     @staticmethod
     @login_manager.user_loader
     def load_user(session_id):
-        return User.by_name(session_id)
+        return cache.get('us:{}'.format(session_id))
+
+    @classmethod
+    def by_id(cls, id):
+        u = cache.get('u:{}'.format(id))
+        if u is not None:
+            return u
+        u = User.where('id', id).first()
+        print('dbq')
+        if u is not None:
+            cache.set('u:{}'.format(id), u)
+        return u
 
     @classmethod
     def _cache_prefix(cls):
@@ -114,6 +132,11 @@ class User(db.Model):
     @cache.memoize()
     def subscribed_feed_ids(self):
         return [feed.id for feed in self.feeds]
+
+    @property
+    def subscribed_feeds(self):
+        from news.models.feed import Feed
+        return [Feed.by_id(x) for x in self.subscribed_feed_ids()]
 
     def subscribed_to(self, feed):
         return feed.id in self.subscribed_feed_ids()

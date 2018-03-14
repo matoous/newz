@@ -1,0 +1,72 @@
+<div class="link">
+    <div class="link-body">
+        <div class="link-feed">
+            <a href="/f/{{link.feed.slug}}">
+                {{ link.feed.name }}
+            </a>
+        </div>
+        <h2>
+            <a href="{{ link.url }}">
+                {{ link.title }}
+            </a>
+        </h2>
+        <div>
+            {{ link.summary }}
+        </div>
+        <div class="bottom-line">
+            <div class="comments">
+                <a href="/f/{{ link.feed.slug }}/{{ link.slug }}">{{ link.comments_count }} comments</a>
+            </div>
+            <div class="date">
+                {{ link.time_ago() }}
+            </div>
+            <div class="author">
+                by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
+            </div>
+        </div>
+    </div>
+    <div class="link-rating">
+        <div class="up">
+            {% if link.vote_by(current_user) %}
+            {% if link.vote_by(current_user).is_upvote %}
+            <a href="/l/{{link.slug}}/vote/unvote">
+                <img class="voted" src="/static/images/play-clicked.svg">
+            </a>
+            {% else %}
+            <a href="/l/{{link.slug}}/vote/upvote">
+                <img src="/static/images/play.svg">
+            </a>
+            {% endif %}
+            {% else %}
+            <a href="/l/{{link.slug}}/vote/upvote">
+                <img src="/static/images/play.svg">
+            </a>
+            {% endif %}
+        </div>
+        <div class="score">
+            {{ link.score }}
+        </div>
+        <div class="down">
+            {% if link.vote_by(current_user) %}
+            {% if link.vote_by(current_user).is_downvote %}
+            <a href="/l/{{link.slug}}/vote/unvote">
+                <img class="voted" src="/static/images/play-clicked.svg">
+            </a>
+            {% else %}
+            <a href="/l/{{link.slug}}/vote/downvote">
+                <img src="/static/images/play.svg">
+            </a>
+            {% endif %}
+            {% else %}
+            <a href="/l/{{link.slug}}/vote/downvote">
+                <img src="/static/images/play.svg">
+            </a>
+            {% endif %}
+        </div>
+        <div class="bookmark">
+            <a href="/l/{{ link.slug }}/bookmark">
+                <img src="/static/images/bookmark.svg">
+            </a>
+        </div>
+    </div>
+</div>

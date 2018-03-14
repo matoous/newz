@@ -1,4 +1,5 @@
 from flask_wtf import Form
+from orator import Model
 from orator.orm import belongs_to, has_many, morph_many
 from slugify import slugify
 from wtforms import StringField
@@ -13,10 +14,11 @@ from news.lib.utils.time_utils import time_ago
 from news.models.report import Report
 
 
-class Link(db.Model):
+class Link(Model):
     __table__ = 'links'
     __fillable__ = ['title', 'slug', 'summary', 'user_id','url','feed_id']
     __guarded__ = ['id', 'reported','spam','archived','ups','downs','comments_count']
+    __hidden__ = ['reported', 'spam']
 
     @classmethod
     def create_table(cls):
@@ -48,20 +50,26 @@ class Link(db.Model):
     def __repr__(self):
         return '<Link {}>'.format(self.id)
 
-    @belongs_to
+    @property
     def feed(self):
         from news.models.feed import Feed
-        return Feed
+        return Feed.by_id(self.feed_id)
 
-    @belongs_to
+    @property
     def user(self):
         from news.models.user import User
-        return User
+        return User.by_id(self.user_id)
 
     @has_many
     def votes(self):
         from news.models.vote import Vote
         return Vote
+
+    def vote_by(self, user):
+        from news.models.vote import Vote
+        if user.is_anonymous:
+            return None
+        return Vote.by_link_and_user(self.id, user.id)
 
     @property
     def num_votes(self):

@@ -29,6 +29,12 @@ def get_feed(slug=None):
     if feed is None:
         abort(404)
 
+    sort = request.args.get('sort')
+    if (sort is None or sort not in ['trending', 'new', 'best']) and current_user.is_authenticated:
+        sort = current_user.preferred_sort
+    if sort is None:
+        sort = feed.default_sort
+
     feed.links = trending_links([feed.id])
     return render_template("feed.html", feed=feed)
 

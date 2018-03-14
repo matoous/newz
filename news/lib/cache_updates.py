@@ -16,3 +16,8 @@ def update_link(updated_link):
         data = default_sorts([updated_link if x == updated_link else x for x in data], sort)
         cache.set(cache_key, data)
     return None
+
+
+@job('medium', connection=redis_conn)
+def update_subs(user, feed_id):
+    pass

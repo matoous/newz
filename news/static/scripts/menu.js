@@ -19,3 +19,13 @@ document.addEventListener("click", function(ev){
         openMenu = null;
     }
 });
+
+document.addEventListener('scroll', function(){
+    var logo = document.querySelector('.nav-logo .logo');
+    if(pageYOffset !== 0 && logo && !logo.classList.contains('smaller')){
+        logo.classList.add('smaller');
+    }
+    else if(pageYOffset === 0 && logo && logo.classList.contains('smaller')){
+        logo.classList.remove('smaller');
+    }
+});

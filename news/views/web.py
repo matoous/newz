@@ -9,8 +9,8 @@ web = Blueprint('web', __name__, template_folder='/templates')
 
 @web.route('/')
 def home():
-    links = Link.with_('feed').order_by('created_at', 'desc').limit(10).get()
-    return render_template("index.html", links=links)
+    links = Link.order_by('created_at', 'desc').limit(10).get()
+    return render_template("index.html", links=links, show_logo=True)
 
 
 @web.route('/my')
@@ -18,4 +18,5 @@ def home():
 def my_feeds():
     fids = current_user.subscribed_feed_ids()
     links = trending_links(fids)
+    current_user.subscribed_feeds()
     return render_template("index.html", links=links)

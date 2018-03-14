@@ -1,0 +1,9 @@
+<ul>
+    {% for feed in current_user.subscribed_feeds %}
+    <li>
+        <a href="/f/{{feed.slug}}">
+            {{ feed.name }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>

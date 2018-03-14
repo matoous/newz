@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from flask import Blueprint, render_template, redirect
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 
 from news.models.user import SignUpForm, LoginForm
 
@@ -23,7 +23,7 @@ def signup():
 def login():
     form = LoginForm()
     if form.validate():
-        login_user(form.user)
+        form.user.login()
         return redirect('/')
     return render_template("login.html", form=form)
 
@@ -31,6 +31,6 @@ def login():
 @auth.route("/logout")
 @login_required
 def logout():
-    logout_user()
+    current_user.logout()
     return redirect('/')
 

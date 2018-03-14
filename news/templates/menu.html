@@ -1,18 +1,27 @@
-    <nav class="main-nav">
-        <div class="nav-left">
-            <div class="menu-opener left" onclick="toggleMenu('feeds-nav',event);">
-                <img src="/static/images/menu.svg">
-            </div>
+<nav class="main-nav">
+    {% if current_user.is_authenticated %}
+    <div class="nav-left">
+        <div class="menu-opener left" onclick="toggleMenu('feeds-nav',event);">
+            <img src="/static/images/menu.svg">
         </div>
-        <div class="nav-right">
-            <div class="menu-opener right" onclick="toggleMenu('side-nav',event);">
-                <img src="/static/images/user.svg">
-            </div>
+    </div>
+    {% endif %}
+    {% if show_logo %}
+    <div class="nav-logo">
+        <div class="logo">
+            The Globalfeed
         </div>
-    </nav>
+    </div>
+    {% endif %}
+    <div class="nav-right">
+        <div class="menu-opener right" onclick="toggleMenu('side-nav',event);">
+            <img src="/static/images/user.svg">
+        </div>
+    </div>
+</nav>
 <nav class="t-nav hidden" id="side-nav">
     <div class="menu-hider" onclick="toggleMenu('side-nav',event);">
-        <i data-feather="x">X</i>
+        <img src="/static/images/x.svg">
     </div>
     <ul>
         <li class="menu-section">
@@ -20,48 +29,48 @@
                 Account
             </div>
             {% if current_user.is_authenticated %}
-                <div class="user">
-                    <div class="info">
-                        {% if current_user.full_name %}
-                            <div class="name">
-                                {{ current_user.full_name }}
-                            </div>
-                        {% endif %}
-                        <div class="username">
-                            {{ current_user.username }}
-                        </div>
+            <div class="user">
+                <div class="info">
+                    {% if current_user.full_name %}
+                    <div class="name">
+                        {{ current_user.full_name }}
+                    </div>
+                    {% endif %}
+                    <div class="username">
+                        {{ current_user.username }}
                     </div>
                 </div>
-                <ul>
-                    <li>
-                        <a href="/u/{{ current_user.username }}">
-                            Your profile
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/settings">
-                            Settings
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/logout">
-                            Sign out
-                        </a>
-                    </li>
-                </ul>
+            </div>
+            <ul>
+                <li>
+                    <a href="/u/{{ current_user.username }}">
+                        Your profile
+                    </a>
+                </li>
+                <li>
+                    <a href="/settings">
+                        Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="/logout">
+                        Sign out
+                    </a>
+                </li>
+            </ul>
             {% else %}
-                <ul>
-                    <li>
-                        <a href="/join">
-                            Sign up
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/login">
-                            Sign in
-                        </a>
-                    </li>
-                </ul>
+            <ul>
+                <li>
+                    <a href="/join">
+                        Sign up
+                    </a>
+                </li>
+                <li>
+                    <a href="/login">
+                        Sign in
+                    </a>
+                </li>
+            </ul>
             {% endif %}
         </li>
         <li class="menu-section">
@@ -77,11 +86,6 @@
                 <li>
                     <a href="/contact">
                         Contact
-                    </a>
-                </li>
-                <li>
-                    <a href="/career">
-                        Career
                     </a>
                 </li>
                 <li>
@@ -108,139 +112,13 @@
                 </li>
             </ul>
         </li>
-        <li class="menu-section">
-            <div class="header">
-                Other
-            </div>
-            <ul>
-                <li>
-                    <a href="/submit">
-                        Submit review
-                    </a>
-                </li>
-                <li>
-                    <a href="/about">
-                        About us
-                    </a>
-                </li>
-            </ul>
-        </li>
     </ul>
 </nav>
+{% if current_user.is_authenticated %}
 <nav class="t-nav hidden" id="feeds-nav">
     <div class="menu-hider" onclick="toggleMenu('feeds-nav', event);">
-        <i data-feather="x">X</i>
+        <img src="/static/images/x.svg">
     </div>
-    <ul>
-        <li class="menu-section">
-            <div class="header">
-                Account
-            </div>
-            {% if current_user.is_authenticated %}
-                <div class="user">
-                    <div class="info">
-                        {% if current_user.full_name %}
-                            <div class="name">
-                                {{ current_user.full_name }}
-                            </div>
-                        {% endif %}
-                        <div class="username">
-                            {{ current_user.username }}
-                        </div>
-                    </div>
-                </div>
-                <ul>
-                    <li>
-                        <a href="/u/{{ current_user.username }}">
-                            Your profile
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/settings">
-                            Settings
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/logout">
-                            Sign out
-                        </a>
-                    </li>
-                </ul>
-            {% else %}
-                <ul>
-                    <li>
-                        <a href="/join">
-                            Sign up
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/login">
-                            Sign in
-                        </a>
-                    </li>
-                </ul>
-            {% endif %}
-        </li>
-        <li class="menu-section">
-            <div class="header">
-                Menu
-            </div>
-            <ul>
-                <li>
-                    <a href="/how-it-works">
-                        How it works
-                    </a>
-                </li>
-                <li>
-                    <a href="/contact">
-                        Contact
-                    </a>
-                </li>
-                <li>
-                    <a href="/career">
-                        Career
-                    </a>
-                </li>
-                <li>
-                    <a href="/help">
-                        Help
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-section">
-            <div class="header">
-                Privacy
-            </div>
-            <ul>
-                <li>
-                    <a href="/terms">
-                        Terms
-                    </a>
-                </li>
-                <li>
-                    <a href="/privacy">
-                        Privacy
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-section">
-            <div class="header">
-                Other
-            </div>
-            <ul>
-                <li>
-                    <a href="/submit">
-                        Submit review
-                    </a>
-                </li>
-                <li>
-                    <a href="/about">
-                        About us
-                    </a>
-                </li>
-            </ul>
-        </li>
-    </ul>
+    {% include 'feeds_menu.html' %}
 </nav>
+{% endif %}

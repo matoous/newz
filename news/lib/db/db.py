@@ -1,9 +1,6 @@
-# apps.members.models
-from flask_orator import Orator
-from orator import Schema, DatabaseManager
+from orator import Schema, DatabaseManager, Model
 
-db = Orator()
-manager = DatabaseManager({
+db = DatabaseManager({
     'default': 'postgres',
     'postgres': {
         'driver': 'postgres',
@@ -11,8 +8,8 @@ manager = DatabaseManager({
         'database': 'newsfeed',
         'user': 'postgres',
         'password': '',
-        'prefix': ''
+        'prefix': '',
     },
 })
-schema = Schema(manager)
-
+schema = Schema(db)
+Model.set_connection_resolver(db)

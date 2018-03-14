@@ -1,7 +1,9 @@
 from enum import IntEnum
 
+from orator import Model
 from orator.orm import belongs_to
 
+from news.lib.cache import cache
 from news.lib.db.db import db, schema
 from news.lib.queue import q
 from news.lib.cache_updates import update_link
@@ -22,7 +24,7 @@ def vote_type_from_string(str):
     return 0
 
 
-class Vote(db.Model):
+class Vote(Model):
     __table__ = 'votes'
     __fillable__ = ['vote_type', 'user_id', 'link_id']
     __timestamps__ = False
@@ -47,10 +49,6 @@ class Vote(db.Model):
     def link(self):
         return Link
 
-    @classmethod
-    def _cache_prefix(cls):
-        return "v:"
-
     @property
     def _id(self):
         return "{}_{}".format(self.user_id, self.link_id)
@@ -73,6 +71,18 @@ class Vote(db.Model):
 
     def commit(self):
         self.apply()
+        # change users params (more karma/trust factor or something)
+
+    @classmethod
+    def by_link_and_user(cls, link_id, user_id):
+        cache_key = '{}_{}'.format(link_id, user_id)
+        v = cache.get(cache_key)
+        if v is not None:
+            return v
+        v = Vote.where('user_id', user_id).where('link_id', link_id).first()
+        cache.set(cache_key, v)
+        return v
+
 
     def apply(self):
         previous_vote = Vote.where('user_id', self.user_id).where('link_id', self.link_id).first()

@@ -7,14 +7,7 @@
 {% block body %}
 <section>
     <div class="container">
-        <div class="feed">
-            <div class="feed-head">
-                <div class="feed-info">
-                    <h1>
-                        The Globalfeed
-                    </h1>
-                </div>
-            </div>
+        <div class="index-menu">
             <div>
                 <a href="/all">Trending</a>
                 <a href="/my">My Feeds</a>
@@ -27,17 +20,17 @@
                     New
                     <ul>
                         <li>
-                            <a href="?s=new">
+                            <a href="?sort=new">
                                 New
                             </a>
                         </li>
                         <li>
-                            <a href="?s=trending">
+                            <a href="?sort=trending">
                                 Trending
                             </a>
                         </li>
                         <li>
-                            <a href="?s=best">
+                            <a href="?sort=best">
                                 Best
                             </a>
                         </li>
@@ -45,61 +38,9 @@
                 </div>
             </div>
             {% for link in links %}
-            <div class="link">
-                <div class="link-body">
-                    <div class="link-feed">
-                        <a href="/f/{{link.feed.slug}}">
-                            {{ link.feed.name }}
-                        </a>
-                    </div>
-                    <h2>
-                        <a href="{{ link.url }}">
-                            {{ link.title }}
-                        </a>
-                    </h2>
-                    <div>
-                        {{link.summary}}
-                    </div>
-                    <div class="bottom-line">
-                        <div class="comments">
-                            <a href="/f/todo/{{link.slug}}">{{ link.comments_count }} comments</a>
-                        </div>
-                        <div class="date">
-                            {{ link.time_ago() }}
-                        </div>
-                        <div class="author">
-                            by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="link-rating">
-                    <div class="up">
-                        {% if link.votes|length > 0 %}
-                            {% if link.votes[0].is_upvote %}
-                            <a href="/l/{{link.slug}}/vote/unvote">Up</a>
-                            {% else %}
-                            <a href="/l/{{link.slug}}/vote/upvote">Up</a>
-                            {% endif %}
-                        {% else %}
-                            <a href="/l/{{link.slug}}/vote/upvote">Up</a>
-                        {% endif %}
-                    </div>
-                    <div class="score">
-                        {{ link.score }}
-                    </div>
-                    <div class="down">
-                        {% if link.votes|length > 0 %}
-                            {% if link.votes[0].is_downvote %}
-                            <a href="/l/{{link.slug}}/vote/unvote">Down</a>
-                            {% else %}
-                            <a href="/l/{{link.slug}}/vote/downvote">Down</a>
-                            {% endif %}
-                        {% else %}
-                            <a href="/l/{{link.slug}}/vote/downvote">Down</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+                {% with link=link %}
+                    {% include 'link_listing.html' %}
+                {% endwith %}
             {% endfor %}
             </div>
     </div>

@@ -1,16 +1,14 @@
-from datetime import datetime, time
-
 from flask_dotenv import DotEnv
 
+from news.lib.db.db import db
 from news.lib.cache import cache
 from news.lib.csrf import csrf
-from news.lib.db.db import db
 from news.lib.login import login_manager
 from news.lib.limiter import limiter
-from news.lib.normalized_trending import hot
 from news.models.feed import Feed
 from news.models.link import Link
 from news.models.subscriptions import create_subscriptions_table
+from news.models.token import DisposableToken
 from news.models.user import User
 from news.models.vote import Vote
 from news.views.auth import auth
@@ -41,22 +39,21 @@ def make_app():
             'database': 'newsfeed',
             'user': 'postgres',
             'password': '',
-            'prefix': ''
+            'prefix': '',
         },
     }
 
-    db.init_app(app)
     csrf.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
     login_manager.init_app(app)
 
     with app.app_context():
-        pass
+        #DisposableToken.create_table()
         #Feed.create_table()
         #User.create_table()
         #Link.create_table()
         #Vote.create_table()
         #create_subscriptions_table()
-
+        pass
     return app
