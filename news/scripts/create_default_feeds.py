@@ -33,7 +33,10 @@ def create_default_feeds():
                   slug=slugify("Hackernews"))
              ]
     for feed in feeds:
-        feed.save()
+        try:
+            feed.save()
+        except:
+            pass
 
     f = Feed.where('slug', 'hackernews').first()
     l = Link(title='Why Pi Matters',
@@ -45,11 +48,40 @@ def create_default_feeds():
              url='https://www.newyorker.com/tech/elements/pi-day-why-pi-matters',
              feed_id=f.id,
              user_id=u.id)
-    l.save()
+    try:
+        l.save()
+    except:
+        pass
     l2 = Link(title='Reddit and the Struggle to Detoxify the Internet',
               slug=slugify('Reddit and the Struggle to Detoxify the Internet'),
               summary='How do we fix life online without limiting free speech?',
               url='https://www.newyorker.com/magazine/2018/03/19/reddit-and-the-struggle-to-detoxify-the-internet',
               feed_id=f.id,
               user_id=u.id)
-    l2.save()
+    try:
+        l2.save()
+    except:
+        pass
+    f = Feed.where('slug', 'the-awesome-earth').first()
+    l3 = Link(title='Is This the Underground Everest?',
+              slug=slugify('Is This the Underground Everest?'),
+              summary='Far beneath a remote mountain range in Uzbekistan, explorers are delving into a labyrinth that could be the world\'s deepest cave.',
+              url='https://www.nationalgeographic.com/magazine/2017/03/dark-star-deepest-cave-climbing-uzbekistan/',
+              feed_id=f.id,
+              user_id=u.id)
+    try:
+        l3.save()
+    except:
+        pass
+
+    f = Feed.where('slug', 'good-long-reads').first()
+    l4 = Link(title='The Man Who’s Helped Elon Musk, Tom Brady, and Ari Emanuel Get Dressed',
+              slug=slugify('The Man Who’s Helped Elon Musk, Tom Brady, and Ari Emanuel Get Dressed'),
+              summary='Andrew Weitz spruces up Hollywood’s reluctant Zoolanders.',
+              url='https://www.newyorker.com/magazine/2018/03/19/the-man-whos-helped-elon-musk-tom-brady-and-ari-emanuel-get-dressed',
+              feed_id=f.id,
+              user_id=u.id)
+    try:
+        l4.save()
+    except:
+        pass
