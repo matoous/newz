@@ -29,3 +29,6 @@ document.addEventListener('scroll', function(){
         logo.classList.remove('smaller');
     }
 });
+setReplyTo = function(id){
+    document.querySelector('#parent_id').value = id;
+};

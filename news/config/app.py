@@ -5,6 +5,7 @@ from news.lib.cache import cache
 from news.lib.csrf import csrf
 from news.lib.login import login_manager
 from news.lib.limiter import limiter
+from news.models.comment import Comment
 from news.models.feed import Feed
 from news.models.link import Link
 from news.models.subscriptions import create_subscriptions_table
@@ -57,5 +58,7 @@ def make_app():
         #Vote.create_table()
         #create_subscriptions_table()
         #create_default_feeds()
+        #Comment.create_table()
         pass
+
     return app

@@ -55,6 +55,10 @@ class Link(Model):
         from news.models.feed import Feed
         return Feed.by_id(self.feed_id)
 
+    @classmethod
+    def by_id(cls, id):
+        return cls.where('id', id).first()
+
     @property
     def user(self):
         from news.models.user import User

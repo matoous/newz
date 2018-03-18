@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, render_template, Response, request, abort
 from flask_login import login_required, current_user
 
 from news.lib.normalized_trending import trending_links
+from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
 from news.models.link import LinkForm, Link
 from news.models.vote import Vote, vote_type_from_string
@@ -105,4 +106,26 @@ def link_view(feed_slug=None, link_slug=None):
     if link is None:
         abort(404)
 
-    return render_template('link.html', link=link, feed=feed)
+    comment_form = CommentForm()
+
+    #TEST
+    sorted_comments = SortedComments.get_full_tree(link)
+    return render_template('link.html', link=link, feed=feed, comment_form=comment_form, comments=sorted_comments, get_comment=Comment.by_id, printer=print)
+
+
+@login_required
+@feed_blueprint.route("/f/<path:feed_slug>/<link_slug>/comment", methods=['POST'])
+def comment_link(feed_slug=None, link_slug=None):
+    feed = Feed.where('slug', feed_slug).first()
+    if feed is None or link_slug is None:
+        abort(404)
+
+    link = Link.where('slug', link_slug).first()
+    if link is None:
+        abort(404)
+
+    comment_form = CommentForm()
+    if comment_form.validate(current_user, link):
+        comment = comment_form.comment
+        comment.commit()
+    return redirect('/f/{}/{}'.format(feed_slug, link_slug))

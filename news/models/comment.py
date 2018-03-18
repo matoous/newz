@@ -3,10 +3,12 @@ from flask_wtf import Form
 from orator import Model
 from orator.orm import has_many, morph_many
 from wtforms import StringField, HiddenField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
+from wtforms.widgets import TextArea
 
 from news.lib.adding import add_to_queries
 from news.lib.cache import cache, conn
+from news.lib.comments import add_new_comment
 from news.lib.db.db import db, schema
 from news.lib.queue import q
 from news.lib.utils.confidence import confidence
@@ -22,9 +24,9 @@ class Comment(Model):
 
     @classmethod
     def create_table(cls):
-        schema.drop_if_exists('links')
-        with schema.create('links') as table:
-            table.big_integer('id').unsigned()
+        schema.drop_if_exists('comments')
+        with schema.create('comments') as table:
+            table.big_increments('id').unsigned()
             table.big_integer('parent_id').unsigned().nullable()
             table.text('text')
             table.integer('user_id').unsigned()
@@ -33,6 +35,8 @@ class Comment(Model):
             table.boolean('spam').default(False)
             table.integer('ups').default(0)
             table.integer('downs').default(0)
+            table.datetime('created_at')
+            table.datetime('updated_at')
 
     def __eq__(self, other):
         if not isinstance(other, Comment):
@@ -79,11 +83,7 @@ class Comment(Model):
     def commit(self):
         self.save()
         self.ups = self.downs = 0
-
-        # self.link.incr(comments_count)
-        # q.enqueue(add_to_tree, self, result_ttl=0) -> add to tree, add to comment sorting
-        # CommentTree.add(link, comment)
-        # SortedComments.update(link, comment)
+        q.enqueue(add_new_comment, self.link, self, result_ttl=0)
 
     @classmethod
     def _cache_key(cls, id):
@@ -114,7 +114,7 @@ class CommentTreeCache:
         return 'ct:{}'.format(link.id)
 
     @classmethod
-    def _write_tree(cls, link, tree, lock):
+    def _write_tree(cls, link, tree):
         key = cls._cache_key(link)
         cache.set(key, tree)
 
@@ -126,19 +126,20 @@ class CommentTreeCache:
     def add(cls, link, comment):
         with redis_lock.Lock(conn, cls._lock_key(link)):
             tree = cls.load_tree(link)
+            print(tree)
             if not tree:
                 raise TreeNotBuildException
-            tree[comment.parent_id].append(comment.id)
+            tree.setdefault(comment.parent_id, []).append(comment.id)
             cache.set(cls._cache_key(link), tree)
 
     @classmethod
     def rebuild(cls, link, comments):
-        with redis_lock.Lock(conn, cls._lock_key(link)) as lock:
+        with redis_lock.Lock(conn, cls._lock_key(link)):
             tree = {}
             for comment in comments:
                 tree.setdefault(comment.parent_id, []).append(comment.id)
 
-            cls._write_tree(link, tree, lock)
+            cls._write_tree(link, tree)
             return cls(link.id, tree)
 
     @classmethod
@@ -158,7 +159,6 @@ class CommentTree:
             CommentTreeCache.add(link, comment)
         except TreeNotBuildException:
             CommentTree._rebuild(link)
-            CommentTreeCache.add(link, comment)
 
     @classmethod
     def by_link(cls, link):
@@ -169,7 +169,7 @@ class CommentTree:
 
     @classmethod
     def _rebuild(cls, link):
-        comments = Comment.where('link_id', link.id).select('parent_it', 'id').get() or []
+        comments = Comment.where('link_id', link.id).select('parent_id', 'id').get() or []
         res = CommentTreeCache.rebuild(link, comments)
         return res.tree
 
@@ -188,7 +188,7 @@ class SortedComments:
         cache_key = cls._cache_key(link, comment.parent_id)
 
         with redis_lock.Lock(conn, cls._lock_key(link, comment.parent_id)):
-            comments = cache.get(cache_key)
+            comments = cache.get(cache_key) or []
             added = False
             for i in range(len(comments)):
                 if comments[i][0] == comment.id:
@@ -211,23 +211,21 @@ class SortedComments:
     @classmethod
     def get_full_tree(cls, link, limit_main_comments=None, limit_count=None, limit_depth=None):
         tree = cls.build_tree(link)
-        return tree
+        return tree[1]
 
 
 class CommentForm(Form):
-    text = StringField('Title', [DataRequired()])
-    parent_id = HiddenField('parent_id', [])
+    text = StringField('comment', [DataRequired(), TextArea()])
+    parent_id = HiddenField('parent_id', [Optional()])
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
         self.comment = None
 
     def validate(self, user, link):
-        rv = Form.validate(self)
-        if not rv:
-            return False
+        # todo add validation
         self.comment = Comment(text=self.text.data,
-                               parent_id=self.parent_id.data,
+                               parent_id=int(self.parent_id.data) if self.parent_id.data != '' else None,
                                user_id=user.id,
                                link_id=link.id)
         return True

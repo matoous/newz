@@ -334,3 +334,9 @@ section {
 .link-card .link-info div {
   position: relative;
 }
+.comment {
+  margin-bottom: 6px;
+}
+.comment .subcomments {
+  padding: 4px 0 4px 16px;
+}

@@ -34,11 +34,36 @@
                     </div>
                 </div>
             </div>
+            {% if current_user.is_authenticated %}
             <div class="link-comments">
-                <form method="post" action="/l/{{ link.slug }}/comment">
-                    <textarea rows="6" cols="60" name="comment"></textarea>
+                <form method="post" action="/f/{{ link.feed.slug }}/{{ link.slug }}/comment">
+                    {{ comment_form.text }}
+                    {{ comment_form.parent_id }}
+                    {{ comment_form.csrf_token }}
                     <button type="submit">Submit</button>
                 </form>
+            </div>
+            {% endif %}
+            <div class="link-comments">
+                {% for comment_id, subcomments in comments recursive %}
+                <div class="comment">
+                    {% set comment = get_comment(comment_id) %}
+                    <div class="comment-header">
+                        <a href="/u/{{ comment.user.username }}">{{ comment.user.name }}</a> {{comment.time_ago()}}
+                    </div>
+                    <div class="comment-text">
+                        {{ comment.text }}
+                    </div>
+                    <div class="comment-options">
+                        <a href="#" onclick="setReplyTo('{{ comment.id }}'); return false">reply</a>
+                    </div>
+                    {% if subcomments|length > 0 %}
+                        <div class="subcomments">
+                            {{ loop(subcomments) }}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
