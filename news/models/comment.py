@@ -2,7 +2,7 @@ import redis_lock
 from flask_wtf import Form
 from orator import Model
 from orator.orm import has_many, morph_many
-from wtforms import StringField, HiddenField
+from wtforms import StringField, HiddenField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 from wtforms.widgets import TextArea
 
@@ -69,10 +69,6 @@ class Comment(Model):
     def reports(self):
         return Report
 
-    @classmethod
-    def _cache_prefix(cls):
-        return "c:"
-
     def time_ago(self):
         return time_ago(self.created_at)
 
@@ -98,6 +94,11 @@ class Comment(Model):
             cache.set(cache_key, comment)
             conn.expire(cache_key, 7 * 24 * 60 * 60) # expire after week
         return comment
+
+    @classmethod
+    def update_cache(cls, comment):
+        cache_key = cls._cache_key(comment.id)
+        cache.set(cache_key, cls.where('id', comment.id).first())
 
 
 class TreeNotBuildException(Exception):
@@ -186,18 +187,20 @@ class SortedComments:
     @classmethod
     def update(cls, link, comment):
         cache_key = cls._cache_key(link, comment.parent_id)
-
+        print('updating link: {}'.format(link.slug))
         with redis_lock.Lock(conn, cls._lock_key(link, comment.parent_id)):
             comments = cache.get(cache_key) or []
+            print("comments before ", comments)
             added = False
             for i in range(len(comments)):
                 if comments[i][0] == comment.id:
-                    comments[i][1] = confidence(comment.ups, comment.downs)
+                    comments[i] = (comment.id, confidence(comment.ups, comment.downs))
                     added = True
                     break
             if not added:
                 comments.append((comment.id, confidence(comment.ups, comment.downs)))
             comments = sorted(comments, key=lambda x: x[1], reverse=True)
+            print("comments after ", comments)
             cache.set(cache_key, comments)
 
     @classmethod
@@ -215,7 +218,7 @@ class SortedComments:
 
 
 class CommentForm(Form):
-    text = StringField('comment', [DataRequired(), TextArea()])
+    text = TextAreaField('comment', [DataRequired()])
     parent_id = HiddenField('parent_id', [Optional()])
 
     def __init__(self, *args, **kwargs):

@@ -16,8 +16,8 @@ from news.models.report import Report
 
 class Link(Model):
     __table__ = 'links'
-    __fillable__ = ['title', 'slug', 'summary', 'user_id','url','feed_id']
-    __guarded__ = ['id', 'reported','spam','archived','ups','downs','comments_count']
+    __fillable__ = ['title', 'slug', 'summary', 'user_id', 'url', 'feed_id']
+    __guarded__ = ['id', 'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
     __hidden__ = ['reported', 'spam']
 
     @classmethod
@@ -64,16 +64,16 @@ class Link(Model):
         from news.models.user import User
         return User.by_id(self.user_id)
 
-    @has_many
+    @property
     def votes(self):
-        from news.models.vote import Vote
-        return Vote
+        from news.models.vote import LinkVote
+        return LinkVote.where('link_id', self.id).get()
 
     def vote_by(self, user):
-        from news.models.vote import Vote
+        from news.models.vote import LinkVote
         if user.is_anonymous:
             return None
-        return Vote.by_link_and_user(self.id, user.id)
+        return LinkVote.by_link_and_user(self.id, user.id)
 
     @property
     def num_votes(self):
@@ -148,3 +148,45 @@ class LinkForm(Form):
                          feed_id=feed.id,
                          user_id=user.id)
         return True
+
+
+class SavedLink(Model):
+    __table__ = 'saved_links'
+    __fillable__ = ['user_id', 'link_id']
+
+    @classmethod
+    def create_table(cls):
+        schema.drop_if_exists('saved_links')
+        with schema.create('saved_links') as table:
+            table.big_integer('link_id').unsigned()
+            table.integer('user_id').unsigned()
+            table.datetime('created_at')
+            table.datetime('updated_at')
+            table.index('link_id')
+            table.index('user_id')
+            table.primary(['link_id', 'user_id'])
+
+    def __repr__(self):
+        return '<SavedLink l:{} u:{}>'.format(self.link_id, self.user_id)
+
+    @property
+    def user(self):
+        from news.models.user import User
+        return User.by_id(self.user_id)
+
+    @property
+    def link(self):
+        return Link.by_id(self.link_id)
+
+    @classmethod
+    def _cache_prefix(cls):
+        return "sl:"
+
+    @classmethod
+    def by_feed(cls, user):
+        return cls.where('user_id', user.id).get()
+
+    def commit(self):
+        self.save()
+        # TODO
+        # q.enqueue(_name_, self, result_ttl=0)

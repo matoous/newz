@@ -18,5 +18,4 @@ def home():
 def my_feeds():
     fids = current_user.subscribed_feed_ids()
     links = trending_links(fids)
-    current_user.subscribed_feeds()
     return render_template("index.html", links=links)

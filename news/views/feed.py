@@ -5,7 +5,7 @@ from news.lib.normalized_trending import trending_links
 from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
 from news.models.link import LinkForm, Link
-from news.models.vote import Vote, vote_type_from_string
+from news.models.vote import LinkVote, vote_type_from_string, CommentVote
 
 feed_blueprint = Blueprint('feed', __name__, template_folder='/templates')
 
@@ -66,7 +66,7 @@ def do_vote(link=None, vote_str=None):
     if link is None or vote is None:
         abort(404)
 
-    vote = Vote(user_id=current_user.id, link_id=link.id, vote_type=vote)
+    vote = LinkVote(user_id=current_user.id, link_id=link.id, vote_type=vote)
     vote.apply()
 
     return "voted"
@@ -108,9 +108,9 @@ def link_view(feed_slug=None, link_slug=None):
 
     comment_form = CommentForm()
 
-    #TEST
     sorted_comments = SortedComments.get_full_tree(link)
-    return render_template('link.html', link=link, feed=feed, comment_form=comment_form, comments=sorted_comments, get_comment=Comment.by_id, printer=print)
+    return render_template('link.html', link=link, feed=feed, comment_form=comment_form, comments=sorted_comments,
+                           get_comment=Comment.by_id)
 
 
 @login_required
@@ -129,3 +129,17 @@ def comment_link(feed_slug=None, link_slug=None):
         comment = comment_form.comment
         comment.commit()
     return redirect('/f/{}/{}'.format(feed_slug, link_slug))
+
+
+@feed_blueprint.route("/c/<comment_id>/vote/<vote_str>")
+@login_required
+def do_comment_vote(comment_id=None, vote_str=None):
+    comment = Comment.by_id(comment_id)
+    vote = vote_type_from_string(vote_str)
+    if comment is None or vote is None:
+        abort(404)
+
+    vote = CommentVote(user_id=current_user.id, comment_id=comment.id, vote_type=vote)
+    vote.apply()
+
+    return "voted"

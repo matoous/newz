@@ -48,20 +48,42 @@
                 {% for comment_id, subcomments in comments recursive %}
                 <div class="comment">
                     {% set comment = get_comment(comment_id) %}
-                    <div class="comment-header">
-                        <a href="/u/{{ comment.user.username }}">{{ comment.user.name }}</a> {{comment.time_ago()}}
-                    </div>
-                    <div class="comment-text">
-                        {{ comment.text }}
-                    </div>
-                    <div class="comment-options">
-                        <a href="#" onclick="setReplyTo('{{ comment.id }}'); return false">reply</a>
-                    </div>
-                    {% if subcomments|length > 0 %}
-                        <div class="subcomments">
-                            {{ loop(subcomments) }}
+                    <div class="comment-voting">
+                        <div class="up">
+                            <a href="/c/{{ comment.id }}/vote/upvote">
+                                <img src="/static/images/play-light.svg">
+                            </a>
                         </div>
-                    {% endif %}
+                        <div class="down">
+                            <a href="/c/{{ comment.id }}/vote/downvote">
+                                <img src="/static/images/play-light.svg">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="comment-body">
+                        <div class="comment-header">
+                            <span>
+                                <a href="/u/{{ comment.user.username }}">{{ comment.user.name }}</a>
+                            </span>
+                            <span>
+                                {{ comment.score }} points
+                            </span>
+                            <span>
+                                {{comment.time_ago()}}
+                            </span>
+                        </div>
+                        <div class="comment-text">
+                            {{ comment.text }}
+                        </div>
+                        <div class="comment-options">
+                            <a href="#" onclick="setReplyTo('{{ comment.id }}'); return false">reply</a> <a href="/c/{{comment.id}}/report">report</a>
+                        </div>
+                        {% if subcomments|length > 0 %}
+                            <div class="subcomments">
+                                {{ loop(subcomments) }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
                 {% endfor %}
             </div>

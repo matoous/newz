@@ -5,14 +5,15 @@ from news.lib.cache import cache
 from news.lib.csrf import csrf
 from news.lib.login import login_manager
 from news.lib.limiter import limiter
+from news.lib.utils.confidence import confidence
 from news.models.comment import Comment
 from news.models.feed import Feed
 from news.models.link import Link
 from news.models.subscriptions import create_subscriptions_table
 from news.models.token import DisposableToken
 from news.models.user import User
-from news.models.vote import Vote
-from news.scripts.create_default_feeds import create_default_feeds
+from news.models.vote import LinkVote, CommentVote
+from news.scripts.create_testing_data import create_default_feeds
 from news.views.auth import auth
 from news.views.feed import feed_blueprint
 from news.views.settings import settings
@@ -55,7 +56,8 @@ def make_app():
         #Feed.create_table()
         #User.create_table()
         #Link.create_table()
-        #Vote.create_table()
+        #LinkVote.create_table()
+        #CommentVote.create_table()
         #create_subscriptions_table()
         #create_default_feeds()
         #Comment.create_table()

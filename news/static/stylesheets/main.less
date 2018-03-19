@@ -412,8 +412,50 @@ section {
 
 .comment {
   margin-bottom: 6px;
+  display: flex;
+  flex-direction: row;
+
+  .comment-voting {
+    padding: 4px 8px 4px 0;
+    .up {
+      margin-bottom: -6px;
+      img {
+        color: #999;
+        height: 16px;
+        width: 16px;
+        transform: rotate(270deg);
+      }
+    }
+    .down {
+      img {
+        color: #999;
+        height: 16px;
+        width: 16px;
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .comment-header {
+    font-size: 13px;
+    color: #666;
+    span {
+      margin-right: 6px;
+    }
+  }
 
   .subcomments {
-    padding: 4px 0 4px 16px;
+    border-left: 1px solid #999;
+    margin: 8px 0 8px 12px;
+    padding-left:  12px;
+  }
+
+  .comment-options {
+    font-size: 13px;
+    margin-top: 6px;
+    a {
+      color: #666;
+      margin-right: 6px;
+    }
   }
 }

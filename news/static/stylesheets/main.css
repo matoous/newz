@@ -336,7 +336,44 @@ section {
 }
 .comment {
   margin-bottom: 6px;
+  display: flex;
+  flex-direction: row;
+}
+.comment .comment-voting {
+  padding: 4px 8px 4px 0;
+}
+.comment .comment-voting .up {
+  margin-bottom: -6px;
+}
+.comment .comment-voting .up img {
+  color: #999;
+  height: 16px;
+  width: 16px;
+  transform: rotate(270deg);
+}
+.comment .comment-voting .down img {
+  color: #999;
+  height: 16px;
+  width: 16px;
+  transform: rotate(90deg);
+}
+.comment .comment-header {
+  font-size: 13px;
+  color: #666;
+}
+.comment .comment-header span {
+  margin-right: 6px;
 }
 .comment .subcomments {
-  padding: 4px 0 4px 16px;
+  border-left: 1px solid #999;
+  margin: 8px 0 8px 12px;
+  padding-left: 12px;
+}
+.comment .comment-options {
+  font-size: 13px;
+  margin-top: 6px;
+}
+.comment .comment-options a {
+  color: #666;
+  margin-right: 6px;
 }

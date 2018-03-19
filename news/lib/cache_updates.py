@@ -7,7 +7,6 @@ from news.lib.sorts import default_sorts
 
 @job('medium', connection=redis_conn)
 def update_link(updated_link):
-    print("updating links")
     for sort in ['trending', 'best']:  # no need to update 'new' because it doesn't depend on score
         cache_key = 'fs:{}.{}'.format(updated_link.feed.b_id, sort)
         data = cache.get(cache_key)

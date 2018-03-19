@@ -7,9 +7,15 @@ from news.models.user import User
 
 def create_default_feeds():
     u = User(username='matoous', email='matdz@seznam.cz')
+    u1 = User(username='test', email='test@test.te')
+    u2 = User(username='test2', email='test2@test.te')
     u.set_password('lokiloki')
+    u1.set_password('testtest')
+    u2.set_password('testtest')
     try:
         u.save()
+        u1.save()
+        u2.save()
     except:
         u = User.where('id', 1).first()
 
