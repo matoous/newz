@@ -2,14 +2,12 @@ import redis_lock
 from flask_wtf import Form
 from orator import Model
 from orator.orm import has_many, morph_many
-from wtforms import StringField, HiddenField, TextAreaField
+from wtforms import HiddenField, TextAreaField
 from wtforms.validators import DataRequired, Optional
-from wtforms.widgets import TextArea
 
-from news.lib.adding import add_to_queries
 from news.lib.cache import cache, conn
 from news.lib.comments import add_new_comment
-from news.lib.db.db import db, schema
+from news.lib.db.db import schema
 from news.lib.queue import q
 from news.lib.utils.confidence import confidence
 from news.lib.utils.time_utils import time_ago
@@ -98,7 +96,9 @@ class Comment(Model):
     @classmethod
     def update_cache(cls, comment):
         cache_key = cls._cache_key(comment.id)
-        cache.set(cache_key, cls.where('id', comment.id).first())
+        comment = cls.where('id', comment.id).first()
+        cache.set(cache_key, comment)
+        return comment
 
 
 class TreeNotBuildException(Exception):
@@ -127,7 +127,6 @@ class CommentTreeCache:
     def add(cls, link, comment):
         with redis_lock.Lock(conn, cls._lock_key(link)):
             tree = cls.load_tree(link)
-            print(tree)
             if not tree:
                 raise TreeNotBuildException
             tree.setdefault(comment.parent_id, []).append(comment.id)
@@ -187,10 +186,8 @@ class SortedComments:
     @classmethod
     def update(cls, link, comment):
         cache_key = cls._cache_key(link, comment.parent_id)
-        print('updating link: {}'.format(link.slug))
         with redis_lock.Lock(conn, cls._lock_key(link, comment.parent_id)):
             comments = cache.get(cache_key) or []
-            print("comments before ", comments)
             added = False
             for i in range(len(comments)):
                 if comments[i][0] == comment.id:
@@ -200,7 +197,6 @@ class SortedComments:
             if not added:
                 comments.append((comment.id, confidence(comment.ups, comment.downs)))
             comments = sorted(comments, key=lambda x: x[1], reverse=True)
-            print("comments after ", comments)
             cache.set(cache_key, comments)
 
     @classmethod

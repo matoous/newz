@@ -1,3 +1,5 @@
+@import "forms";
+
 @font-face {
     font-family: 'DualisLite';
     src:url('/static/fnt/DualisLite.ttf.woff') format('woff'),
@@ -8,6 +10,18 @@
     font-style: normal;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+a, div, h1, h2, h3, h4, h5, h6, p, span {
+    text-rendering: geometricPrecision;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
 
 body {
   font-family: 'Lora', serif;
@@ -410,6 +424,20 @@ section {
   }
 }
 
+.link-add-comment {
+  margin: 32px 0;
+
+  textarea {
+    width: 90%;
+    max-width: 720px;
+  }
+
+  button {
+    margin-top: 12px;
+    display: block;
+  }
+}
+
 .comment {
   margin-bottom: 6px;
   display: flex;
@@ -457,5 +485,57 @@ section {
       color: #666;
       margin-right: 6px;
     }
+  }
+}
+
+.profile {
+  margin-bottom: 42px;
+
+  .profile-head {
+    position: relative;
+    width: 100%;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    border-radius: 50%;
+    max-width: 260px;
+    background-color: #f5f5f5;
+    display: inline-block;
+    margin: 0 auto;
+    overflow: hidden;
+
+    img {
+      display: block;
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+
+  .profile-name {
+    h1{
+      margin: 18px 0 6px 0;
+    }
+    h1.username {
+      text-transform: none;
+    }
+    h1.full-name {
+      text-transform: capitalize;
+    }
+  }
+
+  .profile-url {
+    font-family: 'Roboto Condensed', sans-serif;
+    a {
+      font-weight: bold;
+      color: #666;
+    }
+  }
+
+  .profile-about {
+    margin-top: 32px;
+    font-size: 20px;
+    line-height: 28px;
+    word-wrap: break-word;
   }
 }

@@ -1,5 +1,3 @@
-from enum import IntEnum
-
 from orator import Model
 from orator.orm import belongs_to
 
@@ -195,5 +193,6 @@ class CommentVote(Vote, Model):
 
         cache_key = CommentVote._cache_key(self.comment_id, self.user_id)
         cache.set(cache_key, self)
+        Comment.update_cache(self.comment)
         if self.comment.num_votes < 20 or self.comment.num_votes % 8 == 0:
             q.enqueue(update_comment, self.comment, result_ttl=0)

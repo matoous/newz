@@ -4,16 +4,10 @@ from math import log
 
 import itertools
 
+from news.lib.utils.time_utils import epoch_seconds
 from news.models.link import Link
 
-epoch = datetime(1970, 1, 1)
-
 MAX_LINKS = 1000
-
-
-def epoch_seconds(date):
-    td = date - epoch
-    return td.total_seconds()
 
 
 def hot(score, date):

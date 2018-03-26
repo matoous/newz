@@ -1,22 +1,25 @@
 from flask_wtf import Form
 from orator import Model
 from orator.orm import belongs_to, has_many, morph_many
+from rq.decorators import job
 from slugify import slugify
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length, URL
 
-from news.lib.adding import add_to_queries
 from news.lib.cache import cache
 from news.lib.db.db import db, schema
 from news.lib.db.sorts import sorts
-from news.lib.queue import q
+from news.lib.queue import q, redis_conn
+from news.lib.sorts import default_sorts, sort_cache_key
 from news.lib.utils.time_utils import time_ago
 from news.models.report import Report
+
+MAX_IN_CACHE = 1000
 
 
 class Link(Model):
     __table__ = 'links'
-    __fillable__ = ['title', 'slug', 'summary', 'user_id', 'url', 'feed_id']
+    __fillable__ = ['title', 'slug', 'summary', 'text', 'user_id', 'url', 'feed_id']
     __guarded__ = ['id', 'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
     __hidden__ = ['reported', 'spam']
 
@@ -28,6 +31,7 @@ class Link(Model):
             table.string('title', 128)
             table.string('slug', 150).unique()
             table.text('summary')
+            table.text('text')
             table.text('url')
             table.integer('user_id').unsigned()
             table.datetime('created_at')
@@ -125,7 +129,30 @@ class Link(Model):
     def commit(self):
         self.save()
         self.ups = self.downs = 0
-        q.enqueue(add_to_queries, self, result_ttl=0)
+        q.enqueue(Link.add_to_queries, self, result_ttl=0)
+
+    @classmethod
+    @job('medium', connection=redis_conn)
+    def add_to_queries(link):
+        if len(link.summary) > 300:
+            link.summary = link.summary[:300] + '...'
+
+        # for 'new' all we need is to prepend
+        cache_key = sort_cache_key(link.feed_id, 'new')
+        data = cache.get(cache_key) or []
+        data.insert(0, link)
+        cache.set(cache_key, data[:MAX_IN_CACHE])
+
+        # for the rest, sort the data in cache on insert
+        for sort in ['trending', 'best']:  # no need to update 'new' because it doesn't depend on score
+            cache_key = sort_cache_key(link.feed_id, sort)
+            data = cache.get(cache_key)
+            if data is None:
+                continue
+            data.append(link)
+            data = default_sorts(data, sort)
+            cache.set(cache_key, data)
+        return None
 
 
 class LinkForm(Form):

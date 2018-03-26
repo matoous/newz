@@ -4,6 +4,10 @@ from math import log
 epoch = datetime(1970, 1, 1)
 
 
+def sort_cache_key(feed_id, sort):
+    return 'fs:{}.{}'.format(feed_id.to_bytes(8, 'big'), sort)
+
+
 def epoch_seconds(date):
     td = date - epoch
     return td.total_seconds()

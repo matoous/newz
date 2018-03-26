@@ -43,9 +43,9 @@
                     Comments
                 </a>
             </div>
-            {% for link in user.links %}
-                {% with link=link %}
-                    {% include 'link_listing.html' %}
+            {% for comment in user.comments %}
+                {% with comment=comment %}
+                    {% include 'comment_listing.html' %}
                 {% endwith %}
             {% endfor %}
             </div>

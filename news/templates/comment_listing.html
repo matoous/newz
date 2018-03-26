@@ -1,0 +1,23 @@
+<div class="link">
+    <div class="link-body">
+        <h2>
+            <a href="/f/{{comment.link.feed.slug}}/{{comment.link.slug}}">
+                {{ comment.link.title }}
+            </a>
+        </h2>
+        <div>
+            {{ comment.text }}
+        </div>
+        <div class="bottom-line">
+            <div class="comments">
+                <a href="/f/{{ comment.link.feed.slug }}/{{ comment.link.slug }}">{{ comment.link.comments_count }} comments</a>
+            </div>
+            <div class="date">
+                {{ comment.link.time_ago() }}
+            </div>
+            <div class="author">
+                by <a href="/u/{{ comment.link.user.username }}">{{ comment.link.user.name }}</a>
+            </div>
+        </div>
+    </div>
+</div>

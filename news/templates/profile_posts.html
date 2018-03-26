@@ -13,29 +13,15 @@
                     <img src="/static/images/testingprof.png">
                 </div>
                 <div class="profile-name">
-                    {% if user.full_name %}
-                    <h1 class="full-name">{{ user.full_name }}</h1>
-                    <div class="under-name">{{ user.username }}</div>
-                    {% else %}
-                    <h1 class="username">{{ user.username }}</h1>
-                    {% endif %}
-                    {% if user.url %}
-                    <div class="profile-url">
-                        <a href="{{ user.url }}">{{ user.url }}</a>
-                    </div>
-                    {% endif %}
+                    <h1 class="full-name">{{ user.name }}</h1>
                 </div>
-            </div>
-            <div class="profile-body">
-                {% if user.bio %}
-                <div class="profile-about">
-                    {{ user.bio }}
-                </div>
-                {% endif %}
             </div>
         </div>
         <div class="links">
             <div class="menu">
+                <a href="/u/{{user.username}}">
+                    About
+                </a>
                 <a href="/u/{{user.username}}/posts">
                     Posts
                 </a>

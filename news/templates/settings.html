@@ -6,11 +6,19 @@
 
 {% block body %}
 <section>
-    <form action="/settings" method="POST">
-        {{ form.show_images }}
-        {{ form.min_link_score }}
-        {{ form.csrf_token }}
-        <input type="submit" value="Save">
-    </form>
+    <div class="container">
+        <form action="/settings" method="POST">
+            <div class="f-row">
+                {{ form.show_images.label }}
+                {{ form.show_images }}
+            </div>
+            <div class="f-row">
+                {{ form.min_link_score.label }}
+                {{ form.min_link_score }}
+            </div>
+            {{ form.csrf_token }}
+            <input type="submit" value="Save">
+        </form>
+    </div>
 </section>
 {% endblock %}

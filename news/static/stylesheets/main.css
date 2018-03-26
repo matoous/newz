@@ -1,8 +1,89 @@
+form {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+form p {
+  font-size: .8em;
+}
+form a {
+  color: black;
+}
+form .additional-info {
+  font-size: .8em;
+  border-top: 1px solid #e5e5e5;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+form input[type=password],
+form input[type=email],
+form input[type=text] {
+  display: block;
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #e5e5e5;
+  padding: 1em 1.6em;
+  font-size: 16px;
+}
+.f-row {
+  padding-bottom: 24px;
+}
+.one-page-form {
+  margin: 0 auto 74px auto;
+  max-width: 420px;
+}
+.one-page-form input {
+  width: 100%;
+}
+fieldset {
+  padding: 0;
+  border: none;
+}
+.btn,
+button,
+input[type=submit] {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  border-radius: 3px;
+  background-color: #087cc3;
+  font-family: 'Roboto Condensed', sans-serif;
+  color: #ffffff;
+  line-height: 1.5em;
+  border: none;
+  letter-spacing: 1.05px;
+  height: 41px;
+  -webkit-appearance: button;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 0 32px;
+}
 @font-face {
   font-family: 'DualisLite';
   src: url('/static/fnt/DualisLite.ttf.woff') format('woff'), url('/static/fnt/DualisLite.ttf.svg#DualisLite') format('svg'), url('/static/fnt/DualisLite.ttf.eot'), url('/static/fnt/DualisLite.ttf.eot?#iefix') format('embedded-opentype');
   font-weight: normal;
   font-style: normal;
+}
+* {
+  box-sizing: border-box;
+}
+a,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span {
+  text-rendering: geometricPrecision;
+}
+html,
+body {
+  height: 100%;
+  width: 100%;
 }
 body {
   font-family: 'Lora', serif;
@@ -334,6 +415,17 @@ section {
 .link-card .link-info div {
   position: relative;
 }
+.link-add-comment {
+  margin: 32px 0;
+}
+.link-add-comment textarea {
+  width: 90%;
+  max-width: 720px;
+}
+.link-add-comment button {
+  margin-top: 12px;
+  display: block;
+}
 .comment {
   margin-bottom: 6px;
   display: flex;
@@ -376,4 +468,47 @@ section {
 .comment .comment-options a {
   color: #666;
   margin-right: 6px;
+}
+.profile {
+  margin-bottom: 42px;
+}
+.profile .profile-head {
+  position: relative;
+  width: 100%;
+  text-align: center;
+}
+.profile .profile-avatar {
+  border-radius: 50%;
+  max-width: 260px;
+  background-color: #f5f5f5;
+  display: inline-block;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.profile .profile-avatar img {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+}
+.profile .profile-name h1 {
+  margin: 18px 0 6px 0;
+}
+.profile .profile-name h1.username {
+  text-transform: none;
+}
+.profile .profile-name h1.full-name {
+  text-transform: capitalize;
+}
+.profile .profile-url {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+.profile .profile-url a {
+  font-weight: bold;
+  color: #666;
+}
+.profile .profile-about {
+  margin-top: 32px;
+  font-size: 20px;
+  line-height: 28px;
+  word-wrap: break-word;
 }

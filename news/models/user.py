@@ -4,8 +4,8 @@ from flask_wtf import Form
 from orator import Model
 from orator.orm import belongs_to_many, has_many
 from wtforms import StringField, PasswordField, SelectField, IntegerField
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired
+from wtforms.fields.html5 import EmailField, URLField
+from wtforms.validators import DataRequired, URL
 
 from news.lib.cache import cache
 from news.lib.login import login_manager
@@ -21,6 +21,8 @@ class User(Model):
                     'profile_pic', 'p_show_images', 'p_min_link_score']
     __guarded__ = ['id', 'password', 'reported', 'spammer']
     __hidden__ = ['password', 'reported', 'spammer', 'email_verified']
+
+    # TODO add short about -> will be displayed under name, things like title, profession etc.
 
     @classmethod
     def create_table(cls):
@@ -129,6 +131,11 @@ class User(Model):
         from news.models.link import Link
         return Link
 
+    @has_many
+    def comments(self):
+        from news.models.comment import Comment
+        return Comment
+
     @cache.memoize()
     def subscribed_feed_ids(self):
         return [feed.id for feed in self.feeds]
@@ -162,9 +169,9 @@ class User(Model):
 
 
 class SignUpForm(Form):
-    username = StringField('Username', [DataRequired()])
-    email = EmailField('Email', [DataRequired()])
-    password = PasswordField('Password', [DataRequired()])
+    username = StringField('Username', [DataRequired()], render_kw={'placeholder': 'Username'})
+    email = EmailField('Email', [DataRequired()], render_kw={'placeholder': 'Email'})
+    password = PasswordField('Password', [DataRequired()], render_kw={'placeholder': 'Password'})
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
@@ -195,8 +202,8 @@ class SignUpForm(Form):
 
 
 class LoginForm(Form):
-    username_or_email = StringField('Username or email', [DataRequired()])
-    password = PasswordField('Password', [DataRequired()])
+    username_or_email = StringField('Username or email', [DataRequired()], render_kw={'placeholder': 'Username or email'})
+    password = PasswordField('Password', [DataRequired()], render_kw={'placeholder': 'Password'})
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
@@ -232,4 +239,16 @@ class SettingsForm(Form):
             changes['p_show_images'] = self.show_images.data
         if self.min_link_score != current_user.p_min_link_score:
             changes['p_min_link_score'] = self.min_link_score.data
+        return True
+
+
+class ProfileForm(Form):
+    full_name = StringField('Full name', )
+    bio = StringField('Bio')
+    url = URLField(validators=[URL()])
+
+    def validate(self, user):
+        user.full_name = self.full_name.data
+        user.bio = self.bio.data
+        user.url = self.url.data
         return True

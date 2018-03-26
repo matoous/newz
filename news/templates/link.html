@@ -35,9 +35,9 @@
                 </div>
             </div>
             {% if current_user.is_authenticated %}
-            <div class="link-comments">
+            <div class="link-add-comment">
                 <form method="post" action="/f/{{ link.feed.slug }}/{{ link.slug }}/comment">
-                    {{ comment_form.text }}
+                    {{ comment_form.text(rows='6', cols='60') }}
                     {{ comment_form.parent_id }}
                     {{ comment_form.csrf_token }}
                     <button type="submit">Submit</button>
