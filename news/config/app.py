@@ -23,28 +23,13 @@ from flask import Flask
 
 
 def make_app():
-    env = DotEnv()
     app = Flask(__name__, static_url_path='/static', static_folder="../static")
-    app.config['SECRET_KEY'] = 'secretpico'
+    app.config['SECRET_KEY'] = 'WubbaLubbaDubDub!Pickle!12354112#yolo!'
     app.register_blueprint(web)
     app.register_blueprint(auth)
     app.register_blueprint(feed_blueprint)
     app.register_blueprint(settings)
     app.register_blueprint(user_blueprint)
-
-    env.init_app(app)
-
-    app.config['ORATOR_DATABASES'] = {
-        'default': 'postgres',
-        'postgres': {
-            'driver': 'postgres',
-            'host': 'localhost',
-            'database': 'newsfeed',
-            'user': 'postgres',
-            'password': '',
-            'prefix': '',
-        },
-    }
 
     csrf.init_app(app)
     limiter.init_app(app)

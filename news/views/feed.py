@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, render_template, Response, request, abort
 from flask_login import login_required, current_user
 
 from news.lib.db.query import LinkQuery
+from news.lib.filters import min_score_filter
 from news.lib.normalized_trending import trending_links
 from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
@@ -31,14 +32,19 @@ def get_feed(slug=None):
     if feed is None:
         abort(404)
 
-    sort = request.args.get('sort')
+    sort = request.args.get('s')
     if (sort is None or sort not in ['trending', 'new', 'best']) and current_user.is_authenticated:
         sort = current_user.preferred_sort
     if sort is None:
         sort = feed.default_sort
 
-    links = LinkQuery(feed_id=feed.id, sort='trending')
-    feed.links = [Link.by_id(link_id) for link_id in links]
+    lids = LinkQuery(feed_id=feed.id, sort=sort)
+    links = [Link.by_id(link_id) for link_id in lids]
+
+    if sort == 'new':
+        links = filter(min_score_filter(current_user.p_min_link_score), links)
+
+    feed.links = links
     return render_template("feed.html", feed=feed)
 
 
@@ -110,7 +116,7 @@ def link_view(feed_slug=None, link_slug=None):
 
     comment_form = CommentForm()
 
-    sorted_comments = SortedComments.get_full_tree(link)
+    sorted_comments = SortedComments(link).get_full_tree()
     return render_template('link.html', link=link, feed=feed, comment_form=comment_form, comments=sorted_comments,
                            get_comment=Comment.by_id)
 

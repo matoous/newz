@@ -169,41 +169,54 @@ class CommentTree:
 
 
 class SortedComments:
-    @classmethod
-    def _cache_key(cls, link, parent_id):
-        return 'scm:{}.{}'.format(link.id, parent_id) if parent_id else 'scm:{}'.format(link.id)
+    def __init__(self, link):
+        self.link = link
+        self._tree = CommentTree.by_link(link).tree
+
+    def _cache_key(self, parent_id):
+        return 'scm:{}.{}'.format(self.link.id, parent_id) if parent_id else 'scm:{}'.format(self.link.id)
 
     @classmethod
     def _lock_key(cls, link, parent_id):
-        return 'scm_lock:{}.{}'.format(link.id, parent_id) if parent_id else 'scm_lock:{}'.format(link.id)
+        return 'lock:scm:{}.{}'.format(link.id, parent_id) if parent_id else 'lock:scm:{}'.format(link.id)
 
     @classmethod
     def update(cls, link, comment):
         cache_key = cls._cache_key(link, comment.parent_id)
+        # update comment under read - write - modify lock
         with redis_lock.Lock(conn, cls._lock_key(link, comment.parent_id)):
             comments = cache.get(cache_key) or []
             added = False
+
+            # update comment
             for i in range(len(comments)):
                 if comments[i][0] == comment.id:
                     comments[i] = (comment.id, confidence(comment.ups, comment.downs))
                     added = True
                     break
+
+            # add comment
             if not added:
                 comments.append((comment.id, confidence(comment.ups, comment.downs)))
-            comments = sorted(comments, key=lambda x: x[1], reverse=True)
+
+            # sort and save
+            comments = sorted(comments, key=lambda x: x[1:], reverse=True)
             cache.set(cache_key, comments)
 
-    @classmethod
-    def build_tree(cls, link, comment_id=None, depth=-1):
-        children_ids = cache.get(cls._cache_key(link, comment_id))
-        if children_ids is None or depth == 0:
-            return comment_id, []
-        else:
-            return comment_id, [cls.build_tree(link, children_id, depth - 1) for children_id, _ in children_ids]
+    def build_tree(self, comment_id=None):
+        # get from cache
+        children_tuples = cache.get(self._cache_key(comment_id))
 
-    @classmethod
-    def get_full_tree(cls, link, limit_main_comments=None, limit_count=None, limit_depth=None):
-        tree = cls.build_tree(link)
+        # cache miss, update
+        if children_tuples is None:
+            children = Comment.where('parent_id', comment_id).where('link_id', self.link.id).get()
+            children_tuples = [(x.id, confidence(x.ups, x.downs)) for x in children]
+            cache.set(self._cache_key(comment_id), children_tuples)
+
+        return comment_id, [self.build_tree(children_id) for children_id, _ in children_tuples]
+
+    def get_full_tree(self):
+        tree = self.build_tree()
         return tree[1]
 
 

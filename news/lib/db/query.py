@@ -19,13 +19,14 @@ def tuple_maker(sort):
 
 
 class LinkQuery():
-    def __init__(self, feed_id, sort, time='all'):
+    def __init__(self, feed_id, sort, time='all', filters=()):
         self.feed_id = feed_id
         self.sort = sort
         self.time = time
         self._tupler = tuple_maker(sort)
         self._fetched = False
         self._data = None
+        self._filters = filters
 
     def __iter__(self):
         self.fetch()
@@ -115,6 +116,10 @@ class LinkQuery():
             self._rebuild()
 
         self._fetched = True
+
+        for fnc in self._filters:
+            self._data = filter(fnc, self._data)
+
         return self._data
 
     def fetch_ids(self):
