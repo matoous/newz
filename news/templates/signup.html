@@ -5,38 +5,40 @@
 {% endblock %}
 
 {% block body %}
-<div class="one-page-form">
-    <form action="/join" method="POST">
-        <h2>Sign Up</h2>
-        <p>
-            Already have an account? <a href="/signin">Sign in</a>
-        </p>
-        <fieldset>
-            <div class="f-row">
-                {{ form.username }}
+<div class="page-container">
+    <div class="one-page-form">
+        <form action="/join" method="POST">
+            <h2>Sign Up</h2>
+            <p>
+                Already have an account? <a href="/login">Sign in</a>
+            </p>
+            <fieldset>
+                <div class="f-row">
+                    {{ form.username }}
+                </div>
+                <div class="f-row">
+                    {{ form.email }}
+                </div>
+                <div class="f-row">
+                    {{ form.password }}
+                </div>
+                {{ form.csrf_token }}
+                <input type="submit" value="Sign Up">
+            </fieldset>
+            <div class="additional-info">
+                <b>Need help?</b>
+                <a href="/contact">
+                    Contact us
+                </a>
+                <br>
+                <a href="/terms">
+                    Terms and conditions
+                </a>,
+                <a href="/privacy">
+                    Privacy policy
+                </a>
             </div>
-            <div class="f-row">
-                {{ form.email }}
-            </div>
-            <div class="f-row">
-                {{ form.password }}
-            </div>
-            {{ form.csrf_token }}
-            <input type="submit" value="Sign Up">
-        </fieldset>
-        <div class="additional-info">
-            <b>Need help?</b>
-            <a href="/contact">
-                Contact us
-            </a>
-            <br>
-            <a href="/terms">
-                Terms and conditions
-            </a>,
-            <a href="/privacy">
-                Privacy policy
-            </a>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 {% endblock %}

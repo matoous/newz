@@ -49,21 +49,28 @@ footer {
   font-family: 'Roboto Condensed', sans-serif;
   padding: 12px 0;
   font-size: .8rem;
-  color: white;
-  background-color: #000000;
+  color: #666;
+  width: 100%;
+  position: relative;
+
+  .wrapper {
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    max-width: 480px;
+    border-top: 1px solid #e5e5e5;
+  }
 
   .options {
-    text-align: center;
     font-size: 1rem;
     a {
       font-family: 'DualisLite', sans-serif;
       padding: 0 12px;
-      color: white;
+      color: #666;
     }
   }
 
   .copyright {
-    text-align: right;
     margin-top: 12px;
   }
 }
@@ -72,6 +79,11 @@ section {
   min-height: 100vh;
   margin-bottom: 64px;
   padding-top: 32px;
+}
+
+.page-container {
+  max-width: 100%;
+  padding: 20px;
 }
 
 .main-nav {

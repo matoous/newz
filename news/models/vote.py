@@ -61,7 +61,7 @@ class Vote(Model):
         return None
 
 
-class LinkVote(Vote, Model):
+class LinkVote(Vote):
     __table__ = 'link_votes'
     __fillable__ = ['user_id', 'link_id', 'vote_type']
     __timestamps__ = False
@@ -80,6 +80,12 @@ class LinkVote(Vote, Model):
             table.foreign('link_id').references('id').on('links')
             table.integer('vote_type')
             table.primary(['user_id', 'link_id'])
+
+    def __eq__(self, other):
+        return self.user_id == other.user_id and self.link_id == other.link_id and self.vote_type == other.vote_type
+
+    def __ne__(self, other):
+        return not self == other
 
     @property
     def user(self):
@@ -109,14 +115,15 @@ class LinkVote(Vote, Model):
 
     def apply(self):
         previous_vote = LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).first()
+
         if previous_vote and previous_vote.vote_type == self.vote_type:
             return
 
         if previous_vote and previous_vote.affected_attribute:
-            Link.where('id', self.link_id).decrement(previous_vote.affected_attribute, 1)
+            self.link.decr(previous_vote.affected_attribute, 1)
 
         if self.affected_attribute:
-            Link.where('id', self.link_id).increment(self.affected_attribute, 1)
+            self.link.incr(self.affected_attribute, 1)
 
         if previous_vote is None:
             self.save()
@@ -125,11 +132,12 @@ class LinkVote(Vote, Model):
 
         cache_key = LinkVote._cache_key(self.link_id, self.user_id)
         cache.set(cache_key, self)
+
         if self.link.num_votes < 20 or self.link.num_votes % 8 == 0:
             q.enqueue(update_link, self.link, result_ttl=0)
 
 
-class CommentVote(Vote, Model):
+class CommentVote(Vote):
     __table__ = 'comment_votes'
     __fillable__ = ['user_id', 'comment_id', 'vote_type']
     __timestamps__ = False
@@ -181,10 +189,10 @@ class CommentVote(Vote, Model):
             return
 
         if previous_vote and previous_vote.affected_attribute:
-            Comment.where('id', self.comment_id).decrement(previous_vote.affected_attribute, 1)
+            self.comment.decr(previous_vote.affected_attribute, 1)
 
         if self.affected_attribute:
-            Comment.where('id', self.comment_id).increment(self.affected_attribute, 1)
+            self.comment.incr(self.affected_attribute, 1)
 
         if previous_vote is None:
             self.save()
@@ -193,6 +201,5 @@ class CommentVote(Vote, Model):
 
         cache_key = CommentVote._cache_key(self.comment_id, self.user_id)
         cache.set(cache_key, self)
-        Comment.update_cache(self.comment)
         if self.comment.num_votes < 20 or self.comment.num_votes % 8 == 0:
             q.enqueue(update_comment, self.comment, result_ttl=0)

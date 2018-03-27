@@ -1,26 +1,14 @@
 import heapq
-from datetime import datetime
-from math import log
-
 import itertools
 
-from news.lib.utils.time_utils import epoch_seconds
-from news.models.link import Link
+from news.lib.db.query import LinkQuery
 
 MAX_LINKS = 1000
 
-
-def hot(score, date):
-    order = log(max(abs(score), 1), 10)
-    sign = 1 if score > 0 else -1 if score < 0 else 0
-    seconds = epoch_seconds(date) - 1134028003
-    return round(sign * order + seconds / 45000, 7)
-
-
 # returns links as tuples so they can be effectively merged/sorted with heapq
 def trending_tuples(fid):
-    links = Link.get_by_feed_id(fid, 'trending')
-    return [(-hot(link.score, link.created_at), link) for link in links]
+    query = LinkQuery(fid, 'trending')
+    return [(-hot_score, link) for link, hot_score in query.fetch()]
 
 
 def trending_links(ids):

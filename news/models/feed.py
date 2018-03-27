@@ -16,8 +16,8 @@ from news.models.vote import Vote
 
 class Feed(Model):
     __table__ = 'feeds'
-    __fillable__ = ['name', 'slug', 'description', 'default_sort', 'lang','over_18','logo']
-    __guarded__ = ['id','reported']
+    __fillable__ = ['name', 'slug', 'description', 'default_sort', 'lang', 'over_18', 'logo']
+    __guarded__ = ['id', 'reported']
     __hidden__ = ['reported']
 
     @classmethod

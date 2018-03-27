@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, render_template, Response, request, abort
 from flask_login import login_required, current_user
 
+from news.lib.db.query import LinkQuery
 from news.lib.normalized_trending import trending_links
 from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
@@ -36,7 +37,8 @@ def get_feed(slug=None):
     if sort is None:
         sort = feed.default_sort
 
-    feed.links = trending_links([feed.id])
+    links = LinkQuery(feed_id=feed.id, sort='trending')
+    feed.links = [Link.by_id(link_id) for link_id in links]
     return render_template("feed.html", feed=feed)
 
 

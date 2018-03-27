@@ -11,10 +11,11 @@ from news.lib.db.db import schema
 from news.lib.queue import q
 from news.lib.utils.confidence import confidence
 from news.lib.utils.time_utils import time_ago
+from news.models.base import Base
 from news.models.report import Report
 
 
-class Comment(Model):
+class Comment(Base):
     __table__ = 'comments'
     __fillable__ = ['link_id', 'parent_id', 'text', 'user_id']
     __guarded__ = ['id', 'reported', 'spam', 'ups', 'downs']
@@ -35,6 +36,10 @@ class Comment(Model):
             table.integer('downs').default(0)
             table.datetime('created_at')
             table.datetime('updated_at')
+
+    @classmethod
+    def _cache_prefix(cls):
+        return "c:"
 
     def __eq__(self, other):
         if not isinstance(other, Comment):
@@ -80,24 +85,13 @@ class Comment(Model):
         q.enqueue(add_new_comment, self.link, self, result_ttl=0)
 
     @classmethod
-    def _cache_key(cls, id):
-        return 'cm:{}'.format(id)
-
-    @classmethod
     def by_id(cls, id):
-        cache_key = cls._cache_key(id)
+        cache_key = cls._cache_key_from_id(id)
         comment = cache.get(cache_key)
         if comment is None:
             comment = cls.where('id', id).first()
             cache.set(cache_key, comment)
             conn.expire(cache_key, 7 * 24 * 60 * 60) # expire after week
-        return comment
-
-    @classmethod
-    def update_cache(cls, comment):
-        cache_key = cls._cache_key(comment.id)
-        comment = cls.where('id', comment.id).first()
-        cache.set(cache_key, comment)
         return comment
 
 

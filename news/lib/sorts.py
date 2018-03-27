@@ -1,24 +1,20 @@
 from datetime import datetime
 from math import log
 
+from news.lib.utils.time_utils import epoch_seconds
+
 epoch = datetime(1970, 1, 1)
-
-
-def sort_cache_key(feed_id, sort):
-    return 'fs:{}.{}'.format(feed_id.to_bytes(8, 'big'), sort)
-
-
-def epoch_seconds(date):
-    td = date - epoch
-    return td.total_seconds()
 
 
 def hot(score, date):
     order = log(max(abs(score), 1), 10)
     sign = 1 if score > 0 else -1 if score < 0 else 0
     seconds = epoch_seconds(date) - 1134028003
-    print(round(sign * order + seconds / 45000, 7))
     return round(sign * order + seconds / 45000, 7)
+
+
+def sort_tuples(data):
+    return sorted(data, key=lambda x: x[1:], reverse=True)
 
 
 def default_sorts(data, sort):

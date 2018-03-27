@@ -8,16 +8,18 @@ from wtforms.validators import DataRequired, Length, URL
 
 from news.lib.cache import cache
 from news.lib.db.db import db, schema
+from news.lib.db.query import add_to_queries
 from news.lib.db.sorts import sorts
 from news.lib.queue import q, redis_conn
-from news.lib.sorts import default_sorts, sort_cache_key
-from news.lib.utils.time_utils import time_ago
+from news.lib.sorts import hot
+from news.lib.utils.time_utils import time_ago, epoch_seconds
+from news.models.base import Base
 from news.models.report import Report
 
 MAX_IN_CACHE = 1000
 
 
-class Link(Model):
+class Link(Base):
     __table__ = 'links'
     __fillable__ = ['title', 'slug', 'summary', 'text', 'user_id', 'url', 'feed_id']
     __guarded__ = ['id', 'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
@@ -46,6 +48,14 @@ class Link(Model):
             table.integer('reported').default(0)
             table.boolean('spam').default(False)
 
+    def __init__(self, **attributes):
+        super().__init__(**attributes)
+        self.ups = self.downs = 0
+
+    @classmethod
+    def _cache_prefix(cls):
+        return "l:"
+
     def __eq__(self, other):
         if not isinstance(other, Link):
             return False
@@ -55,18 +65,33 @@ class Link(Model):
         return '<Link {}>'.format(self.id)
 
     @property
+    def hot(self):
+        return hot(self.score, self.created_at)
+
+    @property
     def feed(self):
         from news.models.feed import Feed
         return Feed.by_id(self.feed_id)
 
     @classmethod
     def by_id(cls, id):
-        return cls.where('id', id).first()
+        cache_key = cls._cache_key_from_id(id)
+        cached_data = cache.get(cache_key)
+        if cached_data is None:
+            cached_data = cls.where('id', id).first()
+            cached_data.new_to_cache()
+        return cached_data
 
     @property
     def user(self):
         from news.models.user import User
         return User.by_id(self.user_id)
+
+    @property
+    def trimmed_summary(self):
+        if len(self.summary) > 300:
+            return self.summary[:300] + '...'
+        return self.summary
 
     @property
     def votes(self):
@@ -88,22 +113,12 @@ class Link(Model):
         return Report
 
     @classmethod
-    def _cache_prefix(cls):
-        return "l:"
-
-    @classmethod
     def by_feed(cls, feed, sort):
         return Link.get_by_feed_id(feed.id, sort)
 
     @classmethod
     def get_by_feed_id(cls, feed_id, sort):
-        """
-        Get's links by feed id and caches the result for future use
-        :param feed_id: feed_id
-        :param sort: sorting type: trending/new/best
-        :return: list of links
-        """
-        cache_key = 'fs:{}.{}'.format(feed_id.to_bytes(8, 'big'), sort)
+        cache_key = 'fs:{}.{}'.format(feed_id, sort)
 
         r = cache.get(cache_key)
         if r is not None:
@@ -113,9 +128,6 @@ class Link(Model):
 
         # cache needs array of objects, not a orator collection
         res = [f for f in q.limit(1000).get()]
-        for l in res:
-            if len(l.summary) > 300:
-                l.summary = l.summary[:300] + '...'
         cache.set(cache_key, res)
         return res
 
@@ -128,31 +140,7 @@ class Link(Model):
 
     def commit(self):
         self.save()
-        self.ups = self.downs = 0
-        q.enqueue(Link.add_to_queries, self, result_ttl=0)
-
-    @classmethod
-    @job('medium', connection=redis_conn)
-    def add_to_queries(link):
-        if len(link.summary) > 300:
-            link.summary = link.summary[:300] + '...'
-
-        # for 'new' all we need is to prepend
-        cache_key = sort_cache_key(link.feed_id, 'new')
-        data = cache.get(cache_key) or []
-        data.insert(0, link)
-        cache.set(cache_key, data[:MAX_IN_CACHE])
-
-        # for the rest, sort the data in cache on insert
-        for sort in ['trending', 'best']:  # no need to update 'new' because it doesn't depend on score
-            cache_key = sort_cache_key(link.feed_id, sort)
-            data = cache.get(cache_key)
-            if data is None:
-                continue
-            data.append(link)
-            data = default_sorts(data, sort)
-            cache.set(cache_key, data)
-        return None
+        q.enqueue(add_to_queries, self, result_ttl=0)
 
 
 class LinkForm(Form):

@@ -5,27 +5,29 @@
 {% endblock %}
 
 {% block body %}
-<div class="one-page-form">
-    <form action="/login" method="POST">
-        <h2>Sign In</h2>
-        <p>
-            Don't have an account? <a href="/signin">Sign up</a>
-        </p>
-        <fieldset>
-            <div class="f-row">
-                {{ form.username_or_email }}
+<div class="page-container">
+    <div class="one-page-form">
+        <form action="/login" method="POST">
+            <h2>Sign In</h2>
+            <p>
+                Don't have an account? <a href="/join">Sign up</a>
+            </p>
+            <fieldset>
+                <div class="f-row">
+                    {{ form.username_or_email }}
+                </div>
+                <div class="f-row">
+                    {{ form.password }}
+                </div>
+                {{ form.csrf_token }}
+                <input type="submit" value="Sign In">
+            </fieldset>
+            <div class="additional-info">
+                <a href="/reset-password">
+                    <b>Forgot password?</b>
+                </a>
             </div>
-            <div class="f-row">
-                {{ form.password }}
-            </div>
-            {{ form.csrf_token }}
-            <input type="submit" value="Sign In">
-        </fieldset>
-        <div class="additional-info">
-            <a href="/reset-password">
-                <b>Forgot password?</b>
-            </a>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 {% endblock %}

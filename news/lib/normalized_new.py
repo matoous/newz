@@ -3,6 +3,7 @@ import heapq
 
 import itertools
 
+from news.lib.db.query import LinkQuery
 from news.lib.sorts import epoch_seconds
 from news.models.link import Link
 
@@ -10,8 +11,8 @@ MAX_LINKS = 1000
 
 
 def new_tuples(fid):
-    links = Link.get_by_feed_id(fid, 'new')
-    return [(-epoch_seconds(link.created_at), link) for link in links]
+    query = LinkQuery(fid, 'new')
+    return [(-time, link) for link, time in query.fetch()]
 
 
 def new_links(ids):
