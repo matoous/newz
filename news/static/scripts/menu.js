@@ -21,7 +21,7 @@ document.addEventListener("click", function(ev){
 });
 
 document.addEventListener('scroll', function(){
-    var logo = document.querySelector('.nav-logo .logo');
+    var logo = document.querySelector('.nav-logo.animated .logo');
     if(pageYOffset !== 0 && logo && !logo.classList.contains('smaller')){
         logo.classList.add('smaller');
     }
@@ -29,6 +29,8 @@ document.addEventListener('scroll', function(){
         logo.classList.remove('smaller');
     }
 });
+
 setReplyTo = function(id){
     document.querySelector('#parent_id').value = id;
+    return false;
 };

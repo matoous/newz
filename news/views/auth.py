@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import Blueprint, render_template, redirect
 from flask_login import login_user, logout_user, login_required, current_user
 
+from news.lib.limiter import limiter
 from news.models.user import SignUpForm, LoginForm
 
 auth = Blueprint('auth', __name__, template_folder='/templates')
@@ -16,7 +17,7 @@ def signup():
         user = form.user
         user.save()
         return redirect('/')
-    return render_template("signup.html", form=form)
+    return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
 
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -25,7 +26,7 @@ def login():
     if form.validate():
         form.user.login()
         return redirect('/')
-    return render_template("login.html", form=form)
+    return render_template("login.html", form=form, show_logo=True, hide_menues=True)
 
 
 @auth.route("/logout")

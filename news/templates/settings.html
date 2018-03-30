@@ -7,18 +7,44 @@
 {% block body %}
 <section>
     <div class="container">
-        <form action="/settings" method="POST">
-            <div class="f-row">
-                {{ form.show_images.label }}
-                {{ form.show_images }}
+        <div class="settings">
+            <div class="settings-menu">
+                <ul>
+                    <li class="header">
+                        <b>Settings</b>
+                    </li>
+                    <li>
+                        <a href="/settings">
+                            Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/settings/account">
+                            Account
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/settings/preferences">
+                            Preferences
+                        </a>
+                    </li>
+                </ul>
             </div>
-            <div class="f-row">
-                {{ form.min_link_score.label }}
-                {{ form.min_link_score }}
+            <div class="settings-tab">
+                <form action="/settings" method="POST">
+                    <div class="f-row">
+                        {{ form.show_images.label }}
+                        {{ form.show_images }}
+                    </div>
+                    <div class="f-row">
+                        {{ form.min_link_score.label }}
+                        {{ form.min_link_score }}
+                    </div>
+                    {{ form.csrf_token }}
+                    <input type="submit" value="Save">
+                </form>
             </div>
-            {{ form.csrf_token }}
-            <input type="submit" value="Save">
-        </form>
+        </div>
     </div>
 </section>
 {% endblock %}

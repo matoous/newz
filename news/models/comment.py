@@ -1,6 +1,5 @@
 import redis_lock
 from flask_wtf import Form
-from orator import Model
 from orator.orm import has_many, morph_many
 from wtforms import HiddenField, TextAreaField
 from wtforms.validators import DataRequired, Optional
@@ -91,7 +90,7 @@ class Comment(Base):
         if comment is None:
             comment = cls.where('id', id).first()
             cache.set(cache_key, comment)
-            conn.expire(cache_key, 7 * 24 * 60 * 60) # expire after week
+            conn.expire(cache_key, 7 * 24 * 60 * 60)  # expire after week
         return comment
 
 
@@ -173,8 +172,9 @@ class SortedComments:
         self.link = link
         self._tree = CommentTree.by_link(link).tree
 
-    def _cache_key(self, parent_id):
-        return 'scm:{}.{}'.format(self.link.id, parent_id) if parent_id else 'scm:{}'.format(self.link.id)
+    @classmethod
+    def _cache_key(cls, link, parent_id):
+        return 'scm:{}.{}'.format(link.id, parent_id) if parent_id else 'scm:{}'.format(link.id)
 
     @classmethod
     def _lock_key(cls, link, parent_id):
@@ -205,13 +205,13 @@ class SortedComments:
 
     def build_tree(self, comment_id=None):
         # get from cache
-        children_tuples = cache.get(self._cache_key(comment_id))
+        children_tuples = cache.get(self._cache_key(self.link, comment_id))
 
         # cache miss, update
         if children_tuples is None:
             children = Comment.where('parent_id', comment_id).where('link_id', self.link.id).get()
             children_tuples = [(x.id, confidence(x.ups, x.downs)) for x in children]
-            cache.set(self._cache_key(comment_id), children_tuples)
+            cache.set(self._cache_key(self.link, comment_id), children_tuples)
 
         return comment_id, [self.build_tree(children_id) for children_id, _ in children_tuples]
 

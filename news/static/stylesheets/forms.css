@@ -27,7 +27,7 @@ form input[type=text] {
   padding-bottom: 24px;
 }
 .one-page-form {
-  margin: 0 auto 74px auto;
+  margin: 64px auto 74px auto;
   max-width: 420px;
 }
 .one-page-form input {

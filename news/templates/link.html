@@ -46,8 +46,8 @@
             {% endif %}
             <div class="link-comments">
                 {% for comment_id, subcomments in comments recursive %}
-                <div class="comment">
                     {% set comment = get_comment(comment_id) %}
+                <div class="comment" id="{{ comment.id }}">
                     <div class="comment-voting">
                         <div class="up">
                             <a href="/c/{{ comment.id }}/vote/upvote">
@@ -76,7 +76,7 @@
                             {{ comment.text }}
                         </div>
                         <div class="comment-options">
-                            <a href="#" onclick="setReplyTo('{{ comment.id }}'); return false">reply</a> <a href="/c/{{comment.id}}/report">report</a>
+                            <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a> <a href="/c/{{comment.id}}/report">report</a>
                         </div>
                         {% if subcomments|length > 0 %}
                             <div class="subcomments">

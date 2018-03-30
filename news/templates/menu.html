@@ -1,23 +1,39 @@
 <nav class="main-nav">
-    {% if current_user.is_authenticated %}
+
+    {% if current_user.is_authenticated and not hide_menues %}
     <div class="nav-left">
         <div class="menu-opener left" onclick="toggleMenu('feeds-nav',event);">
             <img src="/static/images/menu.svg">
         </div>
     </div>
     {% endif %}
-    {% if show_logo %}
-    <div class="nav-logo">
-        <div class="logo">
-            The Globalfeed
+
+    <div class="nav-logo{% if show_logo %} animated{% endif %}">
+        <div class="logo{% if not show_logo %} smaller{% endif %}">
+            <a href="/">The Globalfeed</a>
         </div>
     </div>
-    {% endif %}
+
+    {% if not hide_menues %}
     <div class="nav-right">
         <div class="menu-opener right" onclick="toggleMenu('side-nav',event);">
             <img src="/static/images/user.svg">
         </div>
     </div>
+    {% endif %}
+
+    {% if not hide_menues %}
+    <div class="nav-menu">
+        <div class="index-menu">
+            <div>
+                <a href="/">Home</a>
+                <a href="/trending">Trending</a>
+                <a href="/new">New</a>
+                <a href="/best">Best</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </nav>
 <nav class="t-nav hidden" id="side-nav">
     <div class="menu-hider" onclick="toggleMenu('side-nav',event);">

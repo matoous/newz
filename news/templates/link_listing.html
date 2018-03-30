@@ -1,10 +1,12 @@
 <div class="link">
     <div class="link-body">
+        {% if not single_feed %}
         <div class="link-feed">
             <a href="/f/{{link.feed.slug}}">
                 {{ link.feed.name }}
             </a>
         </div>
+        {% endif %}
         <h2>
             <a href="{{ link.url }}">
                 {{ link.title }}

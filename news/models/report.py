@@ -18,7 +18,9 @@ class Report(Model):
             table.integer('user_id').unsigned()
             table.datetime('created_at')
             table.datetime('updated_at')
+            table.index('user_id')
 
     @morph_to
     def reportable(self):
         return
+

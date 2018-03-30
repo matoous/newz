@@ -31,4 +31,4 @@ class DisposableToken(Model):
             id = generate_token(20)
             token = DisposableToken.where('id', id).first()
             if token is None:
-                return DisposableToken.create(id=id)
+                return DisposableToken.create({'id': id})

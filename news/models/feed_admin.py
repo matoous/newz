@@ -1,7 +1,8 @@
 from news.lib.db.db import db, schema
+from news.models.base import Base
 
 
-class FeedAdmin(db.Model):
+class FeedAdmin(Base):
     __table__ = 'feed_admins'
     __fillable__ = ['god', 'user_id', 'feed_id']
 
@@ -16,11 +17,6 @@ class FeedAdmin(db.Model):
             table.datetime('updated_at')
             table.primary(['user_id', 'feed_id'])
 
-    def __init__(self, user, feed, god=False):
-        self.user_id = user.id
-        self.feed_id = feed.id
-        self.god = god
-
     @classmethod
     def by_feed_id(cls, feed_id):
         return cls.where('feed_id', feed_id).get()
@@ -28,3 +24,4 @@ class FeedAdmin(db.Model):
     @classmethod
     def by_user_id(cls, user_id):
         return cls.where('user_id', user_id).get()
+

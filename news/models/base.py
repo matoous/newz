@@ -31,9 +31,6 @@ class Base(Model):
     def write_to_cache(self):
         cache.set(self._cache_key, self)
 
-    def new_to_cache(self):
-        cache.set(self._cache_key, self)
-
     def incr(self, property, amp=1):
         with self.get_read_modify_write_lock():
             self.update_from_cache()

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import bcrypt
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
@@ -7,6 +9,7 @@ from wtforms import StringField, PasswordField, SelectField, IntegerField
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import DataRequired, URL
 
+from news.config.config import GODS
 from news.lib.cache import cache
 from news.lib.login import login_manager
 from news.lib.db.db import db, schema
@@ -112,7 +115,6 @@ class User(Model):
         if u is not None:
             return u
         u = User.where('id', id).first()
-        print('dbq')
         if u is not None:
             cache.set('u:{}'.format(id), u)
         return u
@@ -120,6 +122,10 @@ class User(Model):
     @classmethod
     def _cache_prefix(cls):
         return "u:"
+
+    @property
+    def age(self):
+        return self.created_at - datetime.utcnow()
 
     @belongs_to_many('feeds_users')
     def feeds(self):
@@ -166,6 +172,10 @@ class User(Model):
     @classmethod
     def by_username(cls, username):
         return User.where('username', username).first()
+
+    @property
+    def is_god(self):
+        return self.username in GODS
 
 
 class SignUpForm(Form):
