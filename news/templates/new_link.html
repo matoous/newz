@@ -5,11 +5,29 @@
 {% endblock %}
 
 {% block body %}
-<form action="/f/{{ feed.slug }}/add" method="POST">
-    {{ form.title }}
-    {{ form.summary }}
-    {{ form.url }}
-    {{ form.csrf_token }}
-    <input type="submit" value="Create link">
-</form>
+    <div class="page-container">
+    <div class="one-page-form wide">
+    <form action="/f/{{ feed.slug }}/add" method="POST">
+        {{ form.csrf_token }}
+        <h2>Submit to {{ feed.name }}</h2>
+        <fieldset>
+            <div class="f-row">
+                {{ form.title }}
+            </div>
+            <div class="additional-info">
+                Leave URL blank if you are posting question or text.
+            </div>
+            <div class="f-row">
+                {{ form.url }}
+            </div>
+            <div class="f-row">
+                {{ form.summary }}
+            </div>
+            <input type="submit" value="Create link">
+            <button class="secondary" onclick="generatePreview()" type="button">Preview</button>
+        </fieldset>
+    </form>
+        <div class="preview md" id="preview"></div>
+    </div>
+    </div>
 {% endblock %}

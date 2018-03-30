@@ -34,3 +34,17 @@ setReplyTo = function(id){
     document.querySelector('#parent_id').value = id;
     return false;
 };
+
+handleUrlChange = function(){
+    var url = document.querySelector('#url').value;
+    if(url && url !== ''){
+        document.querySelector('#summary').placeholder = 'Short description';
+    } else {
+        document.querySelector('#summary').placeholder = 'Summary or text';
+    }
+};
+
+generatePreview = function(){
+    const md = document.querySelector('#summary').value;
+    document.querySelector('#preview').innerHTML = SnuOwnd.getParser().render(md);
+};

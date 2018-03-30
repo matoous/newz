@@ -3,7 +3,7 @@ from orator import Model
 from orator.orm import belongs_to, has_many, morph_many
 from rq.decorators import job
 from slugify import slugify
-from wtforms import StringField
+from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, URL
 
 from news.lib.cache import cache
@@ -144,9 +144,9 @@ class Link(Base):
 
 
 class LinkForm(Form):
-    title = StringField('Title', [DataRequired(), Length(max=128, min=6)])
-    summary = StringField('Summary', [Length(max=8192)])
-    url = StringField('Url', [DataRequired(), URL(), Length(max=256)])
+    title = StringField('Title', [DataRequired(), Length(max=128, min=6)], render_kw={'placeholder': 'Title', 'autocomplete': 'off'})
+    url = StringField('Url', [DataRequired(), URL(), Length(max=256)], render_kw={'placeholder': 'URL', 'oninput': 'handleUrlChange()', 'autocomplete': 'off'})
+    summary = TextAreaField('Summary', [Length(max=8192)], render_kw={'placeholder': 'Summary or text', 'rows': 6, 'autocomplete': 'off'})
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)

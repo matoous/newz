@@ -25,8 +25,6 @@ class User(Model):
     __guarded__ = ['id', 'password', 'reported', 'spammer']
     __hidden__ = ['password', 'reported', 'spammer', 'email_verified']
 
-    # TODO add short about -> will be displayed under name, things like title, profession etc.
-
     @classmethod
     def create_table(cls):
         schema.drop_if_exists('users')

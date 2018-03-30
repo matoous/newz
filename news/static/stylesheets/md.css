@@ -1,0 +1,131 @@
+.md {
+  line-height: 1.85;
+  /* https://github.com/mrmrs/fluidity */
+  font-size: 18px;
+  max-width: 100%;
+  color: #444;
+  font-family: 'Merriweather', Georgia, serif;
+  margin: 0;
+  /* === A bit of a gross hack so we can have bleeding divs/blockquotes. */
+  /*  === End gross hack */
+}
+@media screen and (min-width: 32rem) and (max-width: 48rem) {
+  .md {
+    font-size: 15px;
+  }
+}
+@media screen and (min-width: 48rem) {
+  .md {
+    font-size: 16px;
+  }
+}
+.md p,
+.md .splendor-p {
+  font-size: 1rem;
+  margin-bottom: 1.3rem;
+}
+.md h1,
+.md .splendor-h1,
+.md h2,
+.md .splendor-h2,
+.md h3,
+.md .splendor-h3,
+.md h4,
+.md .splendor-h4 {
+  margin: 1.414rem 0 .5rem;
+  font-weight: inherit;
+  line-height: 1.42;
+}
+.md h1,
+.md .splendor-h1 {
+  margin-top: 0;
+  font-size: 1.64rem;
+}
+.md h2,
+.md .splendor-h2 {
+  font-size: 1.56rem;
+}
+.md h3,
+.md .splendor-h3 {
+  font-size: 1.48rem;
+}
+.md h4,
+.md .splendor-h4 {
+  font-size: 1.4rem;
+}
+.md h5,
+.md .splendor-h5 {
+  font-size: 1.32rem;
+}
+.md h6,
+.md .splendor-h6 {
+  font-size: 1.24rem;
+}
+.md small,
+.md .splendor-small {
+  font-size: .707em;
+}
+.md img,
+.md canvas,
+.md iframe,
+.md video,
+.md svg,
+.md select,
+.md textarea {
+  max-width: 100%;
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: italic;
+  font-weight: 300;
+  src: local('Merriweather Light Italic'), local('Merriweather-LightItalic'), url(http://fonts.gstatic.com/s/merriweather/v19/u-4l0qyriQwlOrhSvowK_l5-eR7lXff4jvk.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Merriweather Light'), local('Merriweather-Light'), url(http://fonts.gstatic.com/s/merriweather/v19/u-4n0qyriQwlOrhSvowK_l521wRZWMf_.ttf) format('truetype');
+}
+.md div {
+  width: 100%;
+}
+.md div img {
+  width: 100%;
+}
+.md blockquote p {
+  font-size: 1.5rem;
+  font-style: italic;
+  margin: 1rem auto 1rem;
+  max-width: 48rem;
+}
+.md li {
+  margin-left: .8rem;
+}
+.md h1 {
+  text-transform: none;
+  padding: .6rem 0 !important;
+}
+.md p {
+  color: #555;
+  height: auto;
+  line-height: 1.45;
+}
+.md pre,
+.md code {
+  font-family: Menlo, Monaco, "Courier New", monospace;
+}
+.md pre {
+  background-color: #fafafa;
+  font-size: .8rem;
+  overflow-x: scroll;
+  padding: 1.125em;
+}
+.md a,
+.md a:visited {
+  color: #3498db;
+}
+.md a:hover,
+.md a:focus,
+.md a:active {
+  color: #2980b9;
+}

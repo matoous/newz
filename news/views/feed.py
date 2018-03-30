@@ -63,7 +63,7 @@ def add_link(slug=None):
 
             return redirect('/f/{feed}'.format(feed=feed.slug))
 
-    return render_template("new_link.html", form=form, feed=feed)
+    return render_template("new_link.html", form=form, feed=feed, md_parser=True)
 
 
 @feed_blueprint.route("/l/<link>/vote/<vote_str>")

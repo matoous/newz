@@ -1,7 +1,7 @@
 form {
   font-family: 'Roboto Condensed', sans-serif;
 }
-form p {
+form > p {
   font-size: .8em;
 }
 form a {
@@ -12,6 +12,7 @@ form .additional-info {
   border-top: 1px solid #e5e5e5;
   padding-top: 12px;
   margin-top: 12px;
+  margin-bottom: 12px;
 }
 form input[type=password],
 form input[type=email],
@@ -23,11 +24,23 @@ form input[type=text] {
   padding: 1em 1.6em;
   font-size: 16px;
 }
+form textarea {
+  font-size: 16px;
+  padding: 4px;
+  width: 100%;
+  max-width: 800px;
+}
 .f-row {
   padding-bottom: 24px;
 }
 .one-page-form {
   margin: 64px auto 74px auto;
+  max-width: 420px;
+}
+.one-page-form.wide {
+  max-width: 980px;
+}
+.one-page-form.wide input {
   max-width: 420px;
 }
 .one-page-form input {
@@ -58,4 +71,9 @@ input[type=submit] {
   font-size: 15px;
   font-weight: bold;
   padding: 0 32px;
+}
+.btn.secondary,
+button.secondary,
+input[type=submit].secondary {
+  background-color: #FF851B;
 }
