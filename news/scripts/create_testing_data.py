@@ -36,7 +36,10 @@ def create_default_feeds():
                   slug=slugify("Golang")),
              Feed(name="Hackernews",
                   description="",
-                  slug=slugify("Hackernews"))
+                  slug=slugify("Hackernews")),
+             Feed(name="Testfeed",
+                  description="The Testing Feed",
+                  slug=slugify("Testfeed"))
              ]
     for feed in feeds:
         try:
@@ -91,3 +94,20 @@ def create_default_feeds():
         l4.save()
     except:
         pass
+
+    f = Feed.where('slug', 'testfeed').first()
+
+    import feedparser
+    d = feedparser.parse('https://news.ycombinator.com/rss')
+    for entry in d['entries']:
+        ll = Link(title=entry['title'],
+                  slug=slugify(entry['title']),
+                  summary='',
+                  url=entry['link'],
+                  feed_id=f.id,
+                  user_id=u.id)
+        try:
+            ll.save()
+        except:
+            pass
+

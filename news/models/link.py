@@ -79,7 +79,7 @@ class Link(Base):
         cached_data = cache.get(cache_key)
         if cached_data is None:
             cached_data = cls.where('id', id).first()
-            cached_data.new_to_cache()
+            cached_data.write_to_cache()
         return cached_data
 
     @property
