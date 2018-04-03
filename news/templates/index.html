@@ -35,6 +35,18 @@
                     {% include 'link_listing.html' %}
                 {% endwith %}
             {% endfor %}
+            <div class="">
+                {% if less_links !=  None %}
+                    <a href="?count={{ less_links }}">
+                        Previous
+                    </a>
+                {% endif %}
+                {% if more_links != None %}
+                    <a href="?count={{ more_links }}">
+                        Next
+                    </a>
+                {% endif %}
+            </div>
             </div>
     </div>
 </section>
