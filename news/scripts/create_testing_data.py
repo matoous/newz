@@ -58,7 +58,7 @@ def create_default_feeds():
              feed_id=f.id,
              user_id=u.id)
     try:
-        l.save()
+        l.commit()
     except:
         pass
     l2 = Link(title='Reddit and the Struggle to Detoxify the Internet',
@@ -68,7 +68,7 @@ def create_default_feeds():
               feed_id=f.id,
               user_id=u.id)
     try:
-        l2.save()
+        l2.commit()
     except:
         pass
     f = Feed.where('slug', 'the-awesome-earth').first()
@@ -79,7 +79,7 @@ def create_default_feeds():
               feed_id=f.id,
               user_id=u.id)
     try:
-        l3.save()
+        l3.commit()
     except:
         pass
 
@@ -91,7 +91,7 @@ def create_default_feeds():
               feed_id=f.id,
               user_id=u.id)
     try:
-        l4.save()
+        l4.commit()
     except:
         pass
 
@@ -107,7 +107,7 @@ def create_default_feeds():
                   feed_id=f.id,
                   user_id=u.id)
         try:
-            ll.save()
-        except:
+            ll.commit()
+        except Exception as e:
             pass
 

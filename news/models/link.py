@@ -1,7 +1,6 @@
 from flask_wtf import Form
 from orator import Model
 from orator.orm import belongs_to, has_many, morph_many
-from rq.decorators import job
 from slugify import slugify
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, URL
@@ -10,9 +9,9 @@ from news.lib.cache import cache
 from news.lib.db.db import db, schema
 from news.lib.db.query import add_to_queries
 from news.lib.db.sorts import sorts
-from news.lib.queue import q, redis_conn
+from news.lib.queue import q
 from news.lib.sorts import hot
-from news.lib.utils.time_utils import time_ago, epoch_seconds
+from news.lib.utils.time_utils import time_ago
 from news.models.base import Base
 from news.models.report import Report
 
@@ -32,8 +31,8 @@ class Link(Base):
             table.big_increments('id').unsigned()
             table.string('title', 128)
             table.string('slug', 150).unique()
-            table.text('summary')
-            table.text('text')
+            table.text('summary').nullable()
+            table.text('text').nullable()
             table.text('url')
             table.integer('user_id').unsigned()
             table.datetime('created_at')

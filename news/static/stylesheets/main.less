@@ -104,6 +104,7 @@ section {
     padding: 8px;
     position: absolute;
     z-index: 2;
+    cursor: pointer;
   }
 
   .nav-left {
@@ -164,7 +165,7 @@ section {
 
 .t-nav {
   box-sizing: border-box;
-  padding: 1em;
+  padding: 8px 8px;
   position: fixed;
   overflow: hidden;
   top: 0;
@@ -188,6 +189,10 @@ section {
   &#feeds-nav {
     left: 0;
     right: auto;
+
+    .menu-hider {
+      float: left;
+    }
 
     &.hidden {
       left: -260px;
@@ -251,9 +256,6 @@ section {
     float: right;
     text-align: right;
     cursor: pointer;
-
-    padding: 4px;
-    border-radius: 2px;
   }
 
   &.hidden {
@@ -646,4 +648,8 @@ section {
   margin: 32px 0;
   padding: 16px;
   background-color: rgba(0,0,0,0.04);
+}
+
+.subscribed-feeds {
+  margin-top: 32px!important;
 }

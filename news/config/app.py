@@ -36,16 +36,18 @@ def make_app():
     cache.init_app(app)
     login_manager.init_app(app)
 
+    #cache.clear()
+
     with app.app_context():
         #DisposableToken.create_table()
         #Feed.create_table()
         #User.create_table()
         #Link.create_table()
         #LinkVote.create_table()
+        #Comment.create_table()
         #CommentVote.create_table()
         #create_subscriptions_table()
         #create_default_feeds()
-        #Comment.create_table()
         pass
 
     return app

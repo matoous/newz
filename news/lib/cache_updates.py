@@ -1,10 +1,7 @@
-from redis_lock import Lock
 from rq.decorators import job
 
-from news.lib.cache import cache, conn
 from news.lib.db.query import LinkQuery
 from news.lib.queue import redis_conn
-from news.lib.sorts import default_sorts
 
 
 @job('medium', connection=redis_conn)

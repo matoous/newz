@@ -9,6 +9,7 @@
     <div class="container">
         <div class="links">
             <div class="menu">
+                {% if not hide_sorts %}
                 <div class="sorting">
                     New
                     <ul>
@@ -29,6 +30,7 @@
                         </li>
                     </ul>
                 </div>
+                {% endif %}
             </div>
             {% for link in links %}
                 {% with link=link %}

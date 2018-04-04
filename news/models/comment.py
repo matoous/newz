@@ -22,6 +22,9 @@ class Comment(Base):
 
     @classmethod
     def create_table(cls):
+        """
+        Creates database table for comments
+        """
         schema.drop_if_exists('comments')
         with schema.create('comments') as table:
             table.big_increments('id').unsigned()
@@ -38,6 +41,10 @@ class Comment(Base):
 
     @classmethod
     def _cache_prefix(cls):
+        """
+        Override default cache prefix with shorter one
+        :return: c:
+        """
         return "c:"
 
     def __eq__(self, other):
@@ -50,21 +57,37 @@ class Comment(Base):
 
     @property
     def link(self):
+        """
+        Get link to which this comments belongs
+        :return: Parent Link of Comment
+        """
         from news.models.link import Link
         return Link.by_id(self.link_id)
 
     @property
     def user(self):
+        """
+        Get user who created this link
+        :return: Creator of Comment
+        """
         from news.models.user import User
         return User.by_id(self.user_id)
 
     @has_many
     def votes(self):
-        from news.models.vote import Vote
-        return Vote
+        """
+        Get all votes for given comment
+        :return: Votes for Comment
+        """
+        from news.models.vote import CommentVote
+        return CommentVote
 
     @property
     def num_votes(self):
+        """
+        Number of votes on given comment
+        :return: ups + downs
+        """
         return self.ups + self.downs
 
     @morph_many('reportable')
@@ -76,15 +99,29 @@ class Comment(Base):
 
     @property
     def score(self):
+        """
+        Current score of comment as ups - downs
+        No modifications are done to the result
+        :return: ups - downs
+        """
         return self.ups - self.downs
 
     def commit(self):
+        """
+        Creates new comment and handles all tasks resulting from this action
+        """
         self.save()
         self.ups = self.downs = 0
         q.enqueue(add_new_comment, self.link, self, result_ttl=0)
 
     @classmethod
     def by_id(cls, id):
+        """
+        Gets comment by id from cache
+        Writes comment to cache on cache miss
+        :param id: comment id
+        :return: comment
+        """
         cache_key = cls._cache_key_from_id(id)
         comment = cache.get(cache_key)
         if comment is None:
@@ -99,6 +136,9 @@ class TreeNotBuildException(Exception):
 
 
 class CommentTreeCache:
+    """
+    Caching class for comment tree for link
+    """
     def __init__(self, link_id, tree):
         self.link_id = link_id
         self.tree = tree
@@ -109,16 +149,31 @@ class CommentTreeCache:
 
     @classmethod
     def _write_tree(cls, link, tree):
+        """
+        Writes tree to redis
+        :param link: link
+        :param tree: tree
+        """
         key = cls._cache_key(link)
         cache.set(key, tree)
 
     @classmethod
     def _lock_key(cls, link):
+        """
+        Gets lock key for read/modify/write operations
+        :param link: link
+        :return: redis key
+        """
         return 'c_lock:{}'.format(link.id)
 
     @classmethod
     def add(cls, link, comment):
-        with redis_lock.Lock(conn, cls._lock_key(link)):
+        """
+        Adds comment to comment tree for given link
+        :param link: link
+        :param comment: comment
+        """
+        with redis_lock.RedisLock(conn, cls._lock_key(link)):
             tree = cls.load_tree(link)
             if not tree:
                 raise TreeNotBuildException
@@ -127,12 +182,18 @@ class CommentTreeCache:
 
     @classmethod
     def rebuild(cls, link, comments):
-        with redis_lock.Lock(conn, cls._lock_key(link)):
+        """
+        Rebuilds comment tree for link from passed comments
+        :param link: link
+        :param comments: comments
+        :return:
+        """
+        with redis_lock.RedisLock(conn, cls._lock_key(link)): # todo lock in CommentTree not here, so we dont fetch all comments more times on miss
             tree = {}
             for comment in comments:
                 tree.setdefault(comment.parent_id, []).append(comment.id)
 
-            cls._write_tree(link, tree)
+            cls._write_tree(link, tree)  # save tree to redis
             return cls(link.id, tree)
 
     @classmethod
@@ -142,12 +203,22 @@ class CommentTreeCache:
 
 
 class CommentTree:
+    """
+    CommentTree is interface to unordered comment tree for given link
+
+    CommentTree uses CommentTreeCache od background to access and modify comments for given link
+    """
     def __init__(self, link, tree):
         self.link = link
         self.tree = tree
 
     @classmethod
     def add(cls, link, comment):
+        """
+        Adds comment to comment tree
+        :param link: link
+        :param comment: comment to insert
+        """
         try:
             CommentTreeCache.add(link, comment)
         except TreeNotBuildException:
@@ -155,6 +226,11 @@ class CommentTree:
 
     @classmethod
     def by_link(cls, link):
+        """
+        Get comment tree by link
+        :param link: link
+        :return: comment tree
+        """
         tree = CommentTreeCache.load_tree(link)
         if tree is None:
             tree = cls._rebuild(link)
@@ -162,12 +238,25 @@ class CommentTree:
 
     @classmethod
     def _rebuild(cls, link):
+        """
+        Rebuild the comment tree from database
+        :param link: link
+        :return: comment tree
+        """
         comments = Comment.where('link_id', link.id).select('parent_id', 'id').get() or []
         res = CommentTreeCache.rebuild(link, comments)
         return res.tree
 
 
 class SortedComments:
+    """
+    SortedComments class allows access to sorted comments for links
+
+    Sorted comments are stored in redis
+    Key is combination of link id and parent comment id (root comments don't have parent comment id)
+    This way all we need to do to update the tree is update comments only under the parent comment
+    To get the tree we recursively traverse the tree a fetch children comments
+    """
     def __init__(self, link):
         self.link = link
         self._tree = CommentTree.by_link(link).tree
@@ -182,6 +271,12 @@ class SortedComments:
 
     @classmethod
     def update(cls, link, comment):
+        """
+        Update sorted comments in cache
+        This should be called on votes (maybe not all of them) and on new comments
+        :param link: link
+        :param comment: comment
+        """
         cache_key = cls._cache_key(link, comment.parent_id)
         # update comment under read - write - modify lock
         with redis_lock.Lock(conn, cls._lock_key(link, comment.parent_id)):
@@ -204,6 +299,12 @@ class SortedComments:
             cache.set(cache_key, comments)
 
     def build_tree(self, comment_id=None):
+        """
+        Build sorted tree of comments for given comment_id
+        If comment_id is None, tree for whole link is build
+        :param comment_id: comment_id for comment, None for link
+        :return: (comment_id, [sorted subtrees])
+        """
         # get from cache
         children_tuples = cache.get(self._cache_key(self.link, comment_id))
 
@@ -216,6 +317,10 @@ class SortedComments:
         return comment_id, [self.build_tree(children_id) for children_id, _ in children_tuples]
 
     def get_full_tree(self):
+        """
+        Gets full comment tree for given Link
+        :return: Sorted Comments tree
+        """
         tree = self.build_tree()
         return tree[1]
 

@@ -29,20 +29,20 @@
         <div class="links">
             <div class="menu">
                 <div class="sorting">
-                    New
+                    Trending
                     <ul>
                         <li>
-                            <a href="?s=new">
-                                New
-                            </a>
-                        </li>
-                        <li>
-                            <a href="?s=trending">
+                            <a href="/f/{{feed.slug}}/trending">
                                 Trending
                             </a>
                         </li>
                         <li>
-                            <a href="?s=best">
+                            <a href="/f/{{feed.slug}}/new">
+                                New
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/f/{{feed.slug}}/best">
                                 Best
                             </a>
                         </li>
@@ -58,7 +58,19 @@
                     {% include 'link_listing.html' %}
                 {% endwith %}
             {% endfor %}
+            <div class="">
+                {% if less_links !=  None %}
+                    <a href="?count={{ less_links }}">
+                        Previous
+                    </a>
+                {% endif %}
+                {% if more_links != None %}
+                    <a href="?count={{ more_links }}">
+                        Next
+                    </a>
+                {% endif %}
             </div>
+        </div>
     </div>
 </section>
 {% endblock %}

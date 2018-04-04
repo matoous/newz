@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from news.lib.db.query import LinkQuery
 from news.lib.filters import min_score_filter
 from news.lib.normalized_trending import trending_links
+from news.lib.pagination import paginate
 from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
 from news.models.link import LinkForm, Link
@@ -24,7 +25,8 @@ def new_feed():
 
 
 @feed_blueprint.route("/f/<slug>")
-def get_feed(slug=None):
+@feed_blueprint.route('/f/<slug>/<any(trending, new, best):sort>')
+def get_feed(slug=None, sort=None):
     if slug is None:
         abort(404)
 
@@ -32,20 +34,23 @@ def get_feed(slug=None):
     if feed is None:
         abort(404)
 
-    sort = request.args.get('s')
     if (sort is None or sort not in ['trending', 'new', 'best']) and current_user.is_authenticated:
         sort = current_user.preferred_sort
     if sort is None:
         sort = feed.default_sort
 
-    lids = LinkQuery(feed_id=feed.id, sort=sort)
+    lids, has_less, has_more = paginate(LinkQuery(feed_id=feed.id, sort=sort).fetch_ids(), 20)
     links = [Link.by_id(link_id) for link_id in lids]
 
     if sort == 'new':
         links = filter(min_score_filter(current_user.p_min_link_score), links)
 
     feed.links = links
-    return render_template("feed.html", feed=feed)
+    return render_template("feed.html",
+                           feed=feed,
+                           less_links=has_less,
+                           more_links=has_more,
+                           sort=sort)
 
 
 @feed_blueprint.route("/f/<path:slug>/add", methods=['POST', 'GET'])

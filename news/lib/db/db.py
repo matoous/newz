@@ -7,7 +7,7 @@ db = DatabaseManager({
             'host': 'localhost',
             'database': 'newsfeed',
             'user': 'postgres',
-            'password': '',
+            'password': 'postgres',
             'prefix': '',
         },
     })

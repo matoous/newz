@@ -18,7 +18,12 @@ def tuple_maker(sort):
     return lambda x: (x.id, x.hot) # default to trending
 
 
-class LinkQuery():
+class LinkQuery:
+    """
+    Access object for sorted links
+
+    Should be handled as source of truth, uses redis as store
+    """
     def __init__(self, feed_id, sort, time='all', filters=()):
         self.feed_id = feed_id
         self.sort = sort
@@ -46,10 +51,16 @@ class LinkQuery():
         return "lock:q:{}.{}.{}".format(self.feed_id, self.sort, self.time)
 
     def _save(self):
+        """
+        Save data to cache
+        """
         assert self._fetched
         cache.set(self._cache_key, self._data)
 
     def _rebuild(self):
+        """
+        Rebuild link query from database
+        """
         from news.models.link import Link
         q = Link.where('feed_id', self.feed_id).order_by_raw(sorts[self.sort]).limit(1000)
 
@@ -60,6 +71,10 @@ class LinkQuery():
         self._save()
 
     def delete(self, links):
+        """
+        Delete given links from query
+        :param links: links
+        """
         with Lock(conn, self._lock_key):
             # fetch fresh data from cache
             data = cache.get(self._cache_key) or []
@@ -69,9 +84,13 @@ class LinkQuery():
             self._data = data
             self._fetched = True
             self._save()
-        return True
 
     def insert(self, links):
+        """
+        Insert links into the query
+        :param links: links to insert
+        :return: updated list of [id, sort value...] tuples
+        """
         # read - write - modify
         with Lock(conn, self._lock_key):
             data = cache.get(self._cache_key) or []
@@ -110,6 +129,11 @@ class LinkQuery():
         return True
 
     def fetch(self):
+        """
+        Fetch data from cache and return them
+        Data are tuples in from [id, [sort value 1, [sort value 2, ...]]]
+        :return: sorted and filtered list of [id, sort values...] tuples
+        """
         self._data = cache.get(self._cache_key)
 
         if self._data is None:
@@ -123,13 +147,11 @@ class LinkQuery():
         return self._data
 
     def fetch_ids(self):
-        self._data = cache.get(self._cache_key)
-
-        if self._data is None:
-            self._rebuild()
-
-        self._fetched = True
-        return [r[0] for r in self._data]
+        """
+        Fetch data from cache but return only ids of things
+        :return: sorted and filtered list of ids
+        """
+        return [r[0] for r in self.fetch()]
 
 
 @job('medium', connection=redis_conn)

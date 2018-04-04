@@ -17,34 +17,65 @@ class Base(Model):
 
     @classmethod
     def _cache_key_from_id(cls, id):
+        """
+        Generate cache key from thing id
+        :param id: thing id
+        :return: cache key
+        """
         prefix = cls._cache_prefix()
         return "{prefix}{id}".format(prefix=prefix, id=id)
 
     def get_read_modify_write_lock(self):
+        """
+        Gets read/modify/write lock for given things
+        Used when updating in cache or database
+        :return: RedisLock
+        """
         return Lock(conn, self._cache_key)
 
     def update_from_cache(self):
+        """
+        Update model from redis
+        This is usually performed before updates or when updating for data consistency
+        """
         cached = cache.get(self._cache_key)
         if cached is not None:
             self.set_raw_attributes(cached.attributes_to_dict())
 
     def write_to_cache(self):
+        """
+        Write self to cache
+        What should and what shouldn't be written can be modified by
+        __hidden__ attribute on class (more in documentation of orator)
+        """
         cache.set(self._cache_key, self)
 
-    def incr(self, property, amp=1):
+    def incr(self, attr, amp=1):
+        """
+        Increment given attribute
+        Increments model in both database and redis
+        :param attr: attribute
+        :param amp: amplitude
+        """
         with self.get_read_modify_write_lock():
             self.update_from_cache()
-            new_val = getattr(self, property) + amp
-            self.set_attribute(property, new_val)
+            new_val = getattr(self, attr) + amp
+            self.set_attribute(attr, new_val)
             with db.transaction():
-                self.__class__.where('id', self.id).increment(property, amp)
+                self.__class__.where('id', self.id).increment(attr, amp)
                 self.write_to_cache()
 
-    def decr(self, property, amp=1):
+    def decr(self, attr, amp=1):
+        """
+        Decrement given attribute
+        Decrements model in both database and redis
+        :param attr: attribute
+        :param amp: amplitude
+        """
         with self.get_read_modify_write_lock():
             self.update_from_cache()
-            new_val = getattr(self, property) - amp
-            self.set_attribute(property, new_val)
+            new_val = getattr(self, attr) - amp
+            self.set_attribute(attr, new_val)
             with db.transaction():
-                self.__class__.where('id', self.id).decrement(property, amp)
+                self.__class__.where('id', self.id).decrement(attr, amp)
                 self.write_to_cache()
