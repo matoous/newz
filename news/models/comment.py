@@ -1,4 +1,4 @@
-import redis_lock
+from redis_lock import Lock
 from flask_wtf import Form
 from orator.orm import has_many, morph_many
 from wtforms import HiddenField, TextAreaField
@@ -173,7 +173,7 @@ class CommentTreeCache:
         :param link: link
         :param comment: comment
         """
-        with redis_lock.RedisLock(conn, cls._lock_key(link)):
+        with Lock(conn, cls._lock_key(link)):
             tree = cls.load_tree(link)
             if not tree:
                 raise TreeNotBuildException
@@ -188,7 +188,7 @@ class CommentTreeCache:
         :param comments: comments
         :return:
         """
-        with redis_lock.RedisLock(conn, cls._lock_key(link)): # todo lock in CommentTree not here, so we dont fetch all comments more times on miss
+        with Lock(conn, cls._lock_key(link)): # todo lock in CommentTree not here, so we dont fetch all comments more times on miss
             tree = {}
             for comment in comments:
                 tree.setdefault(comment.parent_id, []).append(comment.id)

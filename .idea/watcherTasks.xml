@@ -21,6 +21,7 @@
       </option>
       <option name="outputFromStdout" value="true" />
       <option name="program" value="/usr/bin/lessc" />
+      <option name="runOnExternalChanges" value="true" />
       <option name="scopeName" value="Project Files" />
       <option name="trackOnlyRoot" value="false" />
       <option name="workingDir" value="$FileDir$" />

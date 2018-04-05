@@ -5,72 +5,76 @@
 {% endblock %}
 
 {% block body %}
-<section>
-    <div class="container">
-        {% set subscribed = current_user.is_authenticated and current_user.subscribed_to(feed) %}
-        <div class="feed {% if subscribed %}hidden{% endif %}">
-            <div class="feed-head">
-                <div class="feed-logo">
-                    <img src="/static/images/testimg.png">
-                </div>
-                <h1>{{ feed.name }}</h1>
-                <div class="feed-info">
-                    {% if subscribed %}
-                        <a href="/f/{{feed.slug}}/unsubscribe">Unsubscribe</a>
-                    {% else %}
-                        <a href="/f/{{feed.slug}}/subscribe">Subscribe</a>
-                    {% endif %}
-                    <div class="feed-description">
-                        {{ feed.description }}
+    <section>
+        <div class="container">
+            {% set subscribed = current_user.is_authenticated and current_user.subscribed_to(feed) %}
+            <div class="feed {% if subscribed %}hidden{% endif %}">
+                <div class="feed-head">
+                    <div class="feed-logo">
+                        <img src="/static/images/testimg.png">
+                    </div>
+                    <h1>{{ feed.name }}</h1>
+                    <div class="feed-info">
+                        <div class="feed-description">
+                            {{ feed.description }}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="links">
-            <div class="menu">
-                <div class="sorting">
-                    Trending
-                    <ul>
-                        <li>
-                            <a href="/f/{{feed.slug}}/trending">
-                                Trending
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/f/{{feed.slug}}/new">
-                                New
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/f/{{feed.slug}}/best">
-                                Best
-                            </a>
-                        </li>
-                    </ul>
+            <div class="links">
+                <div class="menu">
+                    <div class="sorting">
+                        Trending
+                        <ul>
+                            <li>
+                                <a href="/f/{{ feed.slug }}/trending">
+                                    Trending
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/f/{{ feed.slug }}/new">
+                                    New
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/f/{{ feed.slug }}/best">
+                                    Best
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="">
+                        <a class="btn btn-black" href="/f/{{ feed.slug }}/add">Submit</a>
+                    </div>
+                    {% if subscribed %}
+                        <div >
+                            <a class="btn btn-grey" href="/f/{{ feed.slug }}/unsubscribe">Unsubscribe</a>
+                        </div>
+                    {% else %}
+                        <div >
+                            <a class="btn btn-red" href="/f/{{ feed.slug }}/subscribe">Subscribe</a>
+                        </div>
+                    {% endif %}
                 </div>
-                <div class="submit">
-                    <a href="/f/{{feed.slug}}/add">Submit</a>
+                {% set single_feed = True %}
+                {% for link in feed.links %}
+                    {% with link=link %}
+                        {% include 'link_listing.html' %}
+                    {% endwith %}
+                {% endfor %}
+                <div class="">
+                    {% if less_links !=  None %}
+                        <a href="?count={{ less_links }}">
+                            Previous
+                        </a>
+                    {% endif %}
+                    {% if more_links != None %}
+                        <a href="?count={{ more_links }}">
+                            Next
+                        </a>
+                    {% endif %}
                 </div>
             </div>
-            {% set single_feed = True %}
-            {% for link in feed.links %}
-                {% with link=link %}
-                    {% include 'link_listing.html' %}
-                {% endwith %}
-            {% endfor %}
-            <div class="">
-                {% if less_links !=  None %}
-                    <a href="?count={{ less_links }}">
-                        Previous
-                    </a>
-                {% endif %}
-                {% if more_links != None %}
-                    <a href="?count={{ more_links }}">
-                        Next
-                    </a>
-                {% endif %}
-            </div>
         </div>
-    </div>
-</section>
+    </section>
 {% endblock %}

@@ -15,7 +15,6 @@ DEFAULT_FEEDS = [i for i in range(50)]
 
 @web.route('/')
 def get_home():
-    #TODO different sorts
     if current_user.is_authenticated:
         links = trending_links(current_user.subscribed_feed_ids())
     else:
@@ -35,8 +34,7 @@ def get_new_links():
     return render_template("index.html",
                            links=[Link.by_id(link_id) for link_id in paginated_ids],
                            less_links=has_less,
-                           more_links=has_more,
-                           hide_sorts=True)
+                           more_links=has_more)
 
 
 @web.route('/best')
@@ -47,8 +45,7 @@ def get_best_links():
     return render_template("index.html",
                            links=[Link.by_id(link_id) for link_id in paginated_ids],
                            less_links=has_less,
-                           more_links=has_more,
-                           hide_sorts=True)
+                           more_links=has_more)
 
 
 @web.route('/trending')
@@ -58,5 +55,4 @@ def get_trending_links():
     return render_template("index.html",
                            links=[Link.by_id(link_id) for link_id in paginated_ids],
                            less_links=has_less,
-                           more_links=has_more,
-                           hide_sorts=True)
+                           more_links=has_more)

@@ -35,3 +35,12 @@ def logout():
     current_user.logout()
     return redirect('/')
 
+
+@auth.route("/reset", methods=["GET", "POST"])
+def reset():
+    pass
+
+
+@auth.route("/verify", methods=["GET"])
+def verify():
+    pass

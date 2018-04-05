@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Sign Up
+{% endblock %}
+
+{% block body %}
+<div class="page-container">
+    <a href="/" class="black-link small">
+        < Back to homepage
+    </a>
+    <div class="one-page-form">
+        <form action="/join" method="POST">
+            <h2>Sign Up</h2>
+            <p>
+                Already have an account? <a href="/login">Sign in</a>
+            </p>
+            <fieldset>
+                <div class="f-row">
+                    {{ form.username }}
+                </div>
+                <div class="f-row">
+                    {{ form.email }}
+                </div>
+                <div class="f-row">
+                    {{ form.password }}
+                </div>
+                {{ form.csrf_token }}
+                <input type="submit" value="Sign Up">
+            </fieldset>
+            <div class="additional-info">
+                <b>Need help?</b>
+                <a href="/contact">
+                    Contact us
+                </a>
+                <br>
+                <a href="/terms">
+                    Terms and conditions
+                </a>,
+                <a href="/privacy">
+                    Privacy policy
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

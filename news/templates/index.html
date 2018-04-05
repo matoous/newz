@@ -8,44 +8,20 @@
 <section>
     <div class="container">
         <div class="links">
-            <div class="menu">
-                {% if not hide_sorts %}
-                <div class="sorting">
-                    New
-                    <ul>
-                        <li>
-                            <a href="?sort=new">
-                                New
-                            </a>
-                        </li>
-                        <li>
-                            <a href="?sort=trending">
-                                Trending
-                            </a>
-                        </li>
-                        <li>
-                            <a href="?sort=best">
-                                Best
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                {% endif %}
-            </div>
             {% for link in links %}
                 {% with link=link %}
                     {% include 'link_listing.html' %}
                 {% endwith %}
             {% endfor %}
-            <div class="">
-                {% if less_links !=  None %}
+            <div class="page-navigation">
+                <!--{% if less_links !=  None %}
                     <a href="?count={{ less_links }}">
                         Previous
                     </a>
-                {% endif %}
+                {% endif %}-->
                 {% if more_links != None %}
                     <a href="?count={{ more_links }}">
-                        Next
+                        More
                     </a>
                 {% endif %}
             </div>

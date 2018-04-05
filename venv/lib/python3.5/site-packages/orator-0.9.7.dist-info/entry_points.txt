@@ -1,0 +1,3 @@
+[console_scripts]
+orator = orator.commands.application:application.run
+

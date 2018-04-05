@@ -50,33 +50,6 @@ fieldset {
   padding: 0;
   border: none;
 }
-.btn,
-button,
-input[type=submit] {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -o-border-radius: 3px;
-  -ms-border-radius: 3px;
-  border-radius: 3px;
-  background-color: #087cc3;
-  font-family: 'Roboto Condensed', sans-serif;
-  color: #ffffff;
-  line-height: 1.5em;
-  border: none;
-  letter-spacing: 1.05px;
-  height: 41px;
-  -webkit-appearance: button;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-size: 15px;
-  font-weight: bold;
-  padding: 0 32px;
-}
-.btn.secondary,
-button.secondary,
-input[type=submit].secondary {
-  background-color: #FF851B;
-}
 .md {
   line-height: 1.85;
   /* https://github.com/mrmrs/fluidity */
@@ -207,6 +180,34 @@ input[type=submit].secondary {
 .md a:focus,
 .md a:active {
   color: #2980b9;
+}
+.btn,
+button,
+input[type=submit] {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  border-radius: 3px;
+  background-color: #087cc3;
+  font-family: 'Roboto Condensed', sans-serif;
+  color: #ffffff;
+  line-height: 1.5em;
+  border: none;
+  letter-spacing: 1.05px;
+  height: 41px;
+  -webkit-appearance: button;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 0 32px;
+  align-content: center;
+}
+.btn.secondary,
+button.secondary,
+input[type=submit].secondary {
+  background-color: #FF851B;
 }
 @font-face {
   font-family: 'DualisLite';
@@ -470,6 +471,33 @@ section {
   font-size: 1rem;
   font-family: 'Roboto Condensed', sans-serif;
   align-content: space-between;
+}
+.links .menu .subscribe {
+  margin-left: 6px;
+  text-align: center;
+  padding: 6px 12px;
+  overflow: visible;
+  position: relative;
+  box-sizing: border-box;
+  min-width: 120px;
+  float: right;
+  background-color: #ff0000;
+}
+.links .menu .subscribe a {
+  color: white;
+}
+.links .menu .submit {
+  margin-left: 6px;
+  border: 1px solid black;
+  text-align: center;
+  padding: 6px 12px;
+  overflow: visible;
+  position: relative;
+  box-sizing: border-box;
+  min-width: 120px;
+}
+.links .menu .submit a {
+  color: black;
 }
 .links .menu .sorting {
   border: 1px solid black;
@@ -749,4 +777,11 @@ section {
 }
 .subscribed-feeds {
   margin-top: 32px!important;
+}
+.page-navigation {
+  margin-top: 32px;
+}
+.page-navigation a {
+  color: black;
+  font-family: 'Roboto Condensed', sans-serif;
 }

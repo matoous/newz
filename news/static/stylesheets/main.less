@@ -1,5 +1,6 @@
 @import "forms";
 @import "md";
+@import "buttons";
 
 @font-face {
     font-family: 'DualisLite';
@@ -316,6 +317,34 @@ section {
     font-size: 1rem;
     font-family: 'Roboto Condensed', sans-serif;
     align-content: space-between;
+    .subscribe {
+      margin-left: 6px;
+      text-align: center;
+      padding: 6px 12px;
+      overflow: visible;
+      position: relative;
+      box-sizing: border-box;
+      min-width: 120px;
+      float: right;
+      background-color: #ff0000;
+      a {
+        color: white;
+      }
+    }
+
+    .submit {
+      margin-left: 6px;
+      border: 1px solid black;
+      text-align: center;
+      padding: 6px 12px;
+      overflow: visible;
+      position: relative;
+      box-sizing: border-box;
+      min-width: 120px;
+      a {
+        color: black;
+      }
+    }
 
     .sorting {
       border: 1px solid black;
@@ -652,4 +681,13 @@ section {
 
 .subscribed-feeds {
   margin-top: 32px!important;
+}
+
+.page-navigation {
+  margin-top: 32px;
+
+  a {
+    color: black;
+    font-family: 'Roboto Condensed', sans-serif;
+  }
 }
