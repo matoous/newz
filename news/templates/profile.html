@@ -7,6 +7,19 @@
 {% block body %}
 <section>
     <div class="container">
+        <div class="profile-menu">
+            <div class="menu">
+                <a href="/u/{{user.username}}">
+                    About
+                </a>
+                <a href="/u/{{user.username}}/posts">
+                    Posts
+                </a>
+                <a href="/u/{{user.username}}/comments">
+                    Comments
+                </a>
+            </div>
+        </div>
         <div class="profile">
             <div class="profile-head">
                 <div class="profile-avatar">
@@ -34,21 +47,36 @@
                 {% endif %}
             </div>
         </div>
-        <div class="links">
-            <div class="menu">
-                <a href="/u/{{user.username}}/posts">
-                    Posts
-                </a>
-                <a href="/u/{{user.username}}/comments">
-                    Comments
-                </a>
+        <div class="profile-section">
+            <h2>Best Links</h2>
+            <div class="links">
+                {% for link in links %}
+                    {% with link=link %}
+                        {% include 'link_listing.html' %}
+                    {% endwith %}
+                {% endfor %}
             </div>
-            {% for link in user.links %}
-                {% with link=link %}
-                    {% include 'link_listing.html' %}
+        {% if has_more_links %}
+            <div class="page-navigation">
+        <a href="/u/{{ user.username }}/posts?s=new">More</a>
+            </div>
+        {% endif %}
+        </div>
+        <div class="profile-section">
+            <h2>Best Comments</h2>
+        <div class="comments">
+                        {% for comment in comments %}
+                {% with comment=comment %}
+                    {% include 'comment_listing.html' %}
                 {% endwith %}
             {% endfor %}
-            </div>
+        </div>
+                {% if has_more_comments %}
+                    <div class="page-navigation">
+        <a href="/u/{{ user.username }}/comments?s=new">More</a>
+                    </div>
+        {% endif %}
+        </div>
     </div>
 </section>
 {% endblock %}

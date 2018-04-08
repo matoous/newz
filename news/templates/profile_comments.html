@@ -7,6 +7,19 @@
 {% block body %}
 <section>
     <div class="container">
+            <div class="profile-menu">
+            <div class="menu">
+                <a href="/u/{{user.username}}">
+                    About
+                </a>
+                <a href="/u/{{user.username}}/posts">
+                    Posts
+                </a>
+                <a href="/u/{{user.username}}/comments">
+                    Comments
+                </a>
+            </div>
+        </div>
         <div class="profile">
             <div class="profile-head">
                 <div class="profile-avatar">
@@ -26,23 +39,8 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="profile-body">
-                {% if user.bio %}
-                <div class="profile-about">
-                    {{ user.bio }}
-                </div>
-                {% endif %}
-            </div>
         </div>
-        <div class="links">
-            <div class="menu">
-                <a href="/u/{{user.username}}/posts">
-                    Posts
-                </a>
-                <a href="/u/{{user.username}}/comments">
-                    Comments
-                </a>
-            </div>
+        <div class="comments">
             {% for comment in user.comments %}
                 {% with comment=comment %}
                     {% include 'comment_listing.html' %}

@@ -1,0 +1,23 @@
+{% extends "settings.html" %}
+
+{% block settings_content %}
+                    <form action="/settings/profile" method="POST">
+                    <h2>Profile Settings</h2>
+                    <fieldset>
+                                            <div class="f-row">
+                        {{ form.full_name.label }}
+                        {{ form.full_name }}
+                    </div>
+                    <div class="f-row">
+                        {{ form.bio.label }}
+                        {{ form.bio }}
+                    </div>
+                    <div class="f-row">
+                        {{ form.url.label }}
+                        {{ form.url }}
+                    </div>
+                    {{ form.csrf_token }}
+                    <input type="submit" value="Save">
+                    </fieldset>
+                </form>
+{% endblock %}

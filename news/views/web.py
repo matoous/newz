@@ -56,3 +56,28 @@ def get_trending_links():
                            links=[Link.by_id(link_id) for link_id in paginated_ids],
                            less_links=has_less,
                            more_links=has_more)
+
+
+@web.route('/how-it-works')
+def get_how_it_works():
+    return render_template("how_it_works.html")
+
+
+@web.route('/contact')
+def get_contact():
+    return render_template("contact.html")
+
+
+@web.route('/help')
+def get_help():
+    return render_template("help.html")
+
+
+@web.route('/terms')
+def get_terms():
+    return render_template("terms.html")
+
+
+@web.route('/privacy')
+def get_privacy():
+    return render_template("privacy.html")

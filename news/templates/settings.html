@@ -8,41 +8,20 @@
 <section>
     <div class="container">
         <div class="settings">
-            <div class="settings-menu">
-                <ul>
-                    <li class="header">
-                        <b>Settings</b>
-                    </li>
-                    <li>
-                        <a href="/settings">
-                            Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/settings/account">
-                            Account
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/settings/preferences">
-                            Preferences
-                        </a>
-                    </li>
-                </ul>
+            <div class="menu">
+                <a href="/settings/profile">
+                    Profile
+                </a>
+                <a href="/settings/account">
+                    Account
+                </a>
+                <a href="/settings/preferences">
+                    Preferences
+                </a>
             </div>
             <div class="settings-tab">
-                <form action="/settings" method="POST">
-                    <div class="f-row">
-                        {{ form.show_images.label }}
-                        {{ form.show_images }}
-                    </div>
-                    <div class="f-row">
-                        {{ form.min_link_score.label }}
-                        {{ form.min_link_score }}
-                    </div>
-                    {{ form.csrf_token }}
-                    <input type="submit" value="Save">
-                </form>
+                {% block settings_content %}
+                {% endblock %}
             </div>
         </div>
     </div>

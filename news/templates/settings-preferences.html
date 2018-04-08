@@ -1,0 +1,19 @@
+{% extends "settings.html" %}
+
+{% block settings_content %}
+                <form action="/settings" method="POST">
+                <h2>Preferences Settings</h2>
+                    <fieldset>
+                    <div class="f-row">
+                        {{ form.show_images.label }}
+                        {{ form.show_images }}
+                    </div>
+                    <div class="f-row">
+                        {{ form.min_link_score.label }}
+                        {{ form.min_link_score }}
+                    </div>
+                    {{ form.csrf_token }}
+                    <input type="submit" value="Save">
+                </fieldset>
+                </form>
+{% endblock %}

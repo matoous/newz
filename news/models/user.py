@@ -3,11 +3,12 @@ from datetime import datetime
 import bcrypt
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
+from itsdangerous import constant_time_compare
 from orator import Model
 from orator.orm import belongs_to_many, has_many
-from wtforms import StringField, PasswordField, SelectField, IntegerField
+from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.validators import DataRequired, URL
+from wtforms.validators import DataRequired, URL, Length
 
 from news.config.config import GODS
 from news.lib.cache import cache
@@ -21,7 +22,8 @@ MAX_SUBSCRIPTIONS_FREE = 50
 class User(Model):
     __table__ = 'users'
     __fillable__ = ['username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sort', 'bio', 'url',
-                    'profile_pic', 'p_show_images', 'p_min_link_score']
+                    'profile_pic', 'email_public'
+                    'p_show_images', 'p_min_link_score']
     __guarded__ = ['id', 'password', 'reported', 'spammer']
     __hidden__ = ['password', 'reported', 'spammer', 'email_verified']
 
@@ -35,6 +37,7 @@ class User(Model):
             table.string('email', 128).unique()
             table.boolean('email_verified').default(False)
             table.boolean('subscribed').default(False)
+            table.boolean('email_public').default(False)
             table.string('password', 128)
             table.integer('reported').default(0)
             table.boolean('spammer').default(False)
@@ -117,6 +120,11 @@ class User(Model):
             cache.set('u:{}'.format(id), u)
         return u
 
+    def update_with_cache(self):
+        self.save()
+        cache.set('u:{}'.format(id), self)
+        cache.set('us:{}'.format(self.session_token), self)
+
     @classmethod
     def _cache_prefix(cls):
         return "u:"
@@ -179,7 +187,7 @@ class User(Model):
 class SignUpForm(Form):
     username = StringField('Username', [DataRequired()], render_kw={'placeholder': 'Username'})
     email = EmailField('Email', [DataRequired()], render_kw={'placeholder': 'Email'})
-    password = PasswordField('Password', [DataRequired()], render_kw={'placeholder': 'Password'})
+    password = PasswordField('Password', [DataRequired()], render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
@@ -233,7 +241,7 @@ class LoginForm(Form):
         return True
 
 
-class SettingsForm(Form):
+class PreferencesForm(Form):
     show_images = SelectField('Show Images', choices=[('y', 'Always'), ('m', 'Homepage only'), ('n', 'Never')])
     min_link_score = IntegerField('Minimal link score')
 
@@ -250,13 +258,44 @@ class SettingsForm(Form):
         return True
 
 
+class PasswordForm(Form):
+    new_password = PasswordField('New password', [Length(min=6)], render_kw={'autocomplete': "new-password"})
+    new_password_again = PasswordField('New password again', render_kw={'autocomplete': "new-password"})
+    old_password = PasswordField('Old password', render_kw={'autocomplete': 'off'})
+
+    def __init__(self, user, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        self.user = user
+
+    def validate(self):
+        if not self.user.check_password(self.old_password.data):
+            self.errors['password'] = 'Invalid password'
+            return False
+        if not self.new_password.data != self.new_password_again.data:
+            self.errors['passwords'] = 'Passwords don\'t match'
+            return False
+
+        self.user.set_password(self.new_password.data)
+        return True
+
+
+class EmailForm(Form):
+    email = EmailField('Email')
+
+    def __init__(self, user, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        self.user = user
+        self.email.data = user.email
+
+
+class DeactivateForm(Form):
+    pass
+
+
 class ProfileForm(Form):
     full_name = StringField('Full name', )
-    bio = StringField('Bio')
+    bio = TextAreaField('Bio', [Length(max=8192)], render_kw={'rows': 6, 'autocomplete': 'off'})
     url = URLField(validators=[URL()])
 
-    def validate(self, user):
-        user.full_name = self.full_name.data
-        user.bio = self.bio.data
-        user.url = self.url.data
+    def validate(self):
         return True

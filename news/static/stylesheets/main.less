@@ -1,6 +1,9 @@
 @import "forms";
 @import "md";
 @import "buttons";
+@import "profile";
+@import "settings";
+@import "footer";
 
 @font-face {
     font-family: 'DualisLite';
@@ -46,36 +49,6 @@ a {
 
   &:hover {
     text-decoration: underline;
-  }
-}
-
-footer {
-  font-family: 'Roboto Condensed', sans-serif;
-  padding: 12px 0;
-  font-size: .8rem;
-  color: #666;
-  width: 100%;
-  position: relative;
-
-  .wrapper {
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-    max-width: 480px;
-    border-top: 1px solid #e5e5e5;
-  }
-
-  .options {
-    font-size: 1rem;
-    a {
-      font-family: 'DualisLite', sans-serif;
-      padding: 0 12px;
-      color: #666;
-    }
-  }
-
-  .copyright {
-    margin-top: 12px;
   }
 }
 
@@ -157,6 +130,52 @@ section {
     border-bottom: 1px solid #e5e5e5;
     font-family: 'Roboto Condensed', sans-serif;
     font-size: .8em;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    position: relative;
+    height: 42px;
+
+    .options {
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .search {
+      form {
+        position: relative;
+      }
+      input {
+        padding: 6px 48px 6px 12px;
+      }
+      button {
+        z-index: 2;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 32px;
+        width: 32px;
+        padding: 0;
+        margin: 0;
+        background-color: rgba(0,0,0,.04);
+        color: black;
+
+        &:hover {
+          background-color: rgba(0,0,0,.1);
+        }
+      }
+      img {
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        top: 6px;
+        left: 6px;
+      }
+    }
+
     a {
       color: black;
       margin-right: 12px;
@@ -569,110 +588,6 @@ section {
   }
 }
 
-.profile {
-  margin-bottom: 42px;
-
-  .profile-head {
-    position: relative;
-    width: 100%;
-    text-align: center;
-  }
-
-  .profile-avatar {
-    border-radius: 50%;
-    max-width: 260px;
-    background-color: #f5f5f5;
-    display: inline-block;
-    margin: 0 auto;
-    overflow: hidden;
-
-    img {
-      display: block;
-      max-width: 100%;
-      width: 100%;
-    }
-  }
-
-  .profile-name {
-    h1{
-      margin: 18px 0 6px 0;
-    }
-    h1.username {
-      text-transform: none;
-    }
-    h1.full-name {
-      text-transform: capitalize;
-    }
-  }
-
-  .profile-url {
-    font-family: 'Roboto Condensed', sans-serif;
-    a {
-      font-weight: bold;
-      color: #666;
-    }
-  }
-
-  .profile-about {
-    margin-top: 32px;
-    font-size: 20px;
-    line-height: 28px;
-    word-wrap: break-word;
-  }
-}
-
-.settings {
-  display: flex;
-  flex-direction: row;
-  font-family: 'Roboto Condensed', sans-serif;
-
-  .settings-menu {
-    min-width: 240px;
-    margin-right: 32px;
-    margin-bottom: 32px;
-
-    ul {
-      border: 1px solid #e5e5e5;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-      list-style: none;
-      padding: 6px 0;
-      margin: 0;
-
-      li {
-        margin: 0;
-        padding: 0;
-
-        &.header {
-          border-bottom: 1px solid #e5e5e5;
-          padding: 6px 12px 8px;
-        }
-
-        a {
-          display: block;
-          box-sizing: border-box;
-          border-left: 2px solid white;
-          border-bottom: 1px solid #e5e5e5;
-          padding: 4px 12px;
-          text-decoration: none!important;
-
-          &:hover {
-            border-left: 2px solid @blue;
-            background-color: rgba(0,0,0,0.04);
-          }
-        }
-      }
-    }
-
-    a {
-      color: black;
-    }
-
-    .settings-tab {
-    }
-  }
-}
-
 .preview {
   margin: 32px 0;
   padding: 16px;
@@ -690,4 +605,11 @@ section {
     color: black;
     font-family: 'Roboto Condensed', sans-serif;
   }
+}
+
+.single-comment {
+  background-color: rgba(100, 120, 140, 0.1);
+  padding: 6px;
+  border-radius: 4px;
+  margin-bottom: 22px;
 }

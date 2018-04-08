@@ -25,11 +25,19 @@
     {% if not hide_menues %}
     <div class="nav-menu">
         <div class="index-menu">
-            <div>
+            <div class="options">
                 <a href="/">Home</a>
                 <a href="/trending">Trending</a>
                 <a href="/new">New</a>
                 <a href="/best">Best</a>
+            </div>
+            <div class="search">
+                <form method="get" action="/search">
+                    <input name="q" type="text" autocomplete="off" placeholder="Search" required>
+                    <button type="submit">
+                        <img src="/static/images/search.svg" alt="S">
+                    </button>
+                </form>
             </div>
         </div>
     </div>

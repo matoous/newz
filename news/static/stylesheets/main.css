@@ -16,7 +16,8 @@ form .additional-info {
 }
 form input[type=password],
 form input[type=email],
-form input[type=text] {
+form input[type=text],
+form input[type=url] {
   display: block;
   border-radius: 0;
   box-shadow: none;
@@ -25,6 +26,7 @@ form input[type=text] {
   font-size: 16px;
 }
 form textarea {
+  display: block;
   font-size: 16px;
   padding: 4px;
   width: 100%;
@@ -209,6 +211,88 @@ button.secondary,
 input[type=submit].secondary {
   background-color: #FF851B;
 }
+.profile {
+  margin-bottom: 42px;
+}
+.profile .profile-head {
+  position: relative;
+  width: 100%;
+  text-align: center;
+}
+.profile .profile-avatar {
+  border-radius: 50%;
+  max-width: 260px;
+  background-color: #f5f5f5;
+  display: inline-block;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.profile .profile-avatar img {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+}
+.profile .profile-name h1 {
+  margin: 18px 0 6px 0;
+}
+.profile .profile-name h1.username {
+  text-transform: none;
+}
+.profile .profile-name h1.full-name {
+  text-transform: capitalize;
+}
+.profile .profile-url {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+.profile .profile-url a {
+  font-weight: bold;
+  color: #666;
+}
+.profile .profile-about {
+  margin-top: 32px;
+  font-size: 20px;
+  line-height: 28px;
+  word-wrap: break-word;
+}
+.profile-section {
+  margin-bottom: 32px;
+}
+.settings {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+.settings .menu {
+  margin-bottom: 32px;
+}
+.settings .menu a {
+  color: black;
+  margin-right: 12px;
+}
+footer {
+  font-family: 'Roboto Condensed', sans-serif;
+  padding: 12px 0;
+  font-size: .8rem;
+  color: #666;
+  width: 100%;
+  position: relative;
+}
+footer .wrapper {
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  max-width: 480px;
+  border-top: 1px solid #e5e5e5;
+}
+footer .options {
+  font-size: 1rem;
+}
+footer .options a {
+  font-family: 'DualisLite', sans-serif;
+  padding: 0 12px;
+  color: #666;
+}
+footer .copyright {
+  margin-top: 12px;
+}
 @font-face {
   font-family: 'DualisLite';
   src: url('/static/fnt/DualisLite.ttf.woff') format('woff'), url('/static/fnt/DualisLite.ttf.svg#DualisLite') format('svg'), url('/static/fnt/DualisLite.ttf.eot'), url('/static/fnt/DualisLite.ttf.eot?#iefix') format('embedded-opentype');
@@ -251,32 +335,6 @@ a {
 }
 a:hover {
   text-decoration: underline;
-}
-footer {
-  font-family: 'Roboto Condensed', sans-serif;
-  padding: 12px 0;
-  font-size: .8rem;
-  color: #666;
-  width: 100%;
-  position: relative;
-}
-footer .wrapper {
-  margin: 0 auto;
-  padding: 20px;
-  text-align: center;
-  max-width: 480px;
-  border-top: 1px solid #e5e5e5;
-}
-footer .options {
-  font-size: 1rem;
-}
-footer .options a {
-  font-family: 'DualisLite', sans-serif;
-  padding: 0 12px;
-  color: #666;
-}
-footer .copyright {
-  margin-top: 12px;
 }
 section {
   min-height: 100vh;
@@ -341,6 +399,46 @@ section {
   border-bottom: 1px solid #e5e5e5;
   font-family: 'Roboto Condensed', sans-serif;
   font-size: .8em;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  position: relative;
+  height: 42px;
+}
+.main-nav .index-menu .options {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.main-nav .index-menu .search form {
+  position: relative;
+}
+.main-nav .index-menu .search input {
+  padding: 6px 48px 6px 12px;
+}
+.main-nav .index-menu .search button {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 32px;
+  width: 32px;
+  padding: 0;
+  margin: 0;
+  background-color: rgba(0, 0, 0, 0.04);
+  color: black;
+}
+.main-nav .index-menu .search button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.main-nav .index-menu .search img {
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  top: 6px;
+  left: 6px;
 }
 .main-nav .index-menu a {
   color: black;
@@ -686,90 +784,6 @@ section {
   color: #666;
   margin-right: 6px;
 }
-.profile {
-  margin-bottom: 42px;
-}
-.profile .profile-head {
-  position: relative;
-  width: 100%;
-  text-align: center;
-}
-.profile .profile-avatar {
-  border-radius: 50%;
-  max-width: 260px;
-  background-color: #f5f5f5;
-  display: inline-block;
-  margin: 0 auto;
-  overflow: hidden;
-}
-.profile .profile-avatar img {
-  display: block;
-  max-width: 100%;
-  width: 100%;
-}
-.profile .profile-name h1 {
-  margin: 18px 0 6px 0;
-}
-.profile .profile-name h1.username {
-  text-transform: none;
-}
-.profile .profile-name h1.full-name {
-  text-transform: capitalize;
-}
-.profile .profile-url {
-  font-family: 'Roboto Condensed', sans-serif;
-}
-.profile .profile-url a {
-  font-weight: bold;
-  color: #666;
-}
-.profile .profile-about {
-  margin-top: 32px;
-  font-size: 20px;
-  line-height: 28px;
-  word-wrap: break-word;
-}
-.settings {
-  display: flex;
-  flex-direction: row;
-  font-family: 'Roboto Condensed', sans-serif;
-}
-.settings .settings-menu {
-  min-width: 240px;
-  margin-right: 32px;
-  margin-bottom: 32px;
-}
-.settings .settings-menu ul {
-  border: 1px solid #e5e5e5;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  list-style: none;
-  padding: 6px 0;
-  margin: 0;
-}
-.settings .settings-menu ul li {
-  margin: 0;
-  padding: 0;
-}
-.settings .settings-menu ul li.header {
-  border-bottom: 1px solid #e5e5e5;
-  padding: 6px 12px 8px;
-}
-.settings .settings-menu ul li a {
-  display: block;
-  box-sizing: border-box;
-  border-left: 2px solid white;
-  border-bottom: 1px solid #e5e5e5;
-  padding: 4px 12px;
-  text-decoration: none!important;
-}
-.settings .settings-menu ul li a:hover {
-  border-left: 2px solid #0074D9;
-  background-color: rgba(0, 0, 0, 0.04);
-}
-.settings .settings-menu a {
-  color: black;
-}
 .preview {
   margin: 32px 0;
   padding: 16px;
@@ -784,4 +798,10 @@ section {
 .page-navigation a {
   color: black;
   font-family: 'Roboto Condensed', sans-serif;
+}
+.single-comment {
+  background-color: rgba(100, 120, 140, 0.1);
+  padding: 6px;
+  border-radius: 4px;
+  margin-bottom: 22px;
 }

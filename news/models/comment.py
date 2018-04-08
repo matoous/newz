@@ -1,5 +1,5 @@
-from redis_lock import Lock
 from flask_wtf import Form
+from redis_lock import Lock
 from orator.orm import has_many, morph_many
 from wtforms import HiddenField, TextAreaField
 from wtforms.validators import DataRequired, Optional
@@ -279,7 +279,7 @@ class SortedComments:
         """
         cache_key = cls._cache_key(link, comment.parent_id)
         # update comment under read - write - modify lock
-        with redis_lock.Lock(conn, cls._lock_key(link, comment.parent_id)):
+        with Lock(conn, cls._lock_key(link, comment.parent_id)):
             comments = cache.get(cache_key) or []
             added = False
 

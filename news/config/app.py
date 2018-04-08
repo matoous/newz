@@ -1,5 +1,3 @@
-from flask_dotenv import DotEnv
-
 from news.lib.db.db import db
 from news.lib.cache import cache
 from news.lib.csrf import csrf
@@ -19,6 +17,7 @@ from news.views.feed import feed_blueprint
 from news.views.settings import settings
 from news.views.user import user_blueprint
 from news.views.web import web
+from news.views.search import search_blueprint
 from flask import Flask
 
 
@@ -30,6 +29,7 @@ def make_app():
     app.register_blueprint(feed_blueprint)
     app.register_blueprint(settings)
     app.register_blueprint(user_blueprint)
+    app.register_blueprint(search_blueprint)
 
     csrf.init_app(app)
     limiter.init_app(app)

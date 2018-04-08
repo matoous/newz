@@ -1,5 +1,7 @@
 from flask import Blueprint, abort, render_template
 
+from news.models.comment import Comment
+from news.models.link import Link
 from news.models.user import User
 
 user_blueprint = Blueprint('user', __name__, template_folder='/templates')
@@ -10,7 +12,14 @@ def get_users_profile(username):
     user = User.by_username(username)
     if user is None:
         abort(404)
-    return render_template("profile.html", user=user)
+    links = Link.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(11).get()
+    comments = Comment.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(11).get()
+    return render_template("profile.html",
+                           user=user,
+                           links=links[:min(len(links), 10)],
+                           has_more_links=len(links) > 10,
+                           comments=comments[:min(len(comments), 10)],
+                           has_more_comments=len(comments) > 10)
 
 
 @user_blueprint.route("/u/<username>/comments")

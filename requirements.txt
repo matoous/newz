@@ -1,0 +1,15 @@
+Flask==0.12.2
+Flask_WTF==0.14.2
+orator==0.9.7
+Flask_Limiter==1.0.1
+Flask_Login==0.4.1
+Flask_Caching==1.3.3
+rq==0.10.0
+python_redis_lock==3.2.0
+Werkzeug==0.14.1
+WTForms==2.1
+redis==2.10.6
+python_bcrypt==0.3.2
+feedparser==5.2.1
+redis_lock==0.2.0
+unicode_slugify==0.1.3

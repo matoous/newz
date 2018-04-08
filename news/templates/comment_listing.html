@@ -1,22 +1,46 @@
-<div class="link">
-    <div class="link-body">
-        <h2>
-            <a href="/f/{{comment.link.feed.slug}}/{{comment.link.slug}}">
-                {{ comment.link.title }}
-            </a>
-        </h2>
-        <div>
-            {{ comment.text }}
+<div class="single-comment">
+    <div class="link-name">
+        <a href="/f/{{ comment.link.feed.slug }}/{{ comment.link.slug }}">
+            {{ comment.link.title }}
+        </a>
+        |
+        by <a href="/u/{{ comment.link.user.username }}">{{ comment.link.user.name }}</a>
+        |
+        <a href="/f/{{ comment.link.feed.slug }}">
+            {{ comment.link.feed.name }}
+        </a>
+    </div>
+    <div class="comment" id="{{ comment.id }}">
+        <div class="comment-voting">
+            <div class="up">
+                <a href="/c/{{ comment.id }}/vote/upvote">
+                    <img src="/static/images/play-light.svg">
+                </a>
+            </div>
+            <div class="down">
+                <a href="/c/{{ comment.id }}/vote/downvote">
+                    <img src="/static/images/play-light.svg">
+                </a>
+            </div>
         </div>
-        <div class="bottom-line">
-            <div class="comments">
-                <a href="/f/{{ comment.link.feed.slug }}/{{ comment.link.slug }}">{{ comment.link.comments_count }} comments</a>
+        <div class="comment-body">
+            <div class="comment-header">
+                            <span>
+                                <a href="/u/{{ comment.user.username }}">{{ comment.user.name }}</a>
+                            </span>
+                <span>
+                                {{ comment.score }} points
+                            </span>
+                <span>
+                                {{ comment.time_ago() }}
+                            </span>
             </div>
-            <div class="date">
-                {{ comment.link.time_ago() }}
+            <div class="comment-text">
+                {{ comment.text }}
             </div>
-            <div class="author">
-                by <a href="/u/{{ comment.link.user.username }}">{{ comment.link.user.name }}</a>
+            <div class="comment-options">
+                <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a> <a
+                    href="/c/{{ comment.id }}/report">report</a>
             </div>
         </div>
     </div>
