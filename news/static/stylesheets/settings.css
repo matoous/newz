@@ -1,0 +1,10 @@
+.settings {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+.settings .menu {
+  margin-bottom: 32px;
+}
+.settings .menu a {
+  color: black;
+  margin-right: 12px;
+}
