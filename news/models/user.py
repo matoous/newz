@@ -1,6 +1,7 @@
 from datetime import datetime
+from secrets import token_urlsafe
 
-import bcrypt
+from passlib.hash import bcrypt
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
 from itsdangerous import constant_time_compare
@@ -14,6 +15,9 @@ from news.config.config import GODS
 from news.lib.cache import cache
 from news.lib.login import login_manager
 from news.lib.db.db import db, schema
+from news.lib.mail import send_mail, registration_email
+from news.lib.queue import q
+from news.lib.verifications import EmailVerification
 from news.models.token import DisposableToken
 
 MAX_SUBSCRIPTIONS_FREE = 50
@@ -85,10 +89,10 @@ class User(Model):
         return self.username
 
     def set_password(self, password):
-        self.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        self.set_attribute('password', bcrypt.hash(password))
 
     def check_password(self, password):
-        return bcrypt.checkpw(password, self.password)
+        return bcrypt.verify(password, self.password)
 
     def get_id(self):
         if self.session_token is not None:
@@ -104,6 +108,16 @@ class User(Model):
     def logout(self):
         cache.delete('us:{}'.format(self.session_token))
         logout_user()
+
+    def register(self):
+        # save self
+        self.save()
+
+        # create and send verification
+        verification = EmailVerification(self)
+        verification.create()
+
+        # maybe some more setups for new user
 
     @staticmethod
     @login_manager.user_loader
@@ -123,7 +137,8 @@ class User(Model):
     def update_with_cache(self):
         self.save()
         cache.set('u:{}'.format(id), self)
-        cache.set('us:{}'.format(self.session_token), self)
+        if self.session_token:
+            cache.set('us:{}'.format(self.session_token), self)
 
     @classmethod
     def _cache_prefix(cls):
@@ -238,6 +253,9 @@ class LoginForm(Form):
         if self.user is None:
             self.errors['general'] = "Invalid username or password"
             return False
+        if not self.user.check_password(self.password.data):
+            self.errors['general'] = "Invalid username or password"
+            return False
         return True
 
 
@@ -269,13 +287,12 @@ class PasswordForm(Form):
 
     def validate(self):
         if not self.user.check_password(self.old_password.data):
+            print("wrong pw")
             self.errors['password'] = 'Invalid password'
             return False
-        if not self.new_password.data != self.new_password_again.data:
+        if not self.new_password.data == self.new_password_again.data:
             self.errors['passwords'] = 'Passwords don\'t match'
             return False
-
-        self.user.set_password(self.new_password.data)
         return True
 
 

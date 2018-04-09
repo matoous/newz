@@ -1,11 +1,12 @@
 import os
 from pathlib import Path
 
-from flask import Blueprint, render_template, redirect
+from flask import Blueprint, render_template, redirect, request, abort, flash
 from flask_login import login_user, logout_user, login_required, current_user
 
 from news.lib.limiter import limiter
-from news.models.user import SignUpForm, LoginForm
+from news.lib.verifications import EmailVerification
+from news.models.user import SignUpForm, LoginForm, User
 
 auth = Blueprint('auth', __name__, template_folder='/templates')
 
@@ -15,7 +16,7 @@ def signup():
     form = SignUpForm()
     if form.validate():
         user = form.user
-        user.save()
+        user.register()
         return redirect('/')
     return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
 
@@ -41,6 +42,15 @@ def reset():
     pass
 
 
-@auth.route("/verify", methods=["GET"])
-def verify():
-    pass
+@auth.route("/verify/<token>", methods=["GET"])
+def verify(token):
+    if token == '':
+        abort(404)
+    verification = EmailVerification(token=token)
+    if verification.verify():
+        user = User.by_id(verification.user_id)
+        user.email_verified = True
+        user.update_with_cache()
+        flash('Email successfully verified!', 'success')
+        return redirect('/')
+    abort(404)

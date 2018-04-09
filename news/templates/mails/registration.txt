@@ -1,0 +1,6 @@
+Hello {{ user.username }}!
+
+Please verify you email on: {{ url }}
+
+Have a nice day,
+Globalfeed team

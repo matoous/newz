@@ -45,6 +45,16 @@ def get_account_settings():
     return render_template("settings-account.html", pw_form=pw_form, email_form=email_form)
 
 
+@settings.route("/settings/password", methods=['POST'])
+def post_new_password():
+    pw_form = PasswordForm(current_user)
+    if pw_form.validate():
+        current_user.set_password(pw_form.new_password.data)
+        current_user.update_with_cache()
+    email_form = EmailForm(current_user)
+    return render_template("settings-account.html", pw_form=pw_form, email_form=email_form)
+
+
 @settings.route("/settings/account", methods=['POST'])
 def post_account_settings():
     pw_form = PasswordForm(current_user)

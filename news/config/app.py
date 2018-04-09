@@ -3,6 +3,7 @@ from news.lib.cache import cache
 from news.lib.csrf import csrf
 from news.lib.login import login_manager
 from news.lib.limiter import limiter
+from news.lib.mail import mail
 from news.lib.utils.confidence import confidence
 from news.models.comment import Comment
 from news.models.feed import Feed
@@ -22,8 +23,8 @@ from flask import Flask
 
 
 def make_app():
-    app = Flask(__name__, static_url_path='/static', static_folder="../static")
-    app.config['SECRET_KEY'] = 'WubbaLubbaDubDub!Pickle!12354112#yolo!'
+    from news.lib.app import app
+
     app.register_blueprint(web)
     app.register_blueprint(auth)
     app.register_blueprint(feed_blueprint)
@@ -35,6 +36,8 @@ def make_app():
     limiter.init_app(app)
     cache.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
+
 
     #cache.clear()
 

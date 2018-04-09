@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
+from flask_mail import Message
 
+from news.lib.mail import mail
 from news.lib.normalized_best import best_links
 from news.lib.normalized_new import new_links
 from news.lib.normalized_trending import trending_links
