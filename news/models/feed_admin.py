@@ -25,3 +25,6 @@ class FeedAdmin(Base):
     def by_user_id(cls, user_id):
         return cls.where('user_id', user_id).get()
 
+    @classmethod
+    def by_user_and_feed_id(cls, user_id, feed_id):
+        return cls.where('user_id', user_id).where('feed_id', feed_id).first()

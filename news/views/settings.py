@@ -47,6 +47,7 @@ def get_account_settings():
 
 @settings.route("/settings/password", methods=['POST'])
 def post_new_password():
+    # TODO rate limit
     pw_form = PasswordForm(current_user)
     if pw_form.validate():
         current_user.set_password(pw_form.new_password.data)

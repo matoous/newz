@@ -4,6 +4,7 @@ from news.lib.csrf import csrf
 from news.lib.login import login_manager
 from news.lib.limiter import limiter
 from news.lib.mail import mail
+from news.lib.sentry import sentry
 from news.lib.utils.confidence import confidence
 from news.models.comment import Comment
 from news.models.feed import Feed
@@ -37,6 +38,7 @@ def make_app():
     cache.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    sentry.init_app(app)
 
 
     #cache.clear()

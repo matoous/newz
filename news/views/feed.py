@@ -3,11 +3,12 @@ from flask_login import login_required, current_user
 
 from news.lib.db.query import LinkQuery
 from news.lib.filters import min_score_filter
-from news.lib.normalized_trending import trending_links
 from news.lib.pagination import paginate
 from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
+from news.models.feed_admin import FeedAdmin
 from news.models.link import LinkForm, Link
+from news.models.user import User
 from news.models.vote import LinkVote, vote_type_from_string, CommentVote
 
 feed_blueprint = Blueprint('feed', __name__, template_folder='/templates')
@@ -156,3 +157,51 @@ def do_comment_vote(comment_id=None, vote_str=None):
     vote.apply()
 
     return "voted"
+
+
+@feed_blueprint.route("/f/<path:feed_slug>/admins/add", methods=['POST'])
+@login_required
+def do_add_admin(feed_slug):
+    feed = Feed.where('slug', feed_slug).first()
+    username = request.form.get('username')
+    # TODO check username not empty
+    # check privileges
+    if current_user.is_god() or current_user.is_feed_god(feed):
+        user = User.by_username(username)
+        if user is None:
+            abort(404)
+        feed_admin = FeedAdmin(user_id=user.id,
+                               feed_id=feed.id,
+                               god=False)
+        feed_admin.save()
+        return redirect("/f/{}/admins".format(feed.slug))
+    else:
+        abort(403)
+
+
+@feed_blueprint.route("/f/<path:feed_slug>/admins/")
+@login_required
+def get_feed_admins(feed_slug):
+    feed = Feed.where('slug', feed_slug).first()
+    if current_user.is_god() or current_user.is_feed_admin(feed):
+        admins = FeedAdmin.by_feed_id(feed.id)
+        return render_template("feed_admins.html", admins=admins)
+    abort(403)
+
+
+@feed_blueprint.route("/f/<path:feed_slug>/admin")
+@login_required
+def get_feed_admin(feed_slug):
+    pass
+
+
+@feed_blueprint.route("/f/<path:feed_slug>/bans")
+@login_required
+def get_feed_bans(feed_slug):
+    pass
+
+
+@feed_blueprint.route("/f/<path:feed_slug>/ban", methods=['POST'])
+@login_required
+def bad_user(feed_slug):
+    pass

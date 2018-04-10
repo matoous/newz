@@ -18,6 +18,7 @@ from news.lib.db.db import db, schema
 from news.lib.mail import send_mail, registration_email
 from news.lib.queue import q
 from news.lib.verifications import EmailVerification
+from news.models.feed_admin import FeedAdmin
 from news.models.token import DisposableToken
 
 MAX_SUBSCRIPTIONS_FREE = 50
@@ -119,6 +120,19 @@ class User(Model):
 
         # maybe some more setups for new user
 
+    def change_email(self, email):
+        #TODO do it under lock
+        # change email
+        self.email = email
+        self.email_verified = False
+
+        # update
+        self.save()
+
+        # send verification
+        verification = EmailVerification(self)
+        verification.create()
+
     @staticmethod
     @login_manager.user_loader
     def load_user(session_id):
@@ -194,9 +208,15 @@ class User(Model):
     def by_username(cls, username):
         return User.where('username', username).first()
 
-    @property
     def is_god(self):
         return self.username in GODS
+
+    def is_feed_admin(self, feed):
+        return FeedAdmin.by_user_and_feed_id(self.id, feed.id) is not None
+
+    def is_feed_god(self, feed):
+        feed_admin = FeedAdmin.by_user_and_feed_id(self.id, feed.id)
+        return feed_admin.god if feed_admin is not None else False
 
 
 class SignUpForm(Form):
@@ -303,6 +323,11 @@ class EmailForm(Form):
         Form.__init__(self, *args, **kwargs)
         self.user = user
         self.email.data = user.email
+
+    def validate(self):
+        if self.email.data == self.user.email:
+            return False
+        return True
 
 
 class DeactivateForm(Form):
