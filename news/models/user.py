@@ -31,7 +31,8 @@ class User(Base):
     __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sort', 'bio', 'url',
                     'profile_pic', 'email_public'
                     'p_show_images', 'p_min_link_score']
-    __hidden__ = ['id', 'password']
+    __hidden__ = ['password']
+    __append__ = ['session_token']
 
     @classmethod
     def create_table(cls):
@@ -103,8 +104,8 @@ class User(Base):
 
     def login(self):
         token = DisposableToken.get()
-        self.session_token = token.id
-        cache.set('us:{}'.format(self.session_token), self)
+        self.set_attribute("session_token",  token.id)
+        cache.set('us:{}'.format(self.session_token), self.id)
         login_user(self)
 
     def logout(self):
@@ -137,7 +138,10 @@ class User(Base):
     @staticmethod
     @login_manager.user_loader
     def load_user(session_id):
-        u = cache.get('us:{}'.format(session_id))
+        uid = cache.get('us:{}'.format(session_id))
+        u = User.by_id(uid)
+        if u is not None:
+            u.set_attribute("session_token", session_id)
         return u
 
     @classmethod

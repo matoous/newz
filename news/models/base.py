@@ -6,7 +6,6 @@ from news.lib.db.db import db
 
 
 class Base(Model):
-    __hidden__ = ['id']
 
     @classmethod
     def _cache_prefix(cls):
