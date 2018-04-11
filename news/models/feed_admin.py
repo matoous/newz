@@ -1,10 +1,12 @@
 from news.lib.db.db import db, schema
+from news.lib.lazy import lazyprop
 from news.models.base import Base
 
 
 class FeedAdmin(Base):
     __table__ = 'feed_admins'
-    __fillable__ = ['god', 'user_id', 'feed_id']
+    __fillable__ = ['id', 'god', 'user_id', 'feed_id']
+    __incrementing__ = False
 
     @classmethod
     def create_table(cls):
@@ -16,6 +18,16 @@ class FeedAdmin(Base):
             table.datetime('created_at')
             table.datetime('updated_at')
             table.primary(['user_id', 'feed_id'])
+
+    @lazyprop
+    def user(self):
+        from news.models.user import User
+        return User.by_id(self.user_id)
+
+    @lazyprop
+    def feed(self):
+        from news.models.feed import Feed
+        return Feed.by_id(self.feed_id)
 
     @classmethod
     def by_feed_id(cls, feed_id):

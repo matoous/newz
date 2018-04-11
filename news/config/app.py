@@ -8,6 +8,7 @@ from news.lib.sentry import sentry
 from news.lib.utils.confidence import confidence
 from news.models.comment import Comment
 from news.models.feed import Feed
+from news.models.feed_admin import FeedAdmin
 from news.models.link import Link
 from news.models.subscriptions import create_subscriptions_table
 from news.models.token import DisposableToken
@@ -38,7 +39,8 @@ def make_app():
     cache.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
-    sentry.init_app(app)
+    #sentry.init_app(app)
+    cache.clear()
 
 
     #cache.clear()
@@ -53,6 +55,7 @@ def make_app():
         #CommentVote.create_table()
         #create_subscriptions_table()
         #create_default_feeds()
+        #FeedAdmin.create_table()
         pass
 
     return app

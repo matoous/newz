@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, render_template, Response, request, abort
 from flask_login import login_required, current_user
 
+from news.lib.access import feed_admin_required
 from news.lib.db.query import LinkQuery
 from news.lib.filters import min_score_filter
 from news.lib.pagination import paginate
@@ -25,16 +26,9 @@ def new_feed():
     return render_template("new_feed.html", form=form)
 
 
-@feed_blueprint.route("/f/<slug>")
-@feed_blueprint.route('/f/<slug>/<any(trending, new, best):sort>')
-def get_feed(slug=None, sort=None):
-    if slug is None:
-        abort(404)
-
-    feed = Feed.by_slug(slug)
-    if feed is None:
-        abort(404)
-
+@feed_blueprint.route("/f/<feed:feed>")
+@feed_blueprint.route('/f/<feed:feed>/<any(trending, new, best):sort>')
+def get_feed(feed, sort=None):
     if (sort is None or sort not in ['trending', 'new', 'best']) and current_user.is_authenticated:
         sort = current_user.preferred_sort
     if sort is None:
@@ -54,13 +48,9 @@ def get_feed(slug=None, sort=None):
                            sort=sort)
 
 
-@feed_blueprint.route("/f/<path:slug>/add", methods=['POST', 'GET'])
+@feed_blueprint.route("/f/<feed:feed>/add", methods=['POST', 'GET'])
 @login_required
-def add_link(slug=None):
-    feed = Feed.where('slug', slug).first()
-    if feed is None:
-        abort(404)
-
+def add_link(feed):
     form = LinkForm()
     if request.method == 'POST':
         if form.validate(feed, current_user):
@@ -86,36 +76,24 @@ def do_vote(link=None, vote_str=None):
     return "voted"
 
 
-@feed_blueprint.route("/f/<path:slug>/subscribe")
+@feed_blueprint.route("/f/<feed:feed>/subscribe")
 @login_required
-def subscribe(slug=None):
-    feed = Feed.where('slug', slug).first()
-    if feed is None:
-        abort(404)
-
+def subscribe(feed):
     subscribed = current_user.subscribe(feed)
     if not subscribed:
         return "Subscribe NOT OK"
     return "Subscribed"
 
 
-@feed_blueprint.route("/f/<path:slug>/unsubscribe")
+@feed_blueprint.route("/f/<feed:feed>/unsubscribe")
 @login_required
-def unsubscribe(slug=None):
-    feed = Feed.where('slug', slug).first()
-    if feed is None:
-        abort(404)
-
+def unsubscribe(feed):
     current_user.unsubscribe(feed)
     return "Unsubscribed"
 
 
-@feed_blueprint.route("/f/<path:feed_slug>/<link_slug>")
-def link_view(feed_slug=None, link_slug=None):
-    feed = Feed.where('slug', feed_slug).first()
-    if feed is None or link_slug is None:
-        abort(404)
-
+@feed_blueprint.route("/f/<feed:feed>/<link_slug>")
+def link_view(feed, link_slug=None):
     link = Link.where('slug', link_slug).first()
     if link is None:
         abort(404)
@@ -128,12 +106,8 @@ def link_view(feed_slug=None, link_slug=None):
 
 
 @login_required
-@feed_blueprint.route("/f/<path:feed_slug>/<link_slug>/comment", methods=['POST'])
-def comment_link(feed_slug=None, link_slug=None):
-    feed = Feed.where('slug', feed_slug).first()
-    if feed is None or link_slug is None:
-        abort(404)
-
+@feed_blueprint.route("/f/<feed:feed>/<link_slug>/comment", methods=['POST'])
+def comment_link(feed, link_slug=None):
     link = Link.where('slug', link_slug).first()
     if link is None:
         abort(404)
@@ -142,7 +116,7 @@ def comment_link(feed_slug=None, link_slug=None):
     if comment_form.validate(current_user, link):
         comment = comment_form.comment
         comment.commit()
-    return redirect('/f/{}/{}'.format(feed_slug, link_slug))
+    return redirect('/f/{}/{}'.format(feed.slug, link_slug))
 
 
 @feed_blueprint.route("/c/<comment_id>/vote/<vote_str>")
@@ -159,49 +133,45 @@ def do_comment_vote(comment_id=None, vote_str=None):
     return "voted"
 
 
-@feed_blueprint.route("/f/<path:feed_slug>/admins/add", methods=['POST'])
-@login_required
-def do_add_admin(feed_slug):
-    feed = Feed.where('slug', feed_slug).first()
+@feed_blueprint.route("/f/<feed:feed>/add_admin", methods=['POST'])
+@feed_admin_required
+def do_add_admin(feed):
+    #get new admin username
     username = request.form.get('username')
-    # TODO check username not empty
+    if not username or username == "":
+        abort(404)
+
     # check privileges
     if current_user.is_god() or current_user.is_feed_god(feed):
         user = User.by_username(username)
         if user is None:
             abort(404)
-        feed_admin = FeedAdmin(user_id=user.id,
-                               feed_id=feed.id,
-                               god=False)
-        feed_admin.save()
+        feed_admin = FeedAdmin.create(user_id=user.id,
+                                      feed_id=feed.id)
         return redirect("/f/{}/admins".format(feed.slug))
     else:
         abort(403)
 
 
-@feed_blueprint.route("/f/<path:feed_slug>/admins/")
-@login_required
-def get_feed_admins(feed_slug):
-    feed = Feed.where('slug', feed_slug).first()
-    if current_user.is_god() or current_user.is_feed_admin(feed):
-        admins = FeedAdmin.by_feed_id(feed.id)
-        return render_template("feed_admins.html", admins=admins)
-    abort(403)
+@feed_blueprint.route("/f/<feed:feed>/admins/")
+@feed_admin_required
+def get_feed_admins(feed):
+    admins = FeedAdmin.by_feed_id(feed.id)
+    return render_template("feed_admins.html", admins=admins, feed=feed)
 
 
-@feed_blueprint.route("/f/<path:feed_slug>/admin")
-@login_required
-def get_feed_admin(feed_slug):
-    pass
+@feed_blueprint.route("/f/<feed:feed>/admin")
+@feed_admin_required
+def get_feed_admin(feed):
+    return render_template("feed_admin.html", feed=feed)
 
 
-@feed_blueprint.route("/f/<path:feed_slug>/bans")
-@login_required
-def get_feed_bans(feed_slug):
-    pass
+@feed_blueprint.route("/f/<feed:feed>/bans")
+@feed_admin_required
+def get_feed_bans(feed):
+    return render_template("feed_bans.html", feed=feed)
 
-
-@feed_blueprint.route("/f/<path:feed_slug>/ban", methods=['POST'])
-@login_required
-def bad_user(feed_slug):
+@feed_blueprint.route("/f/<feed:feed>/ban", methods=['POST'])
+@feed_admin_required
+def ban_user(feed):
     pass

@@ -9,6 +9,7 @@ from news.lib.cache import cache
 from news.lib.db.db import db, schema
 from news.lib.db.query import add_to_queries
 from news.lib.db.sorts import sorts
+from news.lib.lazy import lazyprop
 from news.lib.queue import q
 from news.lib.sorts import hot
 from news.lib.utils.time_utils import time_ago
@@ -20,9 +21,8 @@ MAX_IN_CACHE = 1000
 
 class Link(Base):
     __table__ = 'links'
-    __fillable__ = ['title', 'slug', 'summary', 'text', 'user_id', 'url', 'feed_id']
-    __guarded__ = ['id', 'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
-    __hidden__ = ['reported', 'spam']
+    __fillable__ = ['title', 'slug', 'summary', 'text', 'user_id', 'url', 'feed_id', 'id',
+                    'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
 
     @classmethod
     def create_table(cls):
@@ -63,25 +63,26 @@ class Link(Base):
     def __repr__(self):
         return '<Link {}>'.format(self.id)
 
-    @property
+    @lazyprop
     def hot(self):
         return hot(self.score, self.created_at)
 
-    @property
+    @lazyprop
     def feed(self):
         from news.models.feed import Feed
         return Feed.by_id(self.feed_id)
 
     @classmethod
     def by_id(cls, id):
-        cache_key = cls._cache_key_from_id(id)
-        cached_data = cache.get(cache_key)
-        if cached_data is None:
-            cached_data = cls.where('id', id).first()
-            cached_data.write_to_cache()
-        return cached_data
+        l = cls.load_from_cache(id)
+        if l is not None:
+            return l
+        l = cls.where('id', id).first()
+        if l is not None:
+            l.write_to_cache()
+        return l
 
-    @property
+    @lazyprop
     def user(self):
         from news.models.user import User
         return User.by_id(self.user_id)
@@ -92,7 +93,7 @@ class Link(Base):
             return self.summary[:300] + '...'
         return self.summary
 
-    @property
+    @lazyprop
     def votes(self):
         from news.models.vote import LinkVote
         return LinkVote.where('link_id', self.id).get()

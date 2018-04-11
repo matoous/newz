@@ -10,15 +10,14 @@ from wtforms.validators import DataRequired, Length, URL
 from news.lib.cache import cache
 from news.lib.db.db import db, schema
 from news.lib.sorts import hot
+from news.models.base import Base
 from news.models.link import Link
 from news.models.vote import Vote
 
 
-class Feed(Model):
+class Feed(Base):
     __table__ = 'feeds'
-    __fillable__ = ['name', 'slug', 'description', 'default_sort', 'lang', 'over_18', 'logo']
-    __guarded__ = ['id', 'reported']
-    __hidden__ = ['reported']
+    __fillable__ = ['id', 'name', 'slug', 'description', 'default_sort', 'lang', 'over_18', 'logo', 'reported']
 
     @classmethod
     def create_table(cls):
@@ -51,11 +50,12 @@ class Feed(Model):
 
     @classmethod
     def by_id(cls, id):
-        f = cache.get('f:{}'.format(id))
+        f = cls.load_from_cache(id)
         if f is not None:
             return f
         f = Feed.where('id', id).first()
-        cache.set('f:{}'.format(id), f)
+        if f is not None:
+            f.write_to_cache()
         return f
 
     @property
@@ -63,12 +63,8 @@ class Feed(Model):
         return "/f/%s/" % self.slug
 
     @classmethod
-    def cache_prefix(cls):
+    def _cache_prefix(cls):
         return "f:"
-
-    @classmethod
-    def by_id(cls, id):
-        return Feed.where('id', id).first()
 
     @belongs_to_many('feeds_users')
     def users(self):

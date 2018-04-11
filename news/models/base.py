@@ -6,6 +6,8 @@ from news.lib.db.db import db
 
 
 class Base(Model):
+    __hidden__ = ['id']
+
     @classmethod
     def _cache_prefix(cls):
         return cls.__name__ + '_'
@@ -40,7 +42,7 @@ class Base(Model):
         """
         cached = cache.get(self._cache_key)
         if cached is not None:
-            self.set_raw_attributes(cached.attributes_to_dict())
+            self.set_raw_attributes(cached)
 
     def write_to_cache(self):
         """
@@ -48,7 +50,22 @@ class Base(Model):
         What should and what shouldn't be written can be modified by
         __hidden__ attribute on class (more in documentation of orator)
         """
-        cache.set(self._cache_key, self)
+        cache.set(self._cache_key, self.serialize())
+
+    @classmethod
+    def load_from_cache(cls, id):
+        """
+        Load model from cache
+        :param id: id
+        :return: model if found else None
+        """
+        data = cache.get(cls._cache_key_from_id(id))
+        if data is None:
+            return None
+        obj = cls()
+        obj.set_raw_attributes(data)
+        obj.set_exists(True)
+        return obj
 
     def incr(self, attr, amp=1):
         """

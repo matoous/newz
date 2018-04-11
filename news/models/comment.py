@@ -7,6 +7,7 @@ from wtforms.validators import DataRequired, Optional
 from news.lib.cache import cache, conn
 from news.lib.comments import add_new_comment
 from news.lib.db.db import schema
+from news.lib.lazy import lazyprop
 from news.lib.queue import q
 from news.lib.utils.confidence import confidence
 from news.lib.utils.time_utils import time_ago
@@ -16,9 +17,7 @@ from news.models.report import Report
 
 class Comment(Base):
     __table__ = 'comments'
-    __fillable__ = ['link_id', 'parent_id', 'text', 'user_id']
-    __guarded__ = ['id', 'reported', 'spam', 'ups', 'downs']
-    __hidden__ = ['reported', 'spam']
+    __fillable__ = ['id', 'reported', 'spam', 'ups', 'downs', 'link_id', 'parent_id', 'text', 'user_id']
 
     @classmethod
     def create_table(cls):
@@ -55,7 +54,7 @@ class Comment(Base):
     def __repr__(self):
         return '<Comment {}>'.format(self.id)
 
-    @property
+    @lazyprop
     def link(self):
         """
         Get link to which this comments belongs
@@ -64,7 +63,7 @@ class Comment(Base):
         from news.models.link import Link
         return Link.by_id(self.link_id)
 
-    @property
+    @lazyprop
     def user(self):
         """
         Get user who created this link
@@ -122,13 +121,13 @@ class Comment(Base):
         :param id: comment id
         :return: comment
         """
-        cache_key = cls._cache_key_from_id(id)
-        comment = cache.get(cache_key)
-        if comment is None:
-            comment = cls.where('id', id).first()
-            cache.set(cache_key, comment)
-            conn.expire(cache_key, 7 * 24 * 60 * 60)  # expire after week
-        return comment
+        c = cls.load_from_cache(id)
+        if c is not None:
+            return c
+        c = cls.where('id', id).first()
+        c.write_to_cache()
+        conn.expire(c._cache_key, 7 * 24 * 60 * 60)  # expire after week
+        return c
 
 
 class TreeNotBuildException(Exception):

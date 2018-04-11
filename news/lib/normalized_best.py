@@ -10,6 +10,11 @@ MAX_LINKS = 1000
 
 
 def get_time_filter(cutoff):
+    """
+    Gets time filter to filter for last month, day etc.
+    :param cutoff: filter name
+    :return: filter
+    """
     now = epoch_seconds(datetime.utcnow())
     time_filters = {
         'all': lambda x: True,
@@ -28,7 +33,12 @@ def best_tuples(fid, time_filter):
 
 
 def best_links(ids, time_limit='all'):
-
+    """
+    Find best links by specified feed ids
+    :param ids: feed ids
+    :param time_limit: time limitation
+    :return: sorted link ids
+    """
     links_by_fids = {}
 
     # get sorted links for individual feeds

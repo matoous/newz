@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block body %}
+<section>
+    <div class="container">
+        <div class="contact">
+            <h1>Feed Admins</h1>
+            <div class="user-search">
+                <form method="post" action="/f/{{ feed.slug }}/add_admin">
+                    <input type="text" name="username" id="username" placeholder="Email or username">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit">Add</button>
+                </form>
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <td>
+                        Username
+                    </td>
+                    <td>
+                        Email
+                    </td>
+                    <td>
+                        God
+                    </td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for admin in admins %}
+                    <tr>
+                        <td>
+                            {{ admin.user.username }}
+                        </td>
+                        <td>
+                            {{ admin.user.email }}
+                        </td>
+                        <td>
+                            {{ admin.god }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

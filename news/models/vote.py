@@ -4,6 +4,7 @@ from orator.orm import belongs_to
 from news.lib.cache import cache
 from news.lib.comments import update_comment
 from news.lib.db.db import db, schema
+from news.lib.lazy import lazyprop
 from news.lib.queue import q
 from news.lib.cache_updates import update_link
 from news.models.comment import Comment
@@ -44,15 +45,15 @@ class Vote(Model):
     def _cache_key(cls, link_id, user_id):
         raise NotImplementedError
 
-    @property
+    @lazyprop
     def is_downvote(self):
         return self.vote_type == -1
 
-    @property
+    @lazyprop
     def is_upvote(self):
         return self.vote_type == 1
 
-    @property
+    @lazyprop
     def affected_attribute(self):
         if self.is_downvote:
             return 'downs'
@@ -87,11 +88,11 @@ class LinkVote(Vote):
     def __ne__(self, other):
         return not self == other
 
-    @property
+    @lazyprop
     def user(self):
         return User.by_id(self.user_id)
 
-    @property
+    @lazyprop
     def link(self):
         return Link.by_id(self.link_id)
 
@@ -157,11 +158,11 @@ class CommentVote(Vote):
             table.integer('vote_type')
             table.primary(['user_id', 'comment_id'])
 
-    @property
+    @lazyprop
     def user(self):
         return User.by_id(self.user_id)
 
-    @property
+    @lazyprop
     def comment(self):
         return Comment.by_id(self.comment_id)
 

@@ -293,6 +293,74 @@ footer .options a {
 footer .copyright {
   margin-top: 12px;
 }
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  max-width: 100%;
+  width: 100%;
+  empty-cells: show;
+  font-size: 15px;
+  line-height: 24px;
+}
+table caption {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: #676b72;
+}
+th {
+  text-align: left;
+  font-weight: 700;
+  vertical-align: bottom;
+}
+td {
+  vertical-align: top;
+}
+tr.align-middle td,
+td.align-middle {
+  vertical-align: middle;
+}
+th,
+td {
+  padding: 1rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+th:first-child,
+td:first-child {
+  padding-left: 0;
+}
+th:last-child,
+td:last-child {
+  padding-right: 0;
+}
+tfoot th,
+tfoot td {
+  color: rgba(49, 52, 57, 0.5);
+}
+table.bordered td,
+table.bordered th {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+table.striped tr:nth-child(odd) td {
+  background: #f8f8f8;
+}
+table.bordered td:first-child,
+table.bordered th:first-child,
+table.striped td:first-child,
+table.striped th:first-child {
+  padding-left: 1rem;
+}
+table.bordered td:last-child,
+table.bordered th:last-child,
+table.striped td:last-child,
+table.striped th:last-child {
+  padding-right: 1rem;
+}
+table.unstyled td,
+table.unstyled th {
+  border: none;
+  padding: 0;
+}
 @font-face {
   font-family: 'DualisLite';
   src: url('/static/fnt/DualisLite.ttf.woff') format('woff'), url('/static/fnt/DualisLite.ttf.svg#DualisLite') format('svg'), url('/static/fnt/DualisLite.ttf.eot'), url('/static/fnt/DualisLite.ttf.eot?#iefix') format('embedded-opentype');
@@ -805,3 +873,4 @@ section {
   border-radius: 4px;
   margin-bottom: 22px;
 }
+/*# sourceMappingURL=main.css.map */

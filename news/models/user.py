@@ -13,24 +13,25 @@ from wtforms.validators import DataRequired, URL, Length
 
 from news.config.config import GODS
 from news.lib.cache import cache
+from news.lib.lazy import lazyprop
 from news.lib.login import login_manager
 from news.lib.db.db import db, schema
 from news.lib.mail import send_mail, registration_email
 from news.lib.queue import q
 from news.lib.verifications import EmailVerification
+from news.models.base import Base
 from news.models.feed_admin import FeedAdmin
 from news.models.token import DisposableToken
 
 MAX_SUBSCRIPTIONS_FREE = 50
 
 
-class User(Model):
+class User(Base):
     __table__ = 'users'
-    __fillable__ = ['username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sort', 'bio', 'url',
+    __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sort', 'bio', 'url',
                     'profile_pic', 'email_public'
                     'p_show_images', 'p_min_link_score']
-    __guarded__ = ['id', 'password', 'reported', 'spammer']
-    __hidden__ = ['password', 'reported', 'spammer', 'email_verified']
+    __hidden__ = ['id', 'password']
 
     @classmethod
     def create_table(cls):
@@ -136,16 +137,17 @@ class User(Model):
     @staticmethod
     @login_manager.user_loader
     def load_user(session_id):
-        return cache.get('us:{}'.format(session_id))
+        u = cache.get('us:{}'.format(session_id))
+        return u
 
     @classmethod
     def by_id(cls, id):
-        u = cache.get('u:{}'.format(id))
+        u = cls.load_from_cache(id)
         if u is not None:
             return u
         u = User.where('id', id).first()
         if u is not None:
-            cache.set('u:{}'.format(id), u)
+            u.write_to_cache()
         return u
 
     def update_with_cache(self):
@@ -181,7 +183,7 @@ class User(Model):
     def subscribed_feed_ids(self):
         return [feed.id for feed in self.feeds]
 
-    @property
+    @lazyprop
     def subscribed_feeds(self):
         from news.models.feed import Feed
         return [Feed.by_id(x) for x in self.subscribed_feed_ids()]
