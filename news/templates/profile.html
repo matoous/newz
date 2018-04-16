@@ -47,6 +47,16 @@
                 {% endif %}
             </div>
         </div>
+        {% if administrations|length > 0 %}
+                    <div class="profile-section">
+            <h2>Admin of</h2>
+            <div class="administrations">
+                {% for administration in administrations %}
+                    <a href="/f/{{ administration.feed.slug }}">{{ administration.feed.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
         <div class="profile-section">
             <h2>Best Links</h2>
             <div class="links">

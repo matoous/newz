@@ -2,9 +2,7 @@ from base64 import urlsafe_b64encode
 from os import urandom
 
 from orator import Model
-from orator.exceptions.query import QueryException
 
-from news.lib.db.db import db
 from news.lib.db.db import schema
 
 

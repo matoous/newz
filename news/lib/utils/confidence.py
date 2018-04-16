@@ -2,6 +2,12 @@ from math import sqrt
 
 
 def confidence(ups, downs):
+    """
+    Returns lower Wilsons bound of confidence in comment to sort by
+    :param ups: ups
+    :param downs: down
+    :return: lower Wilsons bound
+    """
     n = ups + downs
     if n == 0:
         return 0

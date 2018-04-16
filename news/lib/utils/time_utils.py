@@ -3,6 +3,11 @@ from math import ceil
 
 
 def time_ago(time):
+    """
+    Formats time to age string
+    :param time:
+    :return:
+    """
     now = datetime.utcnow()
     ago = now - time
     if ago.seconds < 60:
@@ -27,5 +32,10 @@ epoch = datetime(1970, 1, 1)
 
 
 def epoch_seconds(date):
+    """
+    Gets epoch seconds from date
+    :param date: date
+    :return: epoch seconds
+    """
     td = date - epoch
     return td.total_seconds()

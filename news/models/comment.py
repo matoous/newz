@@ -1,6 +1,6 @@
 from flask_wtf import Form
-from redis_lock import Lock
 from orator.orm import has_many, morph_many
+from redis_lock import Lock
 from wtforms import HiddenField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 

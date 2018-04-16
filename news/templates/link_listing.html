@@ -25,6 +25,14 @@
             <div class="author">
                 by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
             </div>
+                                        {% if current_user.is_feed_admin(link.feed) %}
+                                <div class="admin-options">
+                                    <form class="non-form" method="post" action="/f/{{ link.feed.slug }}/remove">
+                                        <input type="hidden" name="slug" value="{{ link.slug }}">
+                                        <input type="submit" value="remove">
+                                    </form>
+                                </div>
+                            {% endif %}
         </div>
     </div>
     <div class="link-rating">

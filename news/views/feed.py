@@ -163,7 +163,21 @@ def get_feed_admins(feed):
 @feed_blueprint.route("/f/<feed:feed>/admin")
 @feed_admin_required
 def get_feed_admin(feed):
-    return render_template("feed_admin.html", feed=feed)
+    form = FeedForm()
+    form.fill(feed)
+    return render_template("feed_admin.html", feed=feed, form=form)
+
+
+@feed_blueprint.route("/f/<feed:feed>/admin", methods=['POST'])
+@feed_admin_required
+def post_feed_admin(feed):
+    form = FeedForm()
+    if form.validate():
+        feed.title = form.title.data
+        feed.description = form.description.data
+        feed.update_with_cache()
+        return redirect('/f/{}/admin'.format(feed.slug))
+    return render_template("feed_admin.html", feed=feed, form=form)
 
 
 @feed_blueprint.route("/f/<feed:feed>/bans")

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block body %}
+<section>
+    <div class="container">
+        <div class="feed0admin">
+            <div class="admin-menu">
+                <div class="menu">
+                    <a href="/f/{{feed.slug}}/admin">
+                        General
+                    </a>
+                    <a href="/f/{{feed.slug}}/admins">
+                        Admins
+                    </a>
+                    <a href="/f/{{feed.slug}}/bans">
+                        Bans
+                    </a>
+                    <a href="/f/{{ feed.slug }}">
+                        Feed
+                    </a>
+                </div>
+        </div>
+            <div class="admin-tab">
+                {% block admin_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

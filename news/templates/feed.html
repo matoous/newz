@@ -44,17 +44,22 @@
                         </ul>
                     </div>
                     <div class="">
-                        <a class="btn btn-black" href="/f/{{ feed.slug }}/add">Submit</a>
+                        <a href="/f/{{ feed.slug }}/add">Submit</a>
                     </div>
                     {% if subscribed %}
                         <div >
-                            <a class="btn btn-grey" href="/f/{{ feed.slug }}/unsubscribe">Unsubscribe</a>
+                            <a href="/f/{{ feed.slug }}/unsubscribe">Unsubscribe</a>
                         </div>
                     {% else %}
                         <div >
-                            <a class="btn btn-red" href="/f/{{ feed.slug }}/subscribe">Subscribe</a>
+                            <a href="/f/{{ feed.slug }}/subscribe">Subscribe</a>
                         </div>
                     {% endif %}
+                                            {% if current_user.is_feed_admin(feed) %}
+                        <div>
+                            <a href="/f/{{ feed.slug }}/admin">Admin</a>
+                        </div>
+                                            {% endif %}
                 </div>
                 {% set single_feed = True %}
                 {% for link in feed.links %}

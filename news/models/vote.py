@@ -2,11 +2,11 @@ from orator import Model
 from orator.orm import belongs_to
 
 from news.lib.cache import cache
+from news.lib.cache_updates import update_link
 from news.lib.comments import update_comment
-from news.lib.db.db import db, schema
+from news.lib.db.db import schema
 from news.lib.lazy import lazyprop
 from news.lib.queue import q
-from news.lib.cache_updates import update_link
 from news.models.comment import Comment
 from news.models.link import Link
 from news.models.user import User

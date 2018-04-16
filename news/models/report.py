@@ -1,7 +1,7 @@
 from orator import Model
 from orator.orm import morph_to
 
-from news.lib.db.db import db, schema
+from news.lib.db.db import schema
 
 
 class Report(Model):

@@ -40,7 +40,7 @@ def make_app():
     login_manager.init_app(app)
     mail.init_app(app)
     #sentry.init_app(app)
-    cache.clear()
+    #cache.clear()
 
 
     #cache.clear()

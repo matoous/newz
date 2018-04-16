@@ -1,9 +1,13 @@
-from news.lib.db.db import db, schema
+from news.lib.db.db import schema
 from news.lib.lazy import lazyprop
 from news.models.base import Base
 
 
 class FeedAdmin(Base):
+    """
+    FeedAdmin model
+    """
+
     __table__ = 'feed_admins'
     __fillable__ = ['id', 'god', 'user_id', 'feed_id']
     __incrementing__ = False
@@ -31,12 +35,28 @@ class FeedAdmin(Base):
 
     @classmethod
     def by_feed_id(cls, feed_id):
+        """
+        Find feed admins by feed id
+        :param feed_id: feed id
+        :return: feed admins
+        """
         return cls.where('feed_id', feed_id).get()
 
     @classmethod
     def by_user_id(cls, user_id):
+        """
+        Finds users administrations for feeds
+        :param user_id: user_id
+        :return: feed administrations
+        """
         return cls.where('user_id', user_id).get()
 
     @classmethod
     def by_user_and_feed_id(cls, user_id, feed_id):
+        """
+        Finds single feed administration by user and feed id
+        :param user_id: user id
+        :param feed_id: feed id
+        :return: feed administration
+        """
         return cls.where('user_id', user_id).where('feed_id', feed_id).first()

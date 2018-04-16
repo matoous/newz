@@ -1,23 +1,18 @@
 from datetime import datetime
-from secrets import token_urlsafe
 
-from passlib.hash import bcrypt
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
-from itsdangerous import constant_time_compare
-from orator import Model
 from orator.orm import belongs_to_many, has_many
+from passlib.hash import bcrypt
 from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import DataRequired, URL, Length
 
 from news.config.config import GODS
 from news.lib.cache import cache
+from news.lib.db.db import schema
 from news.lib.lazy import lazyprop
 from news.lib.login import login_manager
-from news.lib.db.db import db, schema
-from news.lib.mail import send_mail, registration_email
-from news.lib.queue import q
 from news.lib.verifications import EmailVerification
 from news.models.base import Base
 from news.models.feed_admin import FeedAdmin
@@ -215,12 +210,18 @@ class User(Base):
         return User.where('username', username).first()
 
     def is_god(self):
+        if not self.is_authenticated:
+            return False
         return self.username in GODS
 
     def is_feed_admin(self, feed):
+        if not self.is_authenticated:
+            return False
         return FeedAdmin.by_user_and_feed_id(self.id, feed.id) is not None
 
     def is_feed_god(self, feed):
+        if not self.is_authenticated:
+            return False
         feed_admin = FeedAdmin.by_user_and_feed_id(self.id, feed.id)
         return feed_admin.god if feed_admin is not None else False
 

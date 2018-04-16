@@ -76,7 +76,16 @@
                             {{ comment.text }}
                         </div>
                         <div class="comment-options">
-                            <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a> <a href="/c/{{comment.id}}/report">report</a>
+                            <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a>
+                            <a href="/c/{{comment.id}}/report">report</a>
+                            {% if current_user.is_feed_admin(feed) %}
+                                <div class="admin-options">
+                                    <form class="non-form" method="post" action="/f/{{ feed.slug }}/remove-comment">
+                                        <input type="hidden" name="id" value="{{ comment.id }}">
+                                        <input type="submit" value="remove">
+                                    </form>
+                                </div>
+                            {% endif %}
                         </div>
                         {% if subcomments|length > 0 %}
                             <div class="subcomments">

@@ -1,16 +1,27 @@
-{% extends "base.html" %}
+{% extends "feed_admin_base.html" %}
 
-{% block title %}
-    Settings
-{% endblock %}
-
-{% block body %}
-<section>
-    <div class="container">
-        <div class="contact">
+{% block admin_content %}
             <h1>Feed Administration</h1>
-
-        </div>
-    </div>
-</section>
+            <form action="/f/{{ feed.slug }}/admin" method="POST">
+                <h3>Edit Feed</h3>
+                <fieldset>
+                    <div class="f-row">
+                        {{ form.name.label }}
+                        {{ form.name }}
+                    </div>
+                    <div class="f-row">
+                        {{ form.description.label }}
+                        {{ form.description }}
+                    </div>
+                    {{ form.csrf_token }}
+                    <input type="submit" value="Change">
+                </fieldset>
+            </form>
+            <form action="/f/{{ feed.slug }}/admin" method="POST">
+                <h3>Feed Rules</h3>
+                <fieldset>
+                    {{ form.csrf_token }}
+                    <input type="submit" value="Change">
+                </fieldset>
+            </form>
 {% endblock %}

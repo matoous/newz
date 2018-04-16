@@ -11,6 +11,13 @@ PRECOMPUTE_LIMIT = 1000
 
 
 def tuple_maker(sort):
+    """
+    Tuple maker returns function which transforms model to tuple of values base on sort
+    These tuples are used to sort the models
+    First element in tuple is always the ID of object
+    :param sort:
+    :return:
+    """
     if sort == 'new':
         return lambda x: (x.id, epoch_seconds(x.created_at))
     if sort == 'best':
@@ -156,6 +163,11 @@ class LinkQuery:
 
 @job('medium', connection=redis_conn)
 def add_to_queries(link):
+    """
+    Consumes add_to_queries queue
+    :param link: link to add/update
+    :return: nothing
+    """
     for sort in ['trending', 'best', 'new']:  # no need to update 'new' because it doesn't depend on score
         q = LinkQuery(feed_id=link.feed_id, sort=sort)
         q.insert([link])

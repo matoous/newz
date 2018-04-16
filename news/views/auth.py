@@ -14,7 +14,7 @@ auth = Blueprint('auth', __name__, template_folder='/templates')
 @auth.route("/join", methods=['GET', 'POST'])
 def signup():
     form = SignUpForm()
-    if form.validate():
+    if form.validate_on_submit():
         user = form.user
         user.register()
         return redirect('/')
@@ -24,7 +24,7 @@ def signup():
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
-    if form.validate():
+    if form.validate_on_submit():
         form.user.login()
         return redirect('/')
     return render_template("login.html", form=form, show_logo=True, hide_menues=True)
@@ -39,18 +39,34 @@ def logout():
 
 @auth.route("/reset", methods=["GET", "POST"])
 def reset():
+    # TODO reset users password
     pass
 
 
+@auth.route("/verify/resend", methods=["POST"])
+def resend_verify():
+    pass
+
 @auth.route("/verify/<token>", methods=["GET"])
 def verify(token):
+    """
+    Verify users email
+    :param token: verification token
+    :return:
+    """
     if token == '':
         abort(404)
     verification = EmailVerification(token=token)
+
+    # verify
     if verification.verify():
+
+        # update user
         user = User.by_id(verification.user_id)
         user.email_verified = True
         user.update_with_cache()
+
         flash('Email successfully verified!', 'success')
         return redirect('/')
+
     abort(404)

@@ -1,12 +1,12 @@
 from flask_wtf import Form
 from orator import Model
-from orator.orm import belongs_to, has_many, morph_many
+from orator.orm import morph_many
 from slugify import slugify
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, URL
 
 from news.lib.cache import cache
-from news.lib.db.db import db, schema
+from news.lib.db.db import schema
 from news.lib.db.query import add_to_queries
 from news.lib.db.sorts import sorts
 from news.lib.lazy import lazyprop

@@ -1,3 +1,17 @@
+.non-form input {
+  border: none!important;
+  background-color: transparent!important;
+  padding: 0!important;
+  margin: 0!important;
+  line-height: inherit!important;
+  color: black!important;
+  height: auto!important;
+  font-weight: normal!important;
+  text-transform: none!important;
+}
+.non-form input:hover {
+  text-decoration: underline;
+}
 form {
   font-family: 'Roboto Condensed', sans-serif;
 }
@@ -872,5 +886,9 @@ section {
   padding: 6px;
   border-radius: 4px;
   margin-bottom: 22px;
+}
+.admin-options {
+  display: inline-block;
+  margin-left: 16px;
 }
 /*# sourceMappingURL=main.css.map */

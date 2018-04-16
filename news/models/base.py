@@ -3,16 +3,34 @@ from redis_lock import Lock
 
 from news.lib.cache import conn, cache
 from news.lib.db.db import db
+from news.lib.queue import redis_conn
+
+CACHE_EXPIRE_TIME = 12 * 60 * 60
 
 
 class Base(Model):
+    """
+    Base class for all models which handles queries and caching
+
+    All models should use methods from this class to access and write to cache,
+    If model-specific methods for cache access are needed be really careful
+    when implementing them and try to use as much code from this class as possible
+    """
 
     @classmethod
     def _cache_prefix(cls):
+        """
+        Cache prefix for model, must be unique to prevent conflicts
+        :return: cache prefix
+        """
         return cls.__name__ + '_'
 
     @property
     def _cache_key(self):
+        """
+        Cache key for model
+        :return: cache key for object
+        """
         prefix = self._cache_prefix()
         return "{prefix}{id}".format(prefix=prefix, id=self.id)
 
@@ -49,7 +67,11 @@ class Base(Model):
         What should and what shouldn't be written can be modified by
         __hidden__ attribute on class (more in documentation of orator)
         """
-        cache.set(self._cache_key, self.serialize())
+        # save token to redis for limited time
+        pipe = redis_conn.pipeline()
+        pipe.set(self._cache_key, self.serialize())
+        pipe.expire(self._cache_key, CACHE_EXPIRE_TIME)
+        pipe.execute()
 
     @classmethod
     def load_from_cache(cls, id):

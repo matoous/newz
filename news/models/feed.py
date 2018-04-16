@@ -1,18 +1,12 @@
-from flask_login import current_user
 from flask_wtf import Form
-from orator import Model
-from orator.orm import has_many, belongs_to_many
+from orator.orm import belongs_to_many
 from slugify import slugify
+from wtforms import StringField, TextAreaField
+from wtforms.validators import DataRequired, Length
 
-from wtforms import StringField
-from wtforms.validators import DataRequired, Length, URL
-
-from news.lib.cache import cache
-from news.lib.db.db import db, schema
-from news.lib.sorts import hot
+from news.lib.db.db import schema
 from news.models.base import Base
 from news.models.link import Link
-from news.models.vote import Vote
 
 
 class Feed(Base):
@@ -73,8 +67,8 @@ class Feed(Base):
 
 
 class FeedForm(Form):
-    title = StringField('Title', [DataRequired(), Length(max=128, min=3)])
-    description = StringField('Description', [DataRequired()])
+    name = StringField('Name', [DataRequired(), Length(max=128, min=3)])
+    description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
@@ -84,5 +78,9 @@ class FeedForm(Form):
         rv = Form.validate(self)
         if not rv:
             return False
-        self.feed = Feed(name=self.title.data, description=self.description.data, slug=slugify(self.title.data))
+        self.feed = Feed(name=self.name.data, description=self.description.data, slug=slugify(self.name.data))
         return True
+
+    def fill(self, feed):
+        self.name.data = feed.name
+        self.description.data = feed.description
