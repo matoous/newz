@@ -21,7 +21,13 @@
                 {{ form.url }}
             </div>
             <div class="f-row">
-                {{ form.summary }}
+                <a href="/f/{{ feed.slug }}/rules">Feed rules ></a>
+                <div class="md">
+                    {{ feed.rules_html|safe }}
+                </div>
+            </div>
+            <div class="f-row">
+                {{ form.text }}
             </div>
             <input type="submit" value="Create link">
             <button class="secondary" onclick="generatePreview()" type="button">Preview</button>

@@ -890,5 +890,7 @@ section {
 .admin-options {
   display: inline-block;
   margin-left: 16px;
+  padding: 4px;
+  background-color: yellow;
 }
 /*# sourceMappingURL=main.css.map */

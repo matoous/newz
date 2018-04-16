@@ -1,11 +1,10 @@
-from orator import Model
+from orator import Model, accessor
 from orator.orm import belongs_to
 
 from news.lib.cache import cache
 from news.lib.cache_updates import update_link
 from news.lib.comments import update_comment
 from news.lib.db.db import schema
-from news.lib.lazy import lazyprop
 from news.lib.queue import q
 from news.models.comment import Comment
 from news.models.link import Link
@@ -28,6 +27,7 @@ def vote_type_from_string(str):
 class Vote(Model):
     __timestamps__ = False
     __incrementing__ = False
+    __hidden__ = ['lazy_props']
 
     @classmethod
     def create_table(cls):
@@ -45,15 +45,15 @@ class Vote(Model):
     def _cache_key(cls, link_id, user_id):
         raise NotImplementedError
 
-    @lazyprop
+    @property
     def is_downvote(self):
         return self.vote_type == -1
 
-    @lazyprop
+    @property
     def is_upvote(self):
         return self.vote_type == 1
 
-    @lazyprop
+    @property
     def affected_attribute(self):
         if self.is_downvote:
             return 'downs'
@@ -88,11 +88,11 @@ class LinkVote(Vote):
     def __ne__(self, other):
         return not self == other
 
-    @lazyprop
+    @accessor
     def user(self):
         return User.by_id(self.user_id)
 
-    @lazyprop
+    @accessor
     def link(self):
         return Link.by_id(self.link_id)
 
@@ -124,7 +124,10 @@ class LinkVote(Vote):
             self.link.decr(previous_vote.affected_attribute, 1)
 
         if self.affected_attribute:
+            print(self.affected_attribute)
             self.link.incr(self.affected_attribute, 1)
+
+        print(self.__dict__)
 
         if previous_vote is None:
             self.save()
@@ -158,11 +161,11 @@ class CommentVote(Vote):
             table.integer('vote_type')
             table.primary(['user_id', 'comment_id'])
 
-    @lazyprop
+    @accessor
     def user(self):
         return User.by_id(self.user_id)
 
-    @lazyprop
+    @accessor
     def comment(self):
         return Comment.by_id(self.comment_id)
 

@@ -7,6 +7,19 @@ from news.lib.queue import redis_conn
 
 CACHE_EXPIRE_TIME = 12 * 60 * 60
 
+def lazyprop(fn):
+    """
+    Function decorator for class properties which should be loaded only once and lazily
+    :param fn: function/property to decorate
+    :return: decorated property
+    """
+    attr_name = fn.__name__
+    @property
+    def _lazyprop(self):
+        if not attr_name in self.lazy_props:
+            self.lazy_props[attr_name] = fn(self)
+        return self.lazy_props[attr_name]
+    return _lazyprop
 
 class Base(Model):
     """
@@ -16,6 +29,7 @@ class Base(Model):
     If model-specific methods for cache access are needed be really careful
     when implementing them and try to use as much code from this class as possible
     """
+    __hidden__ = ['lazy_props']
 
     @classmethod
     def _cache_prefix(cls):
@@ -34,6 +48,10 @@ class Base(Model):
         prefix = self._cache_prefix()
         return "{prefix}{id}".format(prefix=prefix, id=self.id)
 
+    @property
+    def _lock_key(self):
+        return "lock:".format(self._cache_key)
+
     @classmethod
     def _cache_key_from_id(cls, id):
         """
@@ -50,7 +68,7 @@ class Base(Model):
         Used when updating in cache or database
         :return: RedisLock
         """
-        return Lock(conn, self._cache_key)
+        return Lock(conn, self._lock_key)
 
     def update_from_cache(self):
         """

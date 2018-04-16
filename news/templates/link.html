@@ -78,7 +78,7 @@
                         <div class="comment-options">
                             <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a>
                             <a href="/c/{{comment.id}}/report">report</a>
-                            {% if current_user.is_feed_admin(feed) %}
+                            {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                                 <div class="admin-options">
                                     <form class="non-form" method="post" action="/f/{{ feed.slug }}/remove-comment">
                                         <input type="hidden" name="id" value="{{ comment.id }}">

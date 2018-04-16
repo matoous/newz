@@ -1,5 +1,6 @@
+from orator import accessor
+
 from news.lib.db.db import schema
-from news.lib.lazy import lazyprop
 from news.models.base import Base
 
 
@@ -23,12 +24,12 @@ class FeedAdmin(Base):
             table.datetime('updated_at')
             table.primary(['user_id', 'feed_id'])
 
-    @lazyprop
+    @accessor
     def user(self):
         from news.models.user import User
         return User.by_id(self.user_id)
 
-    @lazyprop
+    @accessor
     def feed(self):
         from news.models.feed import Feed
         return Feed.by_id(self.feed_id)

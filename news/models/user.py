@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
+from orator import accessor
 from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
 from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField
@@ -11,7 +12,6 @@ from wtforms.validators import DataRequired, URL, Length
 from news.config.config import GODS
 from news.lib.cache import cache
 from news.lib.db.db import schema
-from news.lib.lazy import lazyprop
 from news.lib.login import login_manager
 from news.lib.verifications import EmailVerification
 from news.models.base import Base
@@ -46,9 +46,9 @@ class User(Base):
             table.datetime('created_at')
             table.datetime('updated_at')
             table.string('preferred_sort', 10).default('trending')
-            table.string('bio').nullable()
-            table.string('url').nullable()
-            table.string('profile_pic').nullable()
+            table.text('bio').nullable()
+            table.text('url').nullable()
+            table.text('profile_pic').nullable()
             table.integer('feed_subs').default(0)
             # preferences
             table.string('p_show_images', 1).default('y')
@@ -118,17 +118,17 @@ class User(Base):
         # maybe some more setups for new user
 
     def change_email(self, email):
-        #TODO do it under lock
-        # change email
-        self.email = email
-        self.email_verified = False
+        with self.get_read_modify_write_lock():
+            # change email
+            self.email = email
+            self.email_verified = False
 
-        # update
-        self.save()
+            # update
+            self.save()
 
-        # send verification
-        verification = EmailVerification(self)
-        verification.create()
+            # send verification
+            verification = EmailVerification(self)
+            verification.create()
 
     @staticmethod
     @login_manager.user_loader
@@ -182,7 +182,7 @@ class User(Base):
     def subscribed_feed_ids(self):
         return [feed.id for feed in self.feeds]
 
-    @lazyprop
+    @accessor
     def subscribed_feeds(self):
         from news.models.feed import Feed
         return [Feed.by_id(x) for x in self.subscribed_feed_ids()]
@@ -195,13 +195,17 @@ class User(Base):
             return False
 
         self.feeds().attach(feed)
-        User.where('id', self.id).increment('feed_subs', 1)  # todo update cache too
+        self.incr('feed_subs', 1)
+
+        # TODO add to subscribed feed ids
         cache.delete_memoized(self.subscribed_feed_ids)
         return True
 
     def unsubscribe(self, feed):
         self.feeds().detach(feed.id)
-        User.where('id', self.id).decrement('feed_subs', 1)  # todo update cache too
+        self.decr('feed_subs', 1)
+
+        # TODO add to subscribed feed ids
         cache.delete_memoized(self.subscribed_feed_ids)
         return True
 

@@ -26,7 +26,7 @@ def new_feed():
     return render_template("new_feed.html", form=form)
 
 
-@feed_blueprint.route("/f/<feed:feed>")
+@feed_blueprint.route('/f/<feed:feed>')
 @feed_blueprint.route('/f/<feed:feed>/<any(trending, new, best):sort>')
 def get_feed(feed, sort=None):
     if (sort is None or sort not in ['trending', 'new', 'best']) and current_user.is_authenticated:
@@ -71,6 +71,7 @@ def do_vote(link=None, vote_str=None):
         abort(404)
 
     vote = LinkVote(user_id=current_user.id, link_id=link.id, vote_type=vote)
+    print(vote.__dict__)
     vote.apply()
 
     return "voted"
@@ -173,9 +174,11 @@ def get_feed_admin(feed):
 def post_feed_admin(feed):
     form = FeedForm()
     if form.validate():
-        feed.title = form.title.data
+        feed.name = form.name.data
         feed.description = form.description.data
-        feed.update_with_cache()
+        feed.rules = form.rules.data
+        feed.update()
+        feed.write_to_cache()
         return redirect('/f/{}/admin'.format(feed.slug))
     return render_template("feed_admin.html", feed=feed, form=form)
 

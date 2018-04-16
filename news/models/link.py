@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from orator import Model
+from orator import Model, accessor
 from orator.orm import morph_many
 from slugify import slugify
 from wtforms import StringField, TextAreaField
@@ -9,8 +9,8 @@ from news.lib.cache import cache
 from news.lib.db.db import schema
 from news.lib.db.query import add_to_queries
 from news.lib.db.sorts import sorts
-from news.lib.lazy import lazyprop
 from news.lib.queue import q
+from news.lib.solr import new_link_queue
 from news.lib.sorts import hot
 from news.lib.utils.time_utils import time_ago
 from news.models.base import Base
@@ -21,8 +21,9 @@ MAX_IN_CACHE = 1000
 
 class Link(Base):
     __table__ = 'links'
-    __fillable__ = ['title', 'slug', 'summary', 'text', 'user_id', 'url', 'feed_id', 'id',
+    __fillable__ = ['title', 'slug', 'text', 'user_id', 'url', 'feed_id', 'id',
                     'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
+    __searchable__ = ['title', 'text', 'url', 'user_id', 'feed_id']
 
     @classmethod
     def create_table(cls):
@@ -31,7 +32,6 @@ class Link(Base):
             table.big_increments('id').unsigned()
             table.string('title', 128)
             table.string('slug', 150).unique()
-            table.text('summary').nullable()
             table.text('text').nullable()
             table.text('url')
             table.integer('user_id').unsigned()
@@ -63,11 +63,11 @@ class Link(Base):
     def __repr__(self):
         return '<Link {}>'.format(self.id)
 
-    @lazyprop
+    @accessor
     def hot(self):
         return hot(self.score, self.created_at)
 
-    @lazyprop
+    @accessor
     def feed(self):
         from news.models.feed import Feed
         return Feed.by_id(self.feed_id)
@@ -82,18 +82,16 @@ class Link(Base):
             l.write_to_cache()
         return l
 
-    @lazyprop
+    @accessor
     def user(self):
         from news.models.user import User
         return User.by_id(self.user_id)
 
     @property
     def trimmed_summary(self):
-        if len(self.summary) > 300:
-            return self.summary[:300] + '...'
-        return self.summary
+        return self.text[:max(300, len(self.text))] if self.text else ""
 
-    @lazyprop
+    @accessor
     def votes(self):
         from news.models.vote import LinkVote
         return LinkVote.where('link_id', self.id).get()
@@ -141,12 +139,16 @@ class Link(Base):
     def commit(self):
         self.save()
         q.enqueue(add_to_queries, self, result_ttl=0)
+        q.enqueue(new_link_queue, self)
+
+    def to_solr(self):
+        return {x : self.get_attribute(x) for x in self.__class__.__searchable__}
 
 
 class LinkForm(Form):
     title = StringField('Title', [DataRequired(), Length(max=128, min=6)], render_kw={'placeholder': 'Title', 'autocomplete': 'off'})
     url = StringField('Url', [DataRequired(), URL(), Length(max=256)], render_kw={'placeholder': 'URL', 'oninput': 'handleUrlChange()', 'autocomplete': 'off'})
-    summary = TextAreaField('Summary', [Length(max=8192)], render_kw={'placeholder': 'Summary or text', 'rows': 6, 'autocomplete': 'off'})
+    text = TextAreaField('Summary', [Length(max=8192)], render_kw={'placeholder': 'Summary or text', 'rows': 6, 'autocomplete': 'off'})
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
@@ -158,7 +160,7 @@ class LinkForm(Form):
             return False
         self.link = Link(title=self.title.data,
                          slug=slugify(self.title.data),
-                         summary=self.summary.data,
+                         text=self.text.data,
                          url=self.url.data,
                          feed_id=feed.id,
                          user_id=user.id)

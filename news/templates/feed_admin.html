@@ -13,13 +13,13 @@
                         {{ form.description.label }}
                         {{ form.description }}
                     </div>
-                    {{ form.csrf_token }}
-                    <input type="submit" value="Change">
-                </fieldset>
-            </form>
-            <form action="/f/{{ feed.slug }}/admin" method="POST">
-                <h3>Feed Rules</h3>
-                <fieldset>
+                    <div class="f-row">
+                        {{ form.rules.label }}
+                        {{ form.rules }}
+                    </div>
+                    <div class="md">
+                        {{ feed.rules_html|safe }}
+                    </div>
                     {{ form.csrf_token }}
                     <input type="submit" value="Change">
                 </fieldset>

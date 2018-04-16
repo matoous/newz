@@ -1,4 +1,5 @@
 from flask_wtf import Form
+from orator import accessor
 from orator.orm import has_many, morph_many
 from redis_lock import Lock
 from wtforms import HiddenField, TextAreaField
@@ -7,7 +8,6 @@ from wtforms.validators import DataRequired, Optional
 from news.lib.cache import cache, conn
 from news.lib.comments import add_new_comment
 from news.lib.db.db import schema
-from news.lib.lazy import lazyprop
 from news.lib.queue import q
 from news.lib.utils.confidence import confidence
 from news.lib.utils.time_utils import time_ago
@@ -54,7 +54,7 @@ class Comment(Base):
     def __repr__(self):
         return '<Comment {}>'.format(self.id)
 
-    @lazyprop
+    @accessor
     def link(self):
         """
         Get link to which this comments belongs
@@ -63,7 +63,7 @@ class Comment(Base):
         from news.models.link import Link
         return Link.by_id(self.link_id)
 
-    @lazyprop
+    @accessor
     def user(self):
         """
         Get user who created this link

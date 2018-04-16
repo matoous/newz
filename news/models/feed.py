@@ -1,9 +1,12 @@
 from flask_wtf import Form
+from orator import mutator
 from orator.orm import belongs_to_many
 from slugify import slugify
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length
+from mistletoe import markdown
 
+from news.lib.cache import cache
 from news.lib.db.db import schema
 from news.models.base import Base
 from news.models.link import Link
@@ -11,7 +14,7 @@ from news.models.link import Link
 
 class Feed(Base):
     __table__ = 'feeds'
-    __fillable__ = ['id', 'name', 'slug', 'description', 'default_sort', 'lang', 'over_18', 'logo', 'reported']
+    __fillable__ = ['id', 'name', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo', 'reported']
 
     @classmethod
     def create_table(cls):
@@ -20,7 +23,8 @@ class Feed(Base):
             table.increments('id').unsigned()
             table.string('name', 64)
             table.string('slug', 80).unique()
-            table.string('description').nullable()
+            table.text('description').nullable()
+            table.text('rules').nullable()
             table.string('default_sort', 12).default('trending')
             table.datetime('created_at')
             table.datetime('updated_at')
@@ -54,7 +58,7 @@ class Feed(Base):
 
     @property
     def path(self):
-        return "/f/%s/" % self.slug
+        return "/f/%s" % self.slug
 
     @classmethod
     def _cache_prefix(cls):
@@ -65,10 +69,21 @@ class Feed(Base):
         from news.models.user import User
         return User
 
+    @mutator
+    def rules(self, value):
+        rules = markdown(value)
+        cache.set("rules:{}".format(self.id), rules)
+        self.set_raw_attribute('rules', value)
+
+    @property
+    def rules_html(self):
+        return cache.get("rules:{}".format(self.id)) or ""
+
 
 class FeedForm(Form):
     name = StringField('Name', [DataRequired(), Length(max=128, min=3)])
     description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
+    rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
@@ -84,3 +99,4 @@ class FeedForm(Form):
     def fill(self, feed):
         self.name.data = feed.name
         self.description.data = feed.description
+        self.rules.data = feed.rules
