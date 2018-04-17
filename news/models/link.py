@@ -129,9 +129,6 @@ class Link(Base):
         cache.set(cache_key, res)
         return res
 
-    def time_ago(self):
-        return time_ago(self.created_at)
-
     @property
     def score(self):
         return self.ups - self.downs
@@ -139,7 +136,7 @@ class Link(Base):
     def commit(self):
         self.save()
         q.enqueue(add_to_queries, self, result_ttl=0)
-        q.enqueue(new_link_queue, self)
+        q.enqueue(new_link_queue, self, result_ttl=0)
 
 
 class LinkForm(Form):

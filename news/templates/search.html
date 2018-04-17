@@ -16,6 +16,37 @@
                         </button>
                     </form>
                 </div>
+            <div class="feeds search-results">
+                 <h2>Feeds</h2>
+                {% for feed in feeds %}
+                    <div class="">
+                        <div class="">
+                            <h2>
+                                <a href="{{ feed.feed.url }}">
+                                    {% if feed.name %}
+                                    {{ feed.name|safe }}
+                                    {% else %}
+                                    {{ feed.feed.name }}
+                                    {% endif %}
+                                </a>
+                            </h2>
+                                {% if feed.description %}
+                            <div>
+                                    {{ feed.description|safe }}
+                            </div>
+                        {% endif %}
+                            <div class="bottom-line">
+                                <div class="subcribers">
+                                    XXX subscribers
+                                </div>
+                                <div class="date">
+                                    {{ feed.feed.time_ago() }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
                  <div class="links search-results">
                  <div>
                      In {{ elapsed }} s

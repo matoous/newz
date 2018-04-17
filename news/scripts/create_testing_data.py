@@ -50,7 +50,7 @@ def create_default_feeds():
     f = Feed.where('slug', 'hackernews').first()
     l = Link(title='Why Pi Matters',
              slug=slugify('Why Pi Matters'),
-             summary='Every March 14th, mathematicians like me are prodded out of our burrows like Punxsutawney Phil '
+             text='Every March 14th, mathematicians like me are prodded out of our burrows like Punxsutawney Phil '
                      'on Groundhog Day, blinking and bewildered by all the fuss. Yes, it’s Pi Day again. And not just '
                      'any Pi Day. They’re calling this the Pi Day of the century: 3.14.15. Pi to five digits. A '
                      'once-in-a-lifetime thing.',
@@ -63,7 +63,7 @@ def create_default_feeds():
         pass
     l2 = Link(title='Reddit and the Struggle to Detoxify the Internet',
               slug=slugify('Reddit and the Struggle to Detoxify the Internet'),
-              summary='How do we fix life online without limiting free speech?',
+              text='How do we fix life online without limiting free speech?',
               url='https://www.newyorker.com/magazine/2018/03/19/reddit-and-the-struggle-to-detoxify-the-internet',
               feed_id=f.id,
               user_id=u.id)
@@ -74,7 +74,7 @@ def create_default_feeds():
     f = Feed.where('slug', 'the-awesome-earth').first()
     l3 = Link(title='Is This the Underground Everest?',
               slug=slugify('Is This the Underground Everest?'),
-              summary='Far beneath a remote mountain range in Uzbekistan, explorers are delving into a labyrinth that could be the world\'s deepest cave.',
+              text='Far beneath a remote mountain range in Uzbekistan, explorers are delving into a labyrinth that could be the world\'s deepest cave.',
               url='https://www.nationalgeographic.com/magazine/2017/03/dark-star-deepest-cave-climbing-uzbekistan/',
               feed_id=f.id,
               user_id=u.id)
@@ -86,7 +86,7 @@ def create_default_feeds():
     f = Feed.where('slug', 'good-long-reads').first()
     l4 = Link(title='The Man Who’s Helped Elon Musk, Tom Brady, and Ari Emanuel Get Dressed',
               slug=slugify('The Man Who’s Helped Elon Musk, Tom Brady, and Ari Emanuel Get Dressed'),
-              summary='Andrew Weitz spruces up Hollywood’s reluctant Zoolanders.',
+              text='Andrew Weitz spruces up Hollywood’s reluctant Zoolanders.',
               url='https://www.newyorker.com/magazine/2018/03/19/the-man-whos-helped-elon-musk-tom-brady-and-ari-emanuel-get-dressed',
               feed_id=f.id,
               user_id=u.id)
@@ -111,3 +111,19 @@ def create_default_feeds():
         except Exception as e:
             pass
 
+def importHN():
+    import feedparser
+    u = User.where('id', 1).first()
+    f = Feed.where('slug', 'testfeed').first()
+    d = feedparser.parse('https://news.nationalgeographic.com/news/misc/rss')
+    for entry in d['entries']:
+        ll = Link(title=entry['title'],
+                  slug=slugify(entry['title']),
+                  text='',
+                  url=entry['link'],
+                  feed_id=f.id,
+                  user_id=u.id)
+        try:
+            ll.commit()
+        except Exception as e:
+            pass

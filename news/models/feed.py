@@ -1,6 +1,7 @@
 from flask_wtf import Form
 from orator import mutator
 from orator.orm import belongs_to_many
+from rq.decorators import job
 from slugify import slugify
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length
@@ -8,6 +9,8 @@ from mistletoe import markdown
 
 from news.lib.cache import cache
 from news.lib.db.db import schema
+from news.lib.queue import redis_conn, q
+from news.lib.solr import add_feed_to_search
 from news.models.base import Base
 from news.models.link import Link
 
@@ -58,8 +61,9 @@ class Feed(Base):
         return f
 
     @property
-    def path(self):
-        return "/f/%s" % self.slug
+    def url(self):
+        print(self.__dict__)
+        return "/f/{}".format(self.slug)
 
     @classmethod
     def _cache_prefix(cls):
@@ -79,6 +83,10 @@ class Feed(Base):
     @property
     def rules_html(self):
         return cache.get("rules:{}".format(self.id)) or ""
+
+    def commit(self):
+        self.save()
+        q.enqueue(handle_new_feed, self, result_ttl=0)
 
 
 class FeedForm(Form):
@@ -101,3 +109,8 @@ class FeedForm(Form):
         self.name.data = feed.name
         self.description.data = feed.description
         self.rules.data = feed.rules
+
+@job('medium', connection=redis_conn)
+def handle_new_feed(feed):
+    add_feed_to_search(feed)
+    return None

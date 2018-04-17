@@ -14,7 +14,7 @@ from news.models.subscriptions import create_subscriptions_table
 from news.models.token import DisposableToken
 from news.models.user import User
 from news.models.vote import LinkVote, CommentVote
-from news.scripts.create_testing_data import create_default_feeds
+from news.scripts.create_testing_data import create_default_feeds, importHN
 from news.views.auth import auth
 from news.views.feed import feed_blueprint
 from news.views.settings import settings
@@ -40,8 +40,11 @@ def make_app():
     login_manager.init_app(app)
     mail.init_app(app)
     #sentry.init_app(app)
-
+    #importHN()
     #cache.clear()
+
+    #for feed in Feed.get():
+     #   feed.commit()
 
     with app.app_context():
         #DisposableToken.create_table()

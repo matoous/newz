@@ -21,7 +21,7 @@ def new_feed():
     form = FeedForm()
     if request.method == 'POST' and form.validate():
         feed = form.feed
-        feed.save()
+        feed.commit()
         return redirect('/f/{feed}'.format(feed=feed.slug))
     return render_template("new_feed.html", form=form)
 
