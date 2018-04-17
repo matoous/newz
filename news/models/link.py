@@ -23,7 +23,7 @@ class Link(Base):
     __table__ = 'links'
     __fillable__ = ['title', 'slug', 'text', 'user_id', 'url', 'feed_id', 'id',
                     'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
-    __searchable__ = ['title', 'text', 'url', 'user_id', 'feed_id']
+    __searchable__ = ['id', 'title', 'text', 'url', 'user_id', 'feed_id', 'created_at']
 
     @classmethod
     def create_table(cls):
@@ -140,9 +140,6 @@ class Link(Base):
         self.save()
         q.enqueue(add_to_queries, self, result_ttl=0)
         q.enqueue(new_link_queue, self)
-
-    def to_solr(self):
-        return {x : self.get_attribute(x) for x in self.__class__.__searchable__}
 
 
 class LinkForm(Form):

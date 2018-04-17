@@ -893,4 +893,13 @@ section {
   padding: 4px;
   background-color: yellow;
 }
+.search-page .search {
+  margin-bottom: 16px;
+}
+.search-page .search-results > h2 {
+  margin-bottom: 16px;
+}
+.search-page .search-results em {
+  background-color: yellow;
+}
 /*# sourceMappingURL=main.css.map */

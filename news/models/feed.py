@@ -15,6 +15,7 @@ from news.models.link import Link
 class Feed(Base):
     __table__ = 'feeds'
     __fillable__ = ['id', 'name', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo', 'reported']
+    __searchable__ = ['id', 'name', 'description', 'lang', 'over_18', 'created_at']
 
     @classmethod
     def create_table(cls):

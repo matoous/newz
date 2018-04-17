@@ -28,6 +28,8 @@ class User(Base):
                     'p_show_images', 'p_min_link_score']
     __hidden__ = ['password']
     __append__ = ['session_token']
+    __searchable__ = ['id', 'username', 'full_name']
+
 
     @classmethod
     def create_table(cls):
@@ -118,6 +120,10 @@ class User(Base):
         # maybe some more setups for new user
 
     def change_email(self, email):
+        """
+        Change users email under lock and send email for re-verification of his email
+        :param email:
+        """
         with self.get_read_modify_write_lock():
             # change email
             self.email = email
@@ -150,6 +156,7 @@ class User(Base):
         return u
 
     def update_with_cache(self):
+        # TODO just add session rewrite to call to super function 'write to cache'
         self.save()
         cache.set('u:{}'.format(id), self)
         if self.session_token:

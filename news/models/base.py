@@ -135,3 +135,7 @@ class Base(Model):
             with db.transaction():
                 self.__class__.where('id', self.id).decrement(attr, amp)
                 self.write_to_cache()
+
+    def to_solr(self):
+        assert self.__class__.__searchable__
+        return {x : self.get_attribute(x) for x in self.__class__.__searchable__}
