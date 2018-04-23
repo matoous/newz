@@ -16,80 +16,78 @@
                         </button>
                     </form>
                 </div>
-            <div class="feeds search-results">
-                 <h2>Feeds</h2>
-                {% for feed in feeds %}
-                    <div class="">
-                        <div class="">
-                            <h2>
-                                <a href="{{ feed.feed.url }}">
-                                    {% if feed.name %}
-                                    {{ feed.name|safe }}
-                                    {% else %}
-                                    {{ feed.feed.name }}
-                                    {% endif %}
-                                </a>
-                            </h2>
-                                {% if feed.description %}
-                            <div>
-                                    {{ feed.description|safe }}
-                            </div>
-                        {% endif %}
-                            <div class="bottom-line">
-                                <div class="subcribers">
-                                    XXX subscribers
-                                </div>
-                                <div class="date">
-                                    {{ feed.feed.time_ago() }}
-                                </div>
-                            </div>
-                        </div>
+                                <div class="search-info">
+                        In {{ search_info.elapsed }} s, {{ search_info.hits }} results
                     </div>
-                {% endfor %}
-            </div>
-                 <div class="links search-results">
-                 <div>
-                     In {{ elapsed }} s
-                 </div>
-                <h2>Links</h2>
-                {% for link in links %}
-                    <div class="link">
-                        <div class="link-body">
+                <div class="feeds search-results">
+                    <h2>Feeds</h2>
+                    {% for feed in feeds %}
+                        <div class="s-feed">
+                                <h2>
+                                    <a href="{{ feed.feed.url }}">
+                                        {% if feed.name %}
+                                            {{ feed.name|safe }}
+                                        {% else %}
+                                            {{ feed.feed.name }}
+                                        {% endif %}
+                                    </a>
+                                </h2>
+                                {% if feed.description %}
+                                    <div>
+                                        {{ feed.description|safe }}
+                                    </div>
+                                {% endif %}
+                                <div class="bottom-line">
+                                    <div class="subcribers">
+                                        XXX subscribers
+                                    </div>
+                                    <div class="date">
+                                        {{ feed.feed.time_ago() }}
+                                    </div>
+                                </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="links search-results">
+                    <h2>Links</h2>
+                    {% for link in links %}
+                        <div class="link">
+                            <div class="link-body">
                                 <div class="link-feed">
                                     <a href="/f/{{ link.link.feed.slug }}">
                                         {{ link.link.feed.name }}
                                     </a>
                                 </div>
-                            <h2>
-                                <a href="{{ link.url }}">
-                                    {% if link.title %}
-                                    {{ link.title|safe }}
-                                    {% else %}
-                                    {{ link.link.title }}
-                                    {% endif %}
-                                </a>
-                            </h2>
+                                <h2>
+                                    <a href="{{ link.url }}">
+                                        {% if link.title %}
+                                            {{ link.title|safe }}
+                                        {% else %}
+                                            {{ link.link.title }}
+                                        {% endif %}
+                                    </a>
+                                </h2>
                                 {% if link.text %}
-                            <div>
-                                    {{ link.text|safe }}
-                            </div>
-                        {% endif %}
-                            <div class="bottom-line">
-                                <div class="comments">
-                                    <a href="/f/{{ link.link.feed.slug }}/{{ link.link.slug }}">{{ link.link.comments_count }}
-                                        comments</a>
-                                </div>
-                                <div class="date">
-                                    {{ link.link.time_ago() }}
-                                </div>
-                                <div class="author">
-                                    by <a href="/u/{{ link.link.user.username }}">{{ link.link.user.name }}</a>
+                                    <div>
+                                        {{ link.text|safe }}
+                                    </div>
+                                {% endif %}
+                                <div class="bottom-line">
+                                    <div class="comments">
+                                        <a href="/f/{{ link.link.feed.slug }}/{{ link.link.slug }}">{{ link.link.comments_count }}
+                                            comments</a>
+                                    </div>
+                                    <div class="date">
+                                        {{ link.link.time_ago() }}
+                                    </div>
+                                    <div class="author">
+                                        by <a href="/u/{{ link.link.user.username }}">{{ link.link.user.name }}</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </section>

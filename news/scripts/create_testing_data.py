@@ -116,6 +116,8 @@ def importHN():
     u = User.where('id', 1).first()
     f = Feed.where('slug', 'testfeed').first()
     d = feedparser.parse('https://news.nationalgeographic.com/news/misc/rss')
+    # https://news.ycombinator.com/rss
+    # https://news.nationalgeographic.com/news/misc/rss
     for entry in d['entries']:
         ll = Link(title=entry['title'],
                   slug=slugify(entry['title']),

@@ -49,5 +49,9 @@ def search():
             "description": highlight['description'][0] if highlight and 'description' in highlight else None,
         })
 
-    return render_template("search.html", links=search_result_links, feeds=search_result_feeds, q=q,
-                           elapsed="{0:.2f}".format(end - start))
+    search_info = {
+        'elapsed': "{0:.2f}".format(end - start),
+        'hits': x.hits + y.hits,
+    }
+
+    return render_template("search.html", links=search_result_links, feeds=search_result_feeds, q=q, search_info=search_info)

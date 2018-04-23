@@ -6,7 +6,7 @@
 
 {% block body %}
 <form action="/new_feed" method="POST">
-    {{ form.title }}
+    {{ form.name }}
     {{ form.description }}
     {{ form.csrf_token }}
     <input type="submit" value="Create feed">

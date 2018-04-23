@@ -38,6 +38,9 @@ class Feed(Base):
             table.boolean('reported').default(False)
             table.index('slug')
 
+    def __init__(self, **attributes):
+        super().__init__(**attributes, over_18=False, lang='en')
+
     @property
     def b_id(self):
         return self.id.to_bytes(8, 'big')
@@ -62,7 +65,6 @@ class Feed(Base):
 
     @property
     def url(self):
-        print(self.__dict__)
         return "/f/{}".format(self.slug)
 
     @classmethod
@@ -92,7 +94,9 @@ class Feed(Base):
 class FeedForm(Form):
     name = StringField('Name', [DataRequired(), Length(max=128, min=3)])
     description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
+    # TODO add rules to "create new feed"
     rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
+
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)

@@ -39,6 +39,7 @@ def make_app():
     cache.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+
     #sentry.init_app(app)
     #importHN()
     #cache.clear()

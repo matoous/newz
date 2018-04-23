@@ -36,7 +36,7 @@ setReplyTo = function(id){
 };
 
 handleUrlChange = function(){
-    var url = document.querySelector('#url').value;
+    const url = document.querySelector('#url').value;
     if(url && url !== ''){
         document.querySelector('#summary').placeholder = 'Short description';
     } else {
@@ -47,4 +47,17 @@ handleUrlChange = function(){
 generatePreview = function(){
     const md = document.querySelector('#summary').value;
     document.querySelector('#preview').innerHTML = SnuOwnd.getParser().render(md);
+};
+
+report = function(id) {
+    const reportModal = document.getElementById('report-modal');
+    reportModal.style.display = "block";
+    return false;
+};
+
+close = function(id) {
+    console.log('a');
+    const modal = document.getElementById(id);
+    console.log(modal);
+    modal.style.display = "none";
 };

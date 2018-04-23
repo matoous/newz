@@ -1,4 +1,7 @@
 <ul class="menu-section subscribed-feeds">
+    <div class="header">
+        Your subscriptions
+    </div>
     {% for feed in current_user.subscribed_feeds %}
     <li>
         <a href="/f/{{feed.slug}}">
@@ -6,4 +9,14 @@
         </a>
     </li>
     {% endfor %}
+</ul>
+<ul class="menu-section">
+    <div class="header">
+        Options
+    </div>
+    <li>
+        <a href="/new_feed">
+            Suggest new feed
+        </a>
+    </li>
 </ul>

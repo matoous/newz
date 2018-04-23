@@ -77,7 +77,7 @@
                         </div>
                         <div class="comment-options">
                             <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a>
-                            <a href="/c/{{comment.id}}/report">report</a>
+                            <a href="/c/{{comment.id}}/report" onclick="return report({{ comment.id }})">report</a>
                             {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                                 <div class="admin-options">
                                     <form class="non-form" method="post" action="/f/{{ feed.slug }}/remove-comment">
@@ -99,4 +99,14 @@
         </div>
     </div>
 </section>
+
+    <div id="report-modal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onclick="close('report-modal')">&times;</span>
+    <p>Report</p>
+  </div>
+
+</div>
 {% endblock %}
