@@ -5,108 +5,113 @@
 {% endblock %}
 
 {% block body %}
-<section>
-    <div class="container">
-        <div class="link-card">
-            <div class="link-head">
-                <div class="link-feed">
-                    <a href="/f/{{ link.feed.slug }}">{{ link.feed.name }}</a>
-                </div>
-                <div class="link-title">
-                        <a href="{{link.url}}">
+    <section>
+        <div class="container">
+            <div class="link-card">
+                <div class="link-head">
+                    <div class="link-feed">
+                        <a href="/f/{{ link.feed.slug }}">{{ link.feed.name }}</a>
+                    </div>
+                    <div class="link-title">
+                        <a href="{{ link.url }}">
                             {{ link.title }}
                         </a>
-                </div>
-                <div class="link-summary">
-                    {{link.summary}}
-                </div>
-                <div class="link-info">
-                    <div class="rating">
-                        <a href="/l/{{ link.slug }}/vote/upvote">Upvote</a>
-                        {{ link.score }}
-                        <a href="/l/{{ link.slug }}/vote/downvote">Downvote</a>
                     </div>
-                    <div class="author">
-                        {{ link.time_ago() }} by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
-                        {% if link.user.profile_pic %}
-                        <img src="{{ link.user.profile_pic }}" class="profile-pic-small">
-                        {% endif %}
+                    <div class="link-summary">
+                        {{ link.summary }}
                     </div>
-                </div>
-            </div>
-            {% if current_user.is_authenticated %}
-            <div class="link-add-comment">
-                <form method="post" action="/f/{{ link.feed.slug }}/{{ link.slug }}/comment">
-                    {{ comment_form.text(rows='6', cols='60') }}
-                    {{ comment_form.parent_id }}
-                    {{ comment_form.csrf_token }}
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
-            {% endif %}
-            <div class="link-comments">
-                {% for comment_id, subcomments in comments recursive %}
-                    {% set comment = get_comment(comment_id) %}
-                <div class="comment" id="{{ comment.id }}">
-                    <div class="comment-voting">
-                        <div class="up">
-                            <a href="/c/{{ comment.id }}/vote/upvote">
-                                <img src="/static/images/play-light.svg">
-                            </a>
+                    <div class="link-info">
+                        <div class="rating">
+                            <a href="/l/{{ link.slug }}/vote/upvote">Upvote</a>
+                            {{ link.score }}
+                            <a href="/l/{{ link.slug }}/vote/downvote">Downvote</a>
                         </div>
-                        <div class="down">
-                            <a href="/c/{{ comment.id }}/vote/downvote">
-                                <img src="/static/images/play-light.svg">
-                            </a>
+                        <div class="author">
+                            {{ link.time_ago() }} by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
+                            {% if link.user.profile_pic %}
+                                <img src="{{ link.user.profile_pic }}" class="profile-pic-small">
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="comment-body">
-                        <div class="comment-header">
+                </div>
+                {% if current_user.is_authenticated %}
+                    <div class="link-add-comment">
+                        <form method="post" action="/f/{{ link.feed.slug }}/{{ link.slug }}/comment">
+                            {{ comment_form.text(rows='6', cols='60') }}
+                            {{ comment_form.parent_id }}
+                            {{ comment_form.csrf_token }}
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                {% endif %}
+                <div class="link-comments">
+                    {% for comment_id, subcomments in comments recursive %}
+                        {% set comment = get_comment(comment_id) %}
+                        <div class="comment" id="{{ comment.id }}">
+                            <div class="comment-voting">
+                                <div class="up">
+                                    <a href="/c/{{ comment.id }}/vote/upvote">
+                                        <img src="/static/images/play-light.svg">
+                                    </a>
+                                </div>
+                                <div class="down">
+                                    <a href="/c/{{ comment.id }}/vote/downvote">
+                                        <img src="/static/images/play-light.svg">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="comment-body">
+                                <div class="comment-header">
                             <span>
                                 <a href="/u/{{ comment.user.username }}">{{ comment.user.name }}</a>
                             </span>
-                            <span>
+                                    <span>
                                 {{ comment.score }} points
                             </span>
-                            <span>
-                                {{comment.time_ago()}}
+                                    <span>
+                                {{ comment.time_ago() }}
                             </span>
-                        </div>
-                        <div class="comment-text">
-                            {{ comment.text }}
-                        </div>
-                        <div class="comment-options">
-                            <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a>
-                            <a href="/c/{{comment.id}}/report" onclick="return report({{ comment.id }})">report</a>
-                            {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
-                                <div class="admin-options">
-                                    <form class="non-form" method="post" action="/f/{{ feed.slug }}/remove-comment">
-                                        <input type="hidden" name="id" value="{{ comment.id }}">
-                                        <input type="submit" value="remove">
-                                    </form>
                                 </div>
-                            {% endif %}
-                        </div>
-                        {% if subcomments|length > 0 %}
-                            <div class="subcomments">
-                                {{ loop(subcomments) }}
+                                <div class="comment-text">
+                                    {{ comment.text }}
+                                </div>
+                                <div class="comment-options">
+                                    <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a>
+                                    <a href="/c/{{ comment.id }}/report" onclick="return report({{ comment.id }})">report</a>
+                                    {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
+                                        <div class="admin-options">
+                                            <form class="non-form" method="post"
+                                                  action="/f/{{ feed.slug }}/remove-comment">
+                                                <input type="hidden" name="id" value="{{ comment.id }}">
+                                                <input type="submit" value="remove">
+                                            </form>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% if subcomments|length > 0 %}
+                                    <div class="subcomments">
+                                        {{ loop(subcomments) }}
+                                    </div>
+                                {% endif %}
                             </div>
-                        {% endif %}
-                    </div>
+                        </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
         </div>
-    </div>
-</section>
-
+    </section>
     <div id="report-modal" class="modal">
 
-  <!-- Modal content -->
-  <div class="modal-content">
-    <span class="close" onclick="close('report-modal')">&times;</span>
-    <p>Report</p>
-  </div>
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="close" onclick="closeModal('report-modal')">&times;</div>
+            <form>
+                <h2>Report</h2>
+                <fieldset>
 
-</div>
+                </fieldset>
+            </form>
+        </div>
+
+    </div>
 {% endblock %}

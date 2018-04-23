@@ -49,15 +49,18 @@ generatePreview = function(){
     document.querySelector('#preview').innerHTML = SnuOwnd.getParser().render(md);
 };
 
-report = function(id) {
+const report = function(id) {
     const reportModal = document.getElementById('report-modal');
     reportModal.style.display = "block";
+    reportModal.onclick = function (ev) {
+        if(ev.target === reportModal){
+            reportModal.style.display = "none";
+        }
+    };
     return false;
 };
 
-close = function(id) {
-    console.log('a');
-    const modal = document.getElementById(id);
-    console.log(modal);
-    modal.style.display = "none";
+const closeModal = function(id) {
+    const reportModal = document.getElementById(id);
+    reportModal.style.display = "none";
 };
