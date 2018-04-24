@@ -326,7 +326,7 @@ class SortedComments:
 
 class CommentForm(Form):
     text = TextAreaField('comment', [DataRequired()])
-    parent_id = HiddenField('parent_id', [Optional()])
+    parent_id = HiddenField('parent_id', [Optional()], render_kw={'class': 'parent_comment_id'})
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)

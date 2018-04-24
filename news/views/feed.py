@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, render_template, Response, request, abort
 from flask_login import login_required, current_user
+from feedgen.feed import FeedGenerator
 
 from news.lib.access import feed_admin_required
 from news.lib.db.query import LinkQuery
@@ -46,6 +47,28 @@ def get_feed(feed, sort=None):
                            less_links=has_less,
                            more_links=has_more,
                            sort=sort)
+
+@feed_blueprint.route('/f/<feed:feed>/rss')
+def get_feed_rss(feed):
+    lids, has_less, has_more = paginate(LinkQuery(feed_id=feed.id, sort='trending').fetch_ids(), 30)
+    links = [Link.by_id(link_id) for link_id in lids]
+    fg = FeedGenerator()
+    fg.id(feed.url)
+    fg.title(feed.name)
+    fg.link(href="http://localhost:5000" + feed.url, rel='self')
+    fg.description(feed.description or "Hello, there is some description.")
+    fg.language(feed.lang)
+    for link in links:
+        fe = fg.add_entry()
+        fe.title(link.title)
+        # TODO if is self post put in content, else summary
+        fe.content(link.text)
+        fe.summary(link.text)
+        fe.link(href='http://localhost:5000' + link.url)
+        # TODO hide email if user wants to
+        fe.author(name=link.user.name, email=link.user.email)
+
+    return fg.rss_str(pretty=True)
 
 
 @feed_blueprint.route("/f/<feed:feed>/add", methods=['POST', 'GET'])

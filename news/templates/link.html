@@ -47,7 +47,7 @@
                 <div class="link-comments">
                     {% for comment_id, subcomments in comments recursive %}
                         {% set comment = get_comment(comment_id) %}
-                        <div class="comment" id="{{ comment.id }}">
+                        <div class="comment" id="c{{ comment.id }}">
                             <div class="comment-voting">
                                 <div class="up">
                                     <a href="/c/{{ comment.id }}/vote/upvote">
@@ -75,8 +75,9 @@
                                 <div class="comment-text">
                                     {{ comment.text }}
                                 </div>
+                                <div class="comment-comment"></div>
                                 <div class="comment-options">
-                                    <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a>
+                                    <a href="#" onclick="return commentComment('{{ comment.id }}')">reply</a>
                                     <a href="/c/{{ comment.id }}/report" onclick="return report({{ comment.id }})">report</a>
                                     {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                                         <div class="admin-options">
@@ -105,11 +106,47 @@
         <!-- Modal content -->
         <div class="modal-content">
             <div class="close" onclick="closeModal('report-modal')">&times;</div>
-            <form>
+            <form class="report-form">
                 <h2>Report</h2>
                 <fieldset>
-
+                    <ol>
+                        <li>
+                            <input id="breaks_rules" type="radio" name="reason" value="breaks_rules">
+                            <label for="breaks_rules">
+                                It break's {{ feed.name }} rules
+                            </label>
+                        </li>
+                        <li>
+                            <input id="is_spam" type="radio" name="reason" value="is_spam">
+                            <label for="is_spam">
+                                It is spam
+                            </label>
+                        </li>
+                        <li>
+                            <input id="is_offensive" type="radio" name="reason" value="is_offensive">
+                            <label for="is_offensive">
+                                It is offensive
+                            </label>
+                        </li>
+                        <li>
+                            <input id="other" type="radio" name="reason" value="other">
+                            <label for="other">
+                                It is offensive
+                            </label>
+                        </li>
+                    </ol>
+                    <div class="additional-info">
+                        Be sure to read <a href="/rules">General rules</a> and <a href="/f/{{ feed.name }}/rules">{{ feed.name }} rules</a> before you report.
+                    </div>
                 </fieldset>
+                <div class="form-navigation">
+                    <button class="small">
+                        Cancel
+                    </button>
+                    <button class="small">
+                        Next
+                    </button>
+                </div>
             </form>
         </div>
 

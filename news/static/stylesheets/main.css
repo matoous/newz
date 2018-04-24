@@ -66,6 +66,34 @@ fieldset {
   padding: 0;
   border: none;
 }
+.report-form ol {
+  list-style: none;
+  padding-left: 20px;
+}
+.report-form input[type='radio'] {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  display: block;
+}
+.report-form li {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  margin-bottom: 6px;
+}
+.report-form li label {
+  margin-left: 8px;
+}
+.form-navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.form-navigation > * {
+  margin-left: 6px;
+}
 .md {
   line-height: 1.85;
   /* https://github.com/mrmrs/fluidity */
@@ -224,6 +252,13 @@ input[type=submit] {
 button.secondary,
 input[type=submit].secondary {
   background-color: #FF851B;
+}
+.btn.small,
+button.small,
+input[type=submit].small {
+  line-height: 1.5;
+  height: 32px;
+  padding: 0 16px;
 }
 .profile {
   margin-bottom: 42px;
@@ -446,8 +481,6 @@ table.unstyled th {
   /* 15% from the top and centered */
   padding: 20px;
   border: 1px solid #888;
-  width: 100%;
-  /* Could be more or less, depending on screen size */
   max-width: 540px;
 }
 /* The Close Button */

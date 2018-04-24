@@ -138,6 +138,10 @@ class Link(Base):
         q.enqueue(add_to_queries, self, result_ttl=0)
         q.enqueue(new_link_queue, self, result_ttl=0)
 
+    @property
+    def url(self):
+        return "/f/{}/{}".format(self.feed.slug, self.slug)
+
 
 class LinkForm(Form):
     title = StringField('Title', [DataRequired(), Length(max=128, min=6)], render_kw={'placeholder': 'Title', 'autocomplete': 'off'})

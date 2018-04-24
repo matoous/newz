@@ -1,6 +1,6 @@
-var openMenu = null;
+let openMenu = null;
 toggleMenu = function(tag, ev){
-    var menu = document.querySelector("#" + tag);
+    const menu = document.querySelector("#" + tag);
     if(menu){
         if(menu.classList.contains('hidden')){
             openMenu = menu;
@@ -21,7 +21,7 @@ document.addEventListener("click", function(ev){
 });
 
 document.addEventListener('scroll', function(){
-    var logo = document.querySelector('.nav-logo.animated .logo');
+    const logo = document.querySelector('.nav-logo.animated .logo');
     if(pageYOffset !== 0 && logo && !logo.classList.contains('smaller')){
         logo.classList.add('smaller');
     }
@@ -29,11 +29,6 @@ document.addEventListener('scroll', function(){
         logo.classList.remove('smaller');
     }
 });
-
-setReplyTo = function(id){
-    document.querySelector('#parent_id').value = id;
-    return false;
-};
 
 handleUrlChange = function(){
     const url = document.querySelector('#url').value;
@@ -49,7 +44,7 @@ generatePreview = function(){
     document.querySelector('#preview').innerHTML = SnuOwnd.getParser().render(md);
 };
 
-const report = function(id) {
+report = function(id) {
     const reportModal = document.getElementById('report-modal');
     reportModal.style.display = "block";
     reportModal.onclick = function (ev) {
@@ -60,7 +55,20 @@ const report = function(id) {
     return false;
 };
 
-const closeModal = function(id) {
+closeModal = function(id) {
     const reportModal = document.getElementById(id);
     reportModal.style.display = "none";
+};
+
+setReplyTo = function(id){
+    document.querySelectorAll('.parent_comment_id').forEach(i => {
+        i.value = id;
+    })
+};
+
+commentComment = function(id) {
+    const commentDiv = document.querySelector("#c" + id + " .comment-comment");
+    commentDiv.innerHTML = "<form><textarea rows='6'></textarea></form>";
+    setReplyTo(id);
+    return false;
 };
