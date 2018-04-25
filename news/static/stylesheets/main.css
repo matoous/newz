@@ -483,6 +483,9 @@ table.unstyled th {
   border: 1px solid #888;
   max-width: 540px;
 }
+.modal-content.hidden {
+  display: none;
+}
 /* The Close Button */
 .close {
   color: #aaa;
@@ -1025,5 +1028,11 @@ section {
 }
 .search-page .search-results em {
   background-color: yellow;
+}
+.comment-comment {
+  margin: 12px 0 6px 0;
+}
+.comment-comment textarea {
+  margin-bottom: 6px;
 }
 /*# sourceMappingURL=main.css.map */

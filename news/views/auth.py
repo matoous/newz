@@ -6,7 +6,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 from news.lib.limiter import limiter
 from news.lib.verifications import EmailVerification
-from news.models.user import SignUpForm, LoginForm, User
+from news.models.user import SignUpForm, LoginForm, User, ResetForm, PasswordReset
 
 auth = Blueprint('auth', __name__, template_folder='/templates')
 
@@ -39,8 +39,14 @@ def logout():
 
 @auth.route("/reset", methods=["GET", "POST"])
 def reset():
-    # TODO reset users password
-    pass
+    form = ResetForm()
+    if form.validate_on_submit():
+        user = User.where('email', form.email.data)
+        if user is None:
+            abort(404)
+        pr = PasswordReset(user=user)
+        pr.create()
+    return render_template('reset_password.html', form=form)
 
 
 @auth.route("/verify/resend", methods=["POST"])

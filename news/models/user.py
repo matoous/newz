@@ -1,4 +1,5 @@
 from datetime import datetime
+from secrets import token_urlsafe
 
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
@@ -13,6 +14,8 @@ from news.config.config import GODS
 from news.lib.cache import cache
 from news.lib.db.db import schema
 from news.lib.login import login_manager
+from news.lib.mail import registration_email, send_mail
+from news.lib.queue import q, redis_conn
 from news.lib.verifications import EmailVerification
 from news.models.base import Base
 from news.models.feed_admin import FeedAdmin
@@ -238,9 +241,9 @@ class User(Base):
 
 
 class SignUpForm(Form):
-    username = StringField('Username', [DataRequired()], render_kw={'placeholder': 'Username'})
+    username = StringField('Username', [DataRequired(), Length(min=3,max=20)], render_kw={'placeholder': 'Username'})
     email = EmailField('Email', [DataRequired()], render_kw={'placeholder': 'Email'})
-    password = PasswordField('Password', [DataRequired()], render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
+    password = PasswordField('Password', [DataRequired(), Length(min=6)], render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
@@ -359,3 +362,72 @@ class ProfileForm(Form):
 
     def validate(self):
         return True
+
+class ResetForm(Form):
+    email = EmailField('Email', [DataRequired()])
+
+    def validate(self):
+        return True
+
+
+PASSWORD_RESET_EXPIRE = 60*60* 1  # 48 hours
+
+
+class PasswordReset:
+    """
+    Email Verification handles email verifications
+    """
+
+    def __init__(self, user=None, token=''):
+        self.user = user
+        self.token = token
+
+    def verify(self):
+        """
+        Checks if given verification exists
+        :return:
+        """
+        return redis_conn.get(self._cache_key) is not None
+
+    @property
+    def user_id(self):
+        """
+        Returns ID of user for whom this verification applies
+        :return: user ID
+        """
+        return int(redis_conn.get(self._cache_key))
+
+    @property
+    def _cache_key(self):
+        """
+        Cache key for email verification
+        :return: cache key
+        """
+        return 'p_reset:{}'.format(self.token)
+
+    @property
+    def _url(self):
+        """
+        Formatted URL with verification link
+        :return:
+        """
+        return "localhost:5000/reset?t={}".format(self.token)
+
+    def create(self):
+        """
+        Creates email verification which expires after given time
+        and sends email to user to verify his email
+        """
+
+        # create token
+        self.token = token_urlsafe(16)
+
+        # save token to redis for limited time
+        pipe = redis_conn.pipeline()
+        pipe.set(self._cache_key, self.user.id)
+        pipe.expire(self._cache_key, PASSWORD_RESET_EXPIRE)
+        pipe.execute()
+
+        # send email with verification link
+        # TODO msg = reset_email(self.user, self._url)
+        # q.enqueue(send_mail, msg, result_ttl=0)

@@ -125,6 +125,7 @@ class Comment(Base):
         if c is not None:
             return c
         c = cls.where('id', id).first()
+        # TODO If is none an exception is thrown
         c.write_to_cache()
         conn.expire(c._cache_key, 7 * 24 * 60 * 60)  # expire after week
         return c

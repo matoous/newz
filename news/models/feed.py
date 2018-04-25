@@ -50,6 +50,7 @@ class Feed(Base):
 
     @classmethod
     def by_slug(cls, slug):
+        # TODO cache
         feed = Feed.where('slug', slug).first()
         return feed
 

@@ -78,7 +78,7 @@
                                 <div class="comment-comment"></div>
                                 <div class="comment-options">
                                     <a href="#" onclick="return commentComment('{{ comment.id }}')">reply</a>
-                                    <a href="/c/{{ comment.id }}/report" onclick="return report({{ comment.id }})">report</a>
+                                    <a href="/c/{{ comment.id }}/report" onclick="return reportComment({{ comment.id }})">report</a>
                                     {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                                         <div class="admin-options">
                                             <form class="non-form" method="post"
@@ -106,9 +106,11 @@
         <!-- Modal content -->
         <div class="modal-content">
             <div class="close" onclick="closeModal('report-modal')">&times;</div>
-            <form class="report-form">
+            <form class="report-form" method="post" action="/c/report">
                 <h2>Report</h2>
                 <fieldset>
+                    <input id="report_comment_id" title="think_id" type="hidden" name="think_id">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <ol>
                         <li>
                             <input id="breaks_rules" type="radio" name="reason" value="breaks_rules">
@@ -117,13 +119,13 @@
                             </label>
                         </li>
                         <li>
-                            <input id="is_spam" type="radio" name="reason" value="is_spam">
+                            <input id="spam" type="radio" name="reason" value="is_spam">
                             <label for="is_spam">
                                 It is spam
                             </label>
                         </li>
                         <li>
-                            <input id="is_offensive" type="radio" name="reason" value="is_offensive">
+                            <input id="offensive" type="radio" name="reason" value="is_offensive">
                             <label for="is_offensive">
                                 It is offensive
                             </label>
@@ -131,7 +133,7 @@
                         <li>
                             <input id="other" type="radio" name="reason" value="other">
                             <label for="other">
-                                It is offensive
+                                Other problem
                             </label>
                         </li>
                     </ol>
@@ -150,5 +152,44 @@
             </form>
         </div>
 
+        <div class="modal-content hidden">
+            <div class="close" onclick="closeModal('report-modal')">&times;</div>
+            <form class="report-form">
+                <h2>Which rule does it break?</h2>
+                <fieldset>
+                    <textarea>
+
+                    </textarea>
+                </fieldset>
+                <div class="form-navigation">
+                    <button class="small">
+                        Back
+                    </button>
+                    <button class="small">
+                        Next
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-content hidden">
+            <div class="close" onclick="closeModal('report-modal')">&times;</div>
+            <form class="report-form">
+                <h2>Which problem?</h2>
+                <fieldset>
+                    <textarea>
+
+                    </textarea>
+                </fieldset>
+                <div class="form-navigation">
+                    <button class="small">
+                        Back
+                    </button>
+                    <button class="small">
+                        Next
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}

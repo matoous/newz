@@ -73,6 +73,22 @@ class Link(Base):
         return Feed.by_id(self.feed_id)
 
     @classmethod
+    def by_slug(cls, slug):
+        # TODO should be by slug and feed id so the slugs dont have to be unique
+        id = cache.get("link_id:{}".format(slug))
+
+        if id is None:
+            link = Link.where('slug', slug).first()
+            id = link.id if link is not None else ""
+            cache.set('lstoid:{}'.format(slug), id)
+
+        if id == "":
+            return None
+
+        return Link.by_id(id)
+
+
+    @classmethod
     def by_id(cls, id):
         l = cls.load_from_cache(id)
         if l is not None:
@@ -138,9 +154,6 @@ class Link(Base):
         q.enqueue(add_to_queries, self, result_ttl=0)
         q.enqueue(new_link_queue, self, result_ttl=0)
 
-    @property
-    def url(self):
-        return "/f/{}/{}".format(self.feed.slug, self.slug)
 
 
 class LinkForm(Form):

@@ -10,6 +10,7 @@ from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
 from news.models.feed_admin import FeedAdmin
 from news.models.link import LinkForm, Link
+from news.models.report import ReportForm, Report
 from news.models.user import User
 from news.models.vote import LinkVote, vote_type_from_string, CommentVote
 
@@ -61,10 +62,11 @@ def get_feed_rss(feed):
     for link in links:
         fe = fg.add_entry()
         fe.title(link.title)
-        # TODO if is self post put in content, else summary
         fe.content(link.text)
-        fe.summary(link.text)
-        fe.link(href='http://localhost:5000' + link.url)
+        fe.summary("Post by {} in {}.".format(link.user.name, feed.name))
+        fe.link(href=link.url)
+        fe.published(link.created_at)
+        fe.comments('http://localhost:5000/f/{}/{}'.format(feed.slug, link.slug))
         # TODO hide email if user wants to
         fe.author(name=link.user.name, email=link.user.email)
 
@@ -94,7 +96,6 @@ def do_vote(link=None, vote_str=None):
         abort(404)
 
     vote = LinkVote(user_id=current_user.id, link_id=link.id, vote_type=vote)
-    print(vote.__dict__)
     vote.apply()
 
     return "voted"
@@ -135,12 +136,25 @@ def comment_link(feed, link_slug=None):
     link = Link.where('slug', link_slug).first()
     if link is None:
         abort(404)
-
     comment_form = CommentForm()
     if comment_form.validate(current_user, link):
         comment = comment_form.comment
         comment.commit()
     return redirect('/f/{}/{}'.format(feed.slug, link_slug))
+
+
+@feed_blueprint.route("/c/report", methods=['POST'])
+@login_required
+def report_comment():
+    report_form = ReportForm()
+    comment = None
+    if report_form.validate():
+        comment = Comment.by_id(report_form.think_id.data)
+        if comment is None:
+            abort(404)
+        report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id)
+        comment.reports().save(report)
+    return redirect('/f/{}/{}'.format(comment.link.feed.slug, comment.link.slug)) if comment else abort(404)
 
 
 @feed_blueprint.route("/c/<comment_id>/vote/<vote_str>")
