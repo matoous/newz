@@ -8,20 +8,6 @@ from news.lib.utils.time_utils import time_ago
 
 CACHE_EXPIRE_TIME = 12 * 60 * 60
 
-def lazyprop(fn):
-    """
-    Function decorator for class properties which should be loaded only once and lazily
-    :param fn: function/property to decorate
-    :return: decorated property
-    """
-    attr_name = fn.__name__
-    @property
-    def _lazyprop(self):
-        if not attr_name in self.lazy_props:
-            self.lazy_props[attr_name] = fn(self)
-        return self.lazy_props[attr_name]
-    return _lazyprop
-
 class Base(Model):
     """
     Base class for all models which handles queries and caching
@@ -30,7 +16,6 @@ class Base(Model):
     If model-specific methods for cache access are needed be really careful
     when implementing them and try to use as much code from this class as possible
     """
-    __hidden__ = ['lazy_props']
 
     @classmethod
     def _cache_prefix(cls):

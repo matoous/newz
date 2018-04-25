@@ -12,7 +12,6 @@ from news.lib.db.sorts import sorts
 from news.lib.queue import q
 from news.lib.solr import new_link_queue
 from news.lib.sorts import hot
-from news.lib.utils.time_utils import time_ago
 from news.models.base import Base
 from news.models.report import Report
 

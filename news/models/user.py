@@ -6,7 +6,7 @@ from flask_wtf import Form
 from orator import accessor
 from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
-from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField
+from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import DataRequired, URL, Length
 
@@ -14,8 +14,8 @@ from news.config.config import GODS
 from news.lib.cache import cache
 from news.lib.db.db import schema
 from news.lib.login import login_manager
-from news.lib.mail import registration_email, send_mail
-from news.lib.queue import q, redis_conn
+from news.lib.mail import reset_email, send_mail
+from news.lib.queue import redis_conn, q
 from news.lib.verifications import EmailVerification
 from news.models.base import Base
 from news.models.feed_admin import FeedAdmin
@@ -102,9 +102,13 @@ class User(Base):
             return self.session_token
         return ''
 
+    @accessor
+    def session_token(self):
+        return self._accessor_cache['session_token']
+
     def login(self):
         token = DisposableToken.get()
-        self.set_attribute("session_token",  token.id)
+        self._accessor_cache["session_token"] = token.id
         cache.set('us:{}'.format(self.session_token), self.id)
         login_user(self)
 
@@ -143,9 +147,10 @@ class User(Base):
     @login_manager.user_loader
     def load_user(session_id):
         uid = cache.get('us:{}'.format(session_id))
+
         u = User.by_id(uid)
         if u is not None:
-            u.set_attribute("session_token", session_id)
+            u._accessor_cache["session_token"] = session_id
         return u
 
     @classmethod
@@ -159,11 +164,8 @@ class User(Base):
         return u
 
     def update_with_cache(self):
-        # TODO just add session rewrite to call to super function 'write to cache'
         self.save()
-        cache.set('u:{}'.format(id), self)
-        if self.session_token:
-            cache.set('us:{}'.format(self.session_token), self)
+        self.write_to_cache()
 
     @classmethod
     def _cache_prefix(cls):
@@ -369,6 +371,14 @@ class ResetForm(Form):
     def validate(self):
         return True
 
+class SetPasswordForm(Form):
+    password = PasswordField('Password', [DataRequired(), Length(min=6)], render_kw={'placeholder': 'New password'})
+    password_again = PasswordField('Password again', [DataRequired()], render_kw={'placeholder': 'New password again'})
+    user_id = HiddenField('username')
+
+    def validate(self):
+        return self.password.data == self.password_again.data
+
 
 PASSWORD_RESET_EXPIRE = 60*60* 1  # 48 hours
 
@@ -411,7 +421,7 @@ class PasswordReset:
         Formatted URL with verification link
         :return:
         """
-        return "localhost:5000/reset?t={}".format(self.token)
+        return "localhost:5000/reset_password?t={}".format(self.token)
 
     def create(self):
         """
@@ -429,5 +439,5 @@ class PasswordReset:
         pipe.execute()
 
         # send email with verification link
-        # TODO msg = reset_email(self.user, self._url)
-        # q.enqueue(send_mail, msg, result_ttl=0)
+        msg = reset_email(self.user, self._url)
+        q.enqueue(send_mail, msg, result_ttl=0)

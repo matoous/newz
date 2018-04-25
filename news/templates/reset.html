@@ -6,28 +6,20 @@
 
 {% block body %}
 <div class="page-container">
-    <a href="/" class="black-link small">
-        < Back to homepage
-    </a>
     <div class="one-page-form">
-        <form action="/reset" method="POST">
-            <h2>Reset</h2>
+        <form action="/password_reset" method="POST">
+            <h2>Reset your password</h2>
+            <div>
+                Enter your email address and we will send you a link to reset your password.
+            </div>
+            <p></p>
             <fieldset>
                 <div class="f-row">
-                    {{ form.new_password }}
-                </div>
-                <div class="f-row">
-                    {{ form.new_password_again }}
+                    {{ form.email }}
                 </div>
                 {{ form.csrf_token }}
-                <input type="submit" value="Set Password">
+                <input type="submit" value="Send">
             </fieldset>
-            <div class="additional-info">
-                <b>Need help?</b>
-                <a href="/contact">
-                    Contact us
-                </a>
-            </div>
         </form>
     </div>
 </div>

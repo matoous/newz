@@ -1,0 +1,6 @@
+Hello {{ user.username }}!
+
+You can reset your password on following link: {{ url }}
+
+Have a nice day,
+Globalfeed team
