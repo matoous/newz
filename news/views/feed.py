@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, Response, request, abort
+from flask import Blueprint, redirect, render_template, Response, request, abort, flash
 from flask_login import login_required, current_user
 from feedgen.feed import FeedGenerator
 
@@ -6,6 +6,7 @@ from news.lib.access import feed_admin_required
 from news.lib.db.query import LinkQuery
 from news.lib.filters import min_score_filter
 from news.lib.pagination import paginate
+from news.lib.rss import rss_entries, rss_feed_builder, rss_page
 from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
 from news.models.feed_admin import FeedAdmin
@@ -51,26 +52,9 @@ def get_feed(feed, sort=None):
 
 @feed_blueprint.route('/f/<feed:feed>/rss')
 def get_feed_rss(feed):
-    lids, has_less, has_more = paginate(LinkQuery(feed_id=feed.id, sort='trending').fetch_ids(), 30)
+    lids, _, _ = paginate(LinkQuery(feed_id=feed.id, sort='trending').fetch_ids(), 30)
     links = [Link.by_id(link_id) for link_id in lids]
-    fg = FeedGenerator()
-    fg.id(feed.url)
-    fg.title(feed.name)
-    fg.link(href="http://localhost:5000" + feed.url, rel='self')
-    fg.description(feed.description or "Hello, there is some description.")
-    fg.language(feed.lang)
-    for link in links:
-        fe = fg.add_entry()
-        fe.title(link.title)
-        fe.content(link.text)
-        fe.summary("Post by {} in {}.".format(link.user.name, feed.name))
-        fe.link(href=link.url)
-        fe.published(link.created_at)
-        fe.comments('http://localhost:5000/f/{}/{}'.format(feed.slug, link.slug))
-        # TODO hide email if user wants to
-        fe.author(name=link.user.name, email=link.user.email)
-
-    return fg.rss_str(pretty=True)
+    return rss_page(feed, links)
 
 
 @feed_blueprint.route("/f/<feed:feed>/add", methods=['POST', 'GET'])
@@ -152,8 +136,9 @@ def report_comment():
         comment = Comment.by_id(report_form.think_id.data)
         if comment is None:
             abort(404)
-        report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id)
+        report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id, feed_id=comment.link.feed.id)
         comment.reports().save(report)
+        flash("Thanks for your feedback!")
     return redirect('/f/{}/{}'.format(comment.link.feed.slug, comment.link.slug)) if comment else abort(404)
 
 
@@ -224,6 +209,12 @@ def post_feed_admin(feed):
 @feed_admin_required
 def get_feed_bans(feed):
     return render_template("feed_bans.html", feed=feed)
+
+@feed_blueprint.route("/f/<feed:feed>/reports")
+@feed_admin_required
+def get_feed_reports(feed):
+    reports = Report.where('feed_id', feed.id).get()
+    return render_template("feed_reports.html", feed=feed, reports=reports)
 
 @feed_blueprint.route("/f/<feed:feed>/ban", methods=['POST'])
 @feed_admin_required

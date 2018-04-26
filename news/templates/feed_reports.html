@@ -2,4 +2,40 @@
 
 {% block admin_content %}
             <h1>Reports</h1>
+    <table>
+        <thead>
+            <tr>
+                <td>
+                    reason
+                </td>
+                <td>
+                    comment
+                </td>
+                <td>
+                    reported by
+                </td>
+                <td>
+                    info
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+                <tr>
+                <td>
+                    {{ report.reason }}
+                </td>
+                <td>
+                    {{ report.comment }}
+                </td>
+                <td>
+                    {{ report.user_id }}
+                </td>
+                <td>
+                    {{ report.reportable_type }} : {{ report.reportable_id }}
+                </td>
+                </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

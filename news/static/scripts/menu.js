@@ -70,6 +70,7 @@ setReplyTo = function(id){
 
 cancelComment = function(id) {
   const ele = document.getElementById(id);
+  ele.parentElement.style.display = "none";
   ele.outerHTML = "";
 };
 
@@ -77,6 +78,7 @@ commentComment = function(id) {
     const nowId = '#c' + id + 'c';
     const commentDiv = document.querySelector("#c" + id + " .comment-comment");
     const submitUrl = window.location.pathname + "/comment";
+    commentDiv.style.display = "block";
     commentDiv.innerHTML = `
 <form method="post" action="${submitUrl}" id="${nowId}">
 <textarea name="text" rows='6'></textarea>

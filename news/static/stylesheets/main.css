@@ -170,18 +170,6 @@ fieldset {
 .md textarea {
   max-width: 100%;
 }
-@font-face {
-  font-family: 'Merriweather';
-  font-style: italic;
-  font-weight: 300;
-  src: local('Merriweather Light Italic'), local('Merriweather-LightItalic'), url(http://fonts.gstatic.com/s/merriweather/v19/u-4l0qyriQwlOrhSvowK_l5-eR7lXff4jvk.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Merriweather';
-  font-style: normal;
-  font-weight: 300;
-  src: local('Merriweather Light'), local('Merriweather-Light'), url(http://fonts.gstatic.com/s/merriweather/v19/u-4n0qyriQwlOrhSvowK_l521wRZWMf_.ttf) format('truetype');
-}
 .md div {
   width: 100%;
 }
@@ -906,6 +894,7 @@ section {
 }
 .link-card .link-head {
   max-width: 720px;
+  margin-bottom: 32px;
 }
 .link-card .link-feed {
   margin-bottom: 8px;
@@ -935,6 +924,7 @@ section {
   flex-direction: row;
   flex-wrap: wrap-reverse;
   justify-content: space-between;
+  font-size: 14px;
 }
 .link-card .link-info div {
   position: relative;
@@ -951,7 +941,7 @@ section {
   display: block;
 }
 .comment {
-  margin-bottom: 6px;
+  margin-top: 12px;
   display: flex;
   flex-direction: row;
 }
@@ -982,7 +972,7 @@ section {
 }
 .comment .subcomments {
   border-left: 1px solid #999;
-  margin: 8px 0 8px 12px;
+  margin: 8px 0 0 12px;
   padding-left: 12px;
 }
 .comment .comment-options {
@@ -1030,6 +1020,7 @@ section {
   background-color: yellow;
 }
 .comment-comment {
+  display: none;
   margin: 12px 0 6px 0;
 }
 .comment-comment textarea {

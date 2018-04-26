@@ -1,6 +1,10 @@
-Hello {{ user.username }}!
+You lost your Onefeed password? Sorry about that!
 
-You can reset your password on following link: {{ url }}
+You can use the following link to reset your password:
+
+{{ url }}
+
+If you don’t use this link within 2 hours, it will expire. To get a new password reset link, visit https://localhost:5000/reset_password
 
 Have a nice day,
 Globalfeed team

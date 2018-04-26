@@ -421,7 +421,7 @@ class PasswordReset:
         Formatted URL with verification link
         :return:
         """
-        return "localhost:5000/reset_password?t={}".format(self.token)
+        return "localhost:5000/reset_password/{}".format(self.token)
 
     def create(self):
         """

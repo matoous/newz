@@ -51,7 +51,7 @@ def logout():
     return redirect('/')
 
 
-@auth.route("/password_reset", methods=["GET", "POST"])
+@auth.route("/reset_password", methods=["GET", "POST"])
 def reset():
     """
     Request password reset
@@ -71,37 +71,30 @@ def reset():
     return render_template('reset.html', form=form)
 
 
-@auth.route("/reset_password", methods=['GET', 'POST'])
-def get_set_password():
+@auth.route("/reset_password/<token>", methods=['GET', 'POST'])
+def get_set_password(token):
+    """
+    Set password after receiving reset email
+    :return:
+    """
     if current_user.is_authenticated:
         return redirect("/")
 
-    if request.method == 'GET':
-        token = request.args.get('t')
-        if token is None:
-            abort(404)
+    if token is None:
+        abort(404)
 
+    form = SetPasswordForm()
+    if form.validate_on_submit():
         pr = PasswordReset(token=token)
         if pr.verify():
             user = User.by_id(pr.user_id)
             if user is None:
                 abort(404)
-
-            form = SetPasswordForm()
-            form.user_id.data = user.id
-            return render_template('reset_password.html', form=form)
-        else:
-            abort(404)
-    else:
-        form = SetPasswordForm()
-        if form.validate_on_submit():
-            user = User.by_id(form.user_id.data)
-            if user is None:
-                abort(404)
             user.set_password(form.password.data)
             user.save()
-            return redirect('/')
-        return render_template('reset_password.html', form=form)
+            return redirect("/login")
+
+    return render_template('reset_password.html', form=form, token=token)
 
 
 @auth.route("/verify/resend", methods=["POST"])

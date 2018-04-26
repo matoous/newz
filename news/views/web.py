@@ -1,13 +1,12 @@
+from feedgen.feed import FeedGenerator
 from flask import Blueprint, render_template, request
-from flask_login import login_required, current_user
-from flask_mail import Message
+from flask_login import current_user
 
-from news.lib.mail import mail
 from news.lib.normalized_best import best_links
 from news.lib.normalized_new import new_links
 from news.lib.normalized_trending import trending_links
 from news.lib.pagination import paginate
-from news.lib.ratelimit import rate_limit
+from news.lib.rss import rss_entries
 from news.models.link import Link
 
 web = Blueprint('web', __name__, template_folder='/templates')
@@ -27,6 +26,27 @@ def get_home():
                            show_logo=True,
                            less_links=has_less,
                            more_links=has_more)
+
+@web.route('/rss')
+def get_home_rss():
+    if current_user.is_authenticated:
+        links = trending_links(current_user.subscribed_feed_ids())
+    else:
+        links = trending_links(DEFAULT_FEEDS)
+    paginated_ids, _, _ = paginate(links, 30)
+
+    # TODO maybe do through fake feed (that's what reddit does and it actually makes sense)
+    fg = FeedGenerator()
+    fg.id("https://localhost:5000/")
+    fg.title("Newsfeed")
+    fg.link(href="http://localhost:5000/", rel='self')
+    fg.description("Global news agrregator!")
+    fg.language("en")
+
+    for entry in rss_entries([Link.by_id(link_id) for link_id in paginated_ids]):
+        fg.add_entry(entry)
+
+    return fg.rss_str(pretty=True)
 
 
 @web.route('/new')
@@ -83,3 +103,8 @@ def get_terms():
 @web.route('/privacy')
 def get_privacy():
     return render_template("privacy.html")
+
+@web.route('/rules')
+def get_rules():
+
+    return render_template("rules.html")

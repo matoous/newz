@@ -9,7 +9,7 @@ from news.lib.db.db import schema
 
 class Report(Model):
     __table__ = 'reports'
-    __fillable__ = ['reason', 'comment', 'user_id']
+    __fillable__ = ['reason', 'comment', 'user_id', 'feed_id']
 
     @classmethod
     def create_table(cls):
@@ -18,12 +18,14 @@ class Report(Model):
             table.increments('id').unsigned()
             table.string('reason', 16)
             table.text('comment')
+            table.integer('feed_id').unsigned()
             table.integer('user_id').unsigned()
             table.integer('reportable_id').unsigned()
             table.text('reportable_type')
             table.datetime('created_at')
             table.datetime('updated_at')
             table.index('user_id')
+            table.index('feed_id')
 
     @morph_to
     def reportable(self):
