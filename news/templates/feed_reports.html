@@ -29,10 +29,10 @@
                     {{ report.comment }}
                 </td>
                 <td>
-                    {{ report.user_id }}
+                    <a href="/u/{{ report.user.username }}">{{ report.user.username }}</a>
                 </td>
                 <td>
-                    {{ report.reportable_type }} : {{ report.reportable_id }}
+                    <a href="{{ report.thing.route }}">{{ report.reported_thing }}</a> by <a href="{{ report.thing.user.route }}">{{ report.thing.user.username }}</a>
                 </td>
                 </tr>
         {% endfor %}

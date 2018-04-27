@@ -130,6 +130,10 @@ class Comment(Base):
         conn.expire(c._cache_key, 7 * 24 * 60 * 60)  # expire after week
         return c
 
+    @property
+    def route(self):
+        return "/c/{}".format(self.id)
+
 
 class TreeNotBuildException(Exception):
     pass

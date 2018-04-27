@@ -153,6 +153,10 @@ class Link(Base):
         q.enqueue(add_to_queries, self, result_ttl=0)
         q.enqueue(new_link_queue, self, result_ttl=0)
 
+    @property
+    def route(self):
+        return "/f/{}/{}".format(self.feed.slug, self.slug)
+
 
 
 class LinkForm(Form):

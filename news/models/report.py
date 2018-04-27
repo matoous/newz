@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from orator import Model
+from orator import Model, accessor
 from orator.orm import morph_to
 from wtforms import TextAreaField, RadioField, IntegerField
 from wtforms.validators import Length
@@ -30,6 +30,29 @@ class Report(Model):
     @morph_to
     def reportable(self):
         return
+
+    @accessor
+    def user(self):
+        from news.models.user import User
+        return User.by_id(self.user_id)
+
+    @property
+    def reported_thing(self):
+        if self.reportable_type == "comments":
+            return "comment"
+        if self.reported_thing == "links":
+            return "link"
+        return None
+
+    @accessor
+    def thing(self):
+        if self.reportable_type == "comments":
+            from news.models.comment import Comment
+            return Comment.by_id(self.reportable_id)
+        if self.reportable_type == "links":
+            from news.models.link import Link
+            return Link.by_id(self.reportable_id)
+        return None
 
 class ReportForm(Form):
     comment = TextAreaField("Comment", [Length(max=2048)], render_kw={"placeholder": "Comment", "autocomplete": "off"})

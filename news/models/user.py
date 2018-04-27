@@ -241,6 +241,9 @@ class User(Base):
         feed_admin = FeedAdmin.by_user_and_feed_id(self.id, feed.id)
         return feed_admin.god if feed_admin is not None else False
 
+    @property
+    def route(self):
+        return "/u/{}".format(self.username)
 
 class SignUpForm(Form):
     username = StringField('Username', [DataRequired(), Length(min=3,max=20)], render_kw={'placeholder': 'Username'})

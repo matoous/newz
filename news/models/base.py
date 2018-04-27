@@ -128,3 +128,7 @@ class Base(Model):
 
     def time_ago(self):
         return time_ago(self.created_at)
+
+    @property
+    def route(self):
+        raise NotImplemented
