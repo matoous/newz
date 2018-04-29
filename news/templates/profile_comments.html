@@ -47,6 +47,18 @@
                 {% endwith %}
             {% endfor %}
             </div>
+                <div class="">
+                {% if less_comments !=  None %}
+                    <a href="?count={{ less_comments }}">
+                        Previous
+                    </a>
+                {% endif %}
+                {% if more_comments != None %}
+                    <a href="?count={{ more_comments }}">
+                        Next
+                    </a>
+                {% endif %}
+            </div>
     </div>
 </section>
 {% endblock %}

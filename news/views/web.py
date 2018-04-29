@@ -2,9 +2,7 @@ from feedgen.feed import FeedGenerator
 from flask import Blueprint, render_template, request
 from flask_login import current_user
 
-from news.lib.normalized_best import best_links
-from news.lib.normalized_new import new_links
-from news.lib.normalized_trending import trending_links
+from news.lib.normalized_listing import trending_links, best_links, new_links
 from news.lib.pagination import paginate
 from news.lib.rss import rss_entries
 from news.models.link import Link

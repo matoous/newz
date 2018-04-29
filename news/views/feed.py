@@ -138,7 +138,18 @@ def report_comment():
             abort(404)
         report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id, feed_id=comment.link.feed.id)
         comment.reports().save(report)
+        comment.incr('reported', 1)
         flash("Thanks for your feedback!")
+    return redirect('/f/{}/{}'.format(comment.link.feed.slug, comment.link.slug)) if comment else abort(404)
+
+
+@feed_blueprint.route("/c/remove/<id>", methods=['POST'])
+@feed_admin_required
+def remove_comment(id):
+    comment = Comment.by_id(id)
+    if comment is None:
+        abort(404)
+    comment.delete()
     return redirect('/f/{}/{}'.format(comment.link.feed.slug, comment.link.slug)) if comment else abort(404)
 
 
@@ -213,6 +224,11 @@ def get_feed_bans(feed):
 @feed_blueprint.route("/f/<feed:feed>/reports")
 @feed_admin_required
 def get_feed_reports(feed):
+    q = request.args.get('q', None)
+    q_data = q.split(':')
+    if len(q_data) != 2:
+        abort(404)
+    t, d = q_data
     reports = Report.where('feed_id', feed.id).get()
     return render_template("feed_reports.html", feed=feed, reports=reports)
 

@@ -1,5 +1,6 @@
 from flask import Blueprint, abort, render_template
 
+from news.lib.pagination import paginate
 from news.models.comment import Comment
 from news.models.feed_admin import FeedAdmin
 from news.models.link import Link
@@ -30,7 +31,8 @@ def get_users_comments(username):
     user = User.by_username(username)
     if user is None:
         abort(404)
-    return render_template("profile_comments.html", user=user)
+    comments, less, more = paginate(user.comments, 20)
+    return render_template("profile_comments.html", user=user, comments=comments, less_comments=less, more_comments=more)
 
 
 @user_blueprint.route("/u/<username>/posts")
@@ -38,4 +40,7 @@ def get_users_posts(username):
     user = User.by_username(username)
     if user is None:
         abort(404)
-    return render_template("profile_posts.html", user=user)
+    links, less, more = paginate(user.links, 20)
+    return render_template("profile_posts.html", user=user, links=links, less_links=less, more_links=more)
+
+# TODO turnoff / turnon amdin tools

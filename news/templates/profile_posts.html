@@ -5,48 +5,60 @@
 {% endblock %}
 
 {% block body %}
-<section>
-    <div class="container">
+    <section>
+        <div class="container">
             <div class="profile-menu">
-            <div class="menu">
-                <a href="/u/{{user.username}}">
-                    About
-                </a>
-                <a href="/u/{{user.username}}/posts">
-                    Posts
-                </a>
-                <a href="/u/{{user.username}}/comments">
-                    Comments
-                </a>
-            </div>
-        </div>
-        <div class="profile">
-            <div class="profile-head">
-                <div class="profile-avatar">
-                    <img src="/static/images/testingprof.png">
+                <div class="menu">
+                    <a href="/u/{{ user.username }}">
+                        About
+                    </a>
+                    <a href="/u/{{ user.username }}/posts">
+                        Posts
+                    </a>
+                    <a href="/u/{{ user.username }}/comments">
+                        Comments
+                    </a>
                 </div>
-                <div class="profile-name">
-                    {% if user.full_name %}
-                    <h1 class="full-name">{{ user.full_name }}</h1>
-                    <div class="under-name">{{ user.username }}</div>
-                    {% else %}
-                    <h1 class="username">{{ user.username }}</h1>
-                    {% endif %}
-                    {% if user.url %}
-                    <div class="profile-url">
-                        <a href="{{ user.url }}">{{ user.url }}</a>
+            </div>
+            <div class="profile">
+                <div class="profile-head">
+                    <div class="profile-avatar">
+                        <img src="/static/images/testingprof.png">
                     </div>
-                    {% endif %}
+                    <div class="profile-name">
+                        {% if user.full_name %}
+                            <h1 class="full-name">{{ user.full_name }}</h1>
+                            <div class="under-name">{{ user.username }}</div>
+                        {% else %}
+                            <h1 class="username">{{ user.username }}</h1>
+                        {% endif %}
+                        {% if user.url %}
+                            <div class="profile-url">
+                                <a href="{{ user.url }}">{{ user.url }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="links">
-            {% for link in user.links %}
-                {% with link=link %}
-                    {% include 'link_listing.html' %}
-                {% endwith %}
-            {% endfor %}
+            <div class="links">
+                {% for link in links %}
+                    {% with link=link %}
+                        {% include 'link_listing.html' %}
+                    {% endwith %}
+                {% endfor %}
             </div>
-    </div>
-</section>
+            <div class="">
+                {% if less_links !=  None %}
+                    <a href="?count={{ less_links }}">
+                        Previous
+                    </a>
+                {% endif %}
+                {% if more_links != None %}
+                    <a href="?count={{ more_links }}">
+                        Next
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
 {% endblock %}

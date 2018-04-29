@@ -27,7 +27,7 @@ MAX_SUBSCRIPTIONS_FREE = 50
 class User(Base):
     __table__ = 'users'
     __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sort', 'bio', 'url',
-                    'profile_pic', 'email_public'
+                    'profile_pic', 'email_public', 'feed_subs',
                     'p_show_images', 'p_min_link_score']
     __hidden__ = ['password']
     __append__ = ['session_token']

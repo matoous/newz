@@ -54,6 +54,8 @@ class Report(Model):
             return Link.by_id(self.reportable_id)
         return None
 
+
+
 class ReportForm(Form):
     comment = TextAreaField("Comment", [Length(max=2048)], render_kw={"placeholder": "Comment", "autocomplete": "off"})
     reason = RadioField("Reason", choices=[('breaks_rules',''),('spam',''), ('offensive', ''), ('other', '')])
