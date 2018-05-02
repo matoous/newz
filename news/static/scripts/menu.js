@@ -89,3 +89,8 @@ commentComment = function(id) {
 </form>`;
     return false;
 };
+
+triggerFeedDescription = function(){
+    document.querySelector('.feed').classList.toggle('hidden');
+    document.querySelector('#description-trigger').innerHTML = document.querySelector('#description-trigger').innerHTML.toLowerCase().includes("hide") ? "Display feed details" : "Hide feed details";
+};

@@ -17,7 +17,7 @@ from news.models.link import Link
 
 class Feed(Base):
     __table__ = 'feeds'
-    __fillable__ = ['id', 'name', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo', 'reported']
+    __fillable__ = ['id', 'name', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo', 'reported', 'subscribers_count']
     __searchable__ = ['id', 'name', 'description', 'lang', 'over_18', 'created_at']
 
     @classmethod
@@ -29,6 +29,7 @@ class Feed(Base):
             table.string('slug', 80).unique()
             table.text('description').nullable()
             table.text('rules').nullable()
+            table.integer('subscribers_count').default(0)
             table.string('default_sort', 12).default('trending')
             table.datetime('created_at')
             table.datetime('updated_at')

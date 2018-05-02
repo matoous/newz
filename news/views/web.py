@@ -15,7 +15,7 @@ DEFAULT_FEEDS = [i for i in range(50)]
 @web.route('/')
 def get_home():
     if current_user.is_authenticated:
-        links = trending_links(current_user.subscribed_feed_ids())
+        links = trending_links(current_user.subscribed_feed_ids)
     else:
         links = trending_links(DEFAULT_FEEDS)
     paginated_ids, has_less, has_more = paginate(links, 20)
@@ -23,12 +23,13 @@ def get_home():
                            links=[Link.by_id(link_id) for link_id in paginated_ids],
                            show_logo=True,
                            less_links=has_less,
-                           more_links=has_more)
+                           more_links=has_more,
+                           title="Home")
 
 @web.route('/rss')
 def get_home_rss():
     if current_user.is_authenticated:
-        links = trending_links(current_user.subscribed_feed_ids())
+        links = trending_links(current_user.subscribed_feed_ids)
     else:
         links = trending_links(DEFAULT_FEEDS)
     paginated_ids, _, _ = paginate(links, 30)
@@ -54,7 +55,8 @@ def get_new_links():
     return render_template("index.html",
                            links=[Link.by_id(link_id) for link_id in paginated_ids],
                            less_links=has_less,
-                           more_links=has_more)
+                           more_links=has_more,
+                           title="New")
 
 
 @web.route('/best')
@@ -65,7 +67,8 @@ def get_best_links():
     return render_template("index.html",
                            links=[Link.by_id(link_id) for link_id in paginated_ids],
                            less_links=has_less,
-                           more_links=has_more)
+                           more_links=has_more,
+                           title="Best")
 
 
 @web.route('/trending')
@@ -75,7 +78,8 @@ def get_trending_links():
     return render_template("index.html",
                            links=[Link.by_id(link_id) for link_id in paginated_ids],
                            less_links=has_less,
-                           more_links=has_more)
+                           more_links=has_more,
+                           title="Trending")
 
 
 @web.route('/how-it-works')
@@ -106,3 +110,7 @@ def get_privacy():
 def get_rules():
 
     return render_template("rules.html")
+
+@web.route('/jobs')
+def get_jobs():
+    return render_template("jobs.html")

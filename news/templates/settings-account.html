@@ -28,6 +28,10 @@
                 {{ email_form.email.label }}
                 {{ email_form.email }}
             </div>
+            <div class="f-row">
+                {{ email_form.public.label }}
+                {{ email_form.public }}
+            </div>
             <div class="additional-info">
                 {% if email_form.user.email_verified %}
                     Your email is verified.

@@ -52,8 +52,26 @@
             <h2>Admin of</h2>
             <div class="administrations">
                 {% for administration in administrations %}
-                    <a href="/f/{{ administration.feed.slug }}">{{ administration.feed.name }}</a>
+                    <div class="s-feed">
+                                <h2>
+                                    <a href="{{ administration.feed.url }}">
+                                            {{ administration.feed.name }}
+                                    </a>
+                                </h2>
+                                    <div>
+                                        {{ administration.feed.description }}
+                                    </div>
+                                <div class="bottom-line">
+                                    <div class="subcribers">
+                                        {{ administration.feed.subscribers_count }} subscribers
+                                    </div>
+                                    <div class="date">
+                                        {{ administration.feed.time_ago() }}
+                                    </div>
+                                </div>
+                        </div>
                 {% endfor %}
+
             </div>
         </div>
     {% endif %}

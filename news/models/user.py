@@ -6,7 +6,7 @@ from flask_wtf import Form
 from orator import accessor
 from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
-from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField
+from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField, BooleanField
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import DataRequired, URL, Length
 
@@ -190,17 +190,22 @@ class User(Base):
         from news.models.comment import Comment
         return Comment
 
-    @cache.memoize()
+    @accessor
     def subscribed_feed_ids(self):
-        return [feed.id for feed in self.feeds]
+        key = 'subs:{}'.format(self.id)
+        ids = cache.get(key)
+        if ids is None:
+            ids = [feed.id for feed in self.feeds]
+            cache.set(key, ids)
+        return ids
 
     @accessor
     def subscribed_feeds(self):
         from news.models.feed import Feed
-        return [Feed.by_id(x) for x in self.subscribed_feed_ids()]
+        return [Feed.by_id(x) for x in self.subscribed_feed_ids]
 
     def subscribed_to(self, feed):
-        return feed.id in self.subscribed_feed_ids()
+        return feed.id in self.subscribed_feed_ids
 
     def subscribe(self, feed):
         if self.feed_subs >= MAX_SUBSCRIPTIONS_FREE:
@@ -209,16 +214,25 @@ class User(Base):
         self.feeds().attach(feed)
         self.incr('feed_subs', 1)
 
-        # TODO add to subscribed feed ids
-        cache.delete_memoized(self.subscribed_feed_ids)
+        # TODO DO IN QUEUE
+        feed.incr('subscribers_count', 1)
+        key = 'subs:{}'.format(self.id)
+        ids = cache.get(key) or []
+        ids.append(feed.id)
+        cache.set(key, ids)
         return True
 
     def unsubscribe(self, feed):
         self.feeds().detach(feed.id)
         self.decr('feed_subs', 1)
 
-        # TODO add to subscribed feed ids
-        cache.delete_memoized(self.subscribed_feed_ids)
+        # TODO DO IN QUEUE
+        feed.decr('subscribers_count', 1)
+        key = 'subs:{}'.format(self.id)
+        ids = cache.get(key)
+        if ids is not None:
+            ids = [id for id in ids if id != feed.id]
+            cache.set(key, ids)
         return True
 
     @classmethod
@@ -306,6 +320,8 @@ class LoginForm(Form):
 
 
 class PreferencesForm(Form):
+    subscribe = BooleanField('Subscribe to newsletter')
+    send_digest = BooleanField('Subscribe to best articles of week')
     show_images = SelectField('Show Images', choices=[('y', 'Always'), ('m', 'Homepage only'), ('n', 'Never')])
     min_link_score = IntegerField('Minimal link score')
 
@@ -344,11 +360,13 @@ class PasswordForm(Form):
 
 class EmailForm(Form):
     email = EmailField('Email')
+    public = BooleanField('Email public')
 
     def __init__(self, user, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
         self.user = user
         self.email.data = user.email
+        self.public.data = user.email_public
 
     def validate(self):
         if self.email.data == self.user.email:

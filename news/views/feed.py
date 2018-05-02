@@ -224,12 +224,18 @@ def get_feed_bans(feed):
 @feed_blueprint.route("/f/<feed:feed>/reports")
 @feed_admin_required
 def get_feed_reports(feed):
+    reports = []
+
     q = request.args.get('q', None)
-    q_data = q.split(':')
-    if len(q_data) != 2:
-        abort(404)
-    t, d = q_data
-    reports = Report.where('feed_id', feed.id).get()
+    if q is not None:
+        q_data = q.split(':')
+        if len(q_data) != 2:
+            abort(404)
+        t, d = q_data
+        reports = Report.where('feed_id', feed.id).where('reportable_type', "comments" if t == "c" else "links").where('reportable_id', d).order_by('created_at', 'desc').get()
+    else:
+        reports = Report.where('feed_id', feed.id).order_by('created_at', 'desc').get()
+
     return render_template("feed_reports.html", feed=feed, reports=reports)
 
 @feed_blueprint.route("/f/<feed:feed>/ban", methods=['POST'])

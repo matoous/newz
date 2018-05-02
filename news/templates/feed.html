@@ -20,6 +20,29 @@
                         </div>
                     </div>
                 </div>
+                <div class="feed-options">
+                    {% if subscribed %}
+                        <div>
+                            <a href="/f/{{ feed.slug }}/unsubscribe">Unsubscribe</a>
+                        </div>
+                    {% else %}
+                        <div>
+                            <a href="/f/{{ feed.slug }}/subscribe">Subscribe</a>
+                        </div>
+                    {% endif %}
+                    {% if current_user.is_feed_admin(feed) %}
+                        <div>
+                            <a href="/f/{{ feed.slug }}/admin">Admin</a>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <a href="/f/{{ feed.slug }}/add">Submit</a>
+                    </div>
+                    <div>
+                        <a id="description-trigger" href="" onclick="triggerFeedDescription(); return false;">Display
+                            feed details</a>
+                    </div>
+                </div>
             </div>
             <div class="links">
                 <div class="menu">
@@ -43,23 +66,6 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="">
-                        <a href="/f/{{ feed.slug }}/add">Submit</a>
-                    </div>
-                    {% if subscribed %}
-                        <div >
-                            <a href="/f/{{ feed.slug }}/unsubscribe">Unsubscribe</a>
-                        </div>
-                    {% else %}
-                        <div >
-                            <a href="/f/{{ feed.slug }}/subscribe">Subscribe</a>
-                        </div>
-                    {% endif %}
-                                            {% if current_user.is_feed_admin(feed) %}
-                        <div>
-                            <a href="/f/{{ feed.slug }}/admin">Admin</a>
-                        </div>
-                                            {% endif %}
                 </div>
                 {% set single_feed = True %}
                 {% for link in feed.links %}
