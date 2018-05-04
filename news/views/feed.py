@@ -70,6 +70,12 @@ def add_link(feed):
 
     return render_template("new_link.html", form=form, feed=feed, md_parser=True)
 
+@feed_blueprint.route("/f/<feed:feed>/<link_slug>/remove", methods=['POST'])
+@feed_admin_required
+def remove_link():
+    # TODO
+    pass
+
 
 @feed_blueprint.route("/l/<link>/vote/<vote_str>")
 @login_required

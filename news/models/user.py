@@ -11,6 +11,7 @@ from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import DataRequired, URL, Length
 
 from news.config.config import GODS
+from news.lib.app import app
 from news.lib.cache import cache
 from news.lib.db.db import schema
 from news.lib.login import login_manager
@@ -442,7 +443,7 @@ class PasswordReset:
         Formatted URL with verification link
         :return:
         """
-        return "localhost:5000/reset_password/{}".format(self.token)
+        return "{}/reset_password/{}".format(app.config['ME'], self.token)
 
     def create(self):
         """

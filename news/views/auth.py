@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, abort, flash, request
 from flask_login import login_required, current_user
 
+from news.lib.ratelimit import rate_limit
 from news.lib.verifications import EmailVerification
 from news.models.user import SignUpForm, LoginForm, User, ResetForm, PasswordReset, SetPasswordForm
 
@@ -24,7 +25,7 @@ def signup():
     return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
 
 
-@auth.route("/login", methods=["GET", "POST"])
+@auth.route("/login")
 def login():
     """
     Login existing user
@@ -34,7 +35,20 @@ def login():
         return redirect("/")
 
     form = LoginForm()
-    if form.validate_on_submit():
+    return render_template("login.html", form=form, show_logo=True, hide_menues=True)
+
+@auth.route("/login", methods=["POST"])
+@rate_limit("login", 10, 300, limit_user=False, limit_ip=True)
+def post_login():
+    """
+    Login existing user
+    :return:
+    """
+    if current_user.is_authenticated:
+        return redirect("/")
+
+    form = LoginForm()
+    if form.validate():
         form.user.login()
         return redirect('/')
     return render_template("login.html", form=form, show_logo=True, hide_menues=True)

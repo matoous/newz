@@ -883,6 +883,12 @@ section {
 .links .link .bottom-line .date {
   margin-left: 32px;
 }
+.links .link .bottom-line .options {
+  margin-left: 16px;
+}
+.links .link .bottom-line .options a {
+  margin-right: 6px;
+}
 .links h2 {
   margin: 0 0 2px 0;
 }

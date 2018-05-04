@@ -347,7 +347,7 @@
 
 	// function autolink_delim(uint8_t *data, size_t link_end, size_t offset, size_t size)
 	function autolink_delim(data_, link_end, offset, size) {
-		var data = data_.slice(offset)
+		var data = data_.slice(offset);
 		var cclose, copen = 0;
 		var i;
 
@@ -1543,7 +1543,7 @@
 					out.s += ' ';
 					escape_html(out, attr.s, false);
 					out.s += '="';
-					escape_html(out, value.s, false)
+					escape_html(out, value.s, false);
 					out.s += '"';
 				}
 				reset = 1;
@@ -1812,7 +1812,7 @@
 		/* looking for the matching closing bracket */
 		for (level = 1; i < data.length; i++) {
 			if (data[i] == '\n') text_has_nl = 1;
-			else if (data[i - 1] == '\\') continue;
+			else if (data[i - 1] == '\\')
 			else if (data[i] == '[') level++;
 			else if (data[i] == ']') {
 				level--;
@@ -2310,8 +2310,8 @@
 	// var MKDEXT_LAX_HTML_BLOCKS = (1 << 5);
 	var MKDEXT_SPACE_HEADERS = (1 << 6);
 	var MKDEXT_SUPERSCRIPT = (1 << 7);
-	var MKDEXT_LAX_SPACING = (1 << 8)
-	var MKDEXT_NO_EMAIL_AUTOLINK = (1 << 9)
+	var MKDEXT_LAX_SPACING = (1 << 8);
+	var MKDEXT_NO_EMAIL_AUTOLINK = (1 << 9);
 
 	var HTML_SKIP_HTML = (1 << 0);
 	var HTML_SKIP_STYLE = (1 << 1);
@@ -2329,7 +2329,7 @@
 	var MKD_TABLE_ALIGN_R = 2;
 	var MKD_TABLE_ALIGN_CENTER = 3;
 	var MKD_TABLE_ALIGNMASK = 3;
-	var MKD_TABLE_HEADER = 4
+	var MKD_TABLE_HEADER = 4;
 
 	var HTML_TAG_NONE = 0;
 	var HTML_TAG_OPEN = 1;
@@ -2343,15 +2343,14 @@
 	 */
 	function Buffer(str) {
 		this.s = str || "";
-	};
-
-	/**
+    }
+    /**
 	 */
 	Buffer.prototype.truncate = function(size) {
 		if (this.s.length < size) throw new RangeError("Buffer smaller than desired size");
 		if (size < 0) throw new RangeError("Size argument is negative");
 		this.s = this.s.slice(0, size);
-	}
+	};
 
 
 	/**
@@ -2372,10 +2371,8 @@
 		this.refs = {};
 		this.nestingLimit = 16;
 		this.maxTableCols = 64;
-	};
-
-
-	/* is_empty - returns the line length when it is empty, 0 otherwise */
+    }
+    /* is_empty - returns the line length when it is empty, 0 otherwise */
 	function is_empty(data) {
 		var i;
 		for (i = 0; i < data.length && data[i] != '\n'; i++)
@@ -3294,8 +3291,9 @@
 
 		beg = 0;
 		while (beg < size) {
-			for (end = beg + 1; end < size && data[end - 1] != '\n'; end++) {};
-			pre = prefix_code(data.slice(beg, end));
+            for (end = beg + 1; end < size && data[end - 1] != '\n'; end++) {
+            }
+            pre = prefix_code(data.slice(beg, end));
 
 			if (pre) beg += pre; /* skipping prefix */
 			else if (!is_empty(data.slice(beg, end)))
@@ -3904,7 +3902,7 @@
 		if (md.extensions & MKDEXT_SUPERSCRIPT) md.activeChars['^'] = MD_CHAR_SUPERSCRIPT;
 
 		return md;
-	}
+	};
 
 	var DEFAULT_BODY_FLAGS = HTML_SKIP_HTML | HTML_SKIP_IMAGES | HTML_SAFELINK | HTML_ESCAPE | HTML_USE_XHTML;
 	var DEFAULT_WIKI_FLAGS = HTML_SKIP_HTML | HTML_SAFELINK | HTML_ALLOW_ELEMENT_WHITELIST | HTML_ESCAPE | HTML_USE_XHTML;

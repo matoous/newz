@@ -8,6 +8,16 @@ from news.lib.cache import conn
 
 
 def rate_limit(prefix, limit, seconds, limit_user=True, limit_ip=True, key_func=None):
+    """
+    Ratelimiting middleware
+    :param prefix: ratelimiting prefix to use in redis
+    :param limit: number of requests
+    :param seconds: timespan in seconds
+    :param limit_user: limit by user if user is logged in
+    :param limit_ip: limit by ip
+    :param key_func: custom key func
+    :return: wrapped function with ratelimiting
+    """
     def decorator(f):
         def rate_limited(*args, **kwargs):
             # construct keys
