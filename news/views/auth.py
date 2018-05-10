@@ -9,6 +9,7 @@ auth = Blueprint('auth', __name__, template_folder='/templates')
 
 
 @auth.route("/join", methods=['GET', 'POST'])
+@rate_limit("join", 3, 60*60, limit_user=False, limit_ip=True)
 def signup():
     """
     Sign Up new user
@@ -65,7 +66,7 @@ def logout():
     return redirect('/')
 
 
-@auth.route("/reset_password", methods=["GET", "POST"])
+@auth.route("/reset_password")
 def reset():
     """
     Request password reset
@@ -76,6 +77,27 @@ def reset():
 
     form = ResetForm()
     if form.validate_on_submit():
+        user = User.where('email', form.email.data).first()
+        if user is None:
+            abort(404)
+        pr = PasswordReset(user=user)
+        pr.create()
+        return render_template('reset_confirm.html')
+    return render_template('reset.html', form=form)
+
+
+@auth.route("/reset_password", methods=["POST"])
+@rate_limit("mailaction", 5, 60*60, limit_user=False, limit_ip=True)
+def post_reset():
+    """
+    Request password reset
+    :return:
+    """
+    if current_user.is_authenticated:
+        return redirect("/")
+
+    form = ResetForm()
+    if form.validate():
         user = User.where('email', form.email.data).first()
         if user is None:
             abort(404)
@@ -112,10 +134,11 @@ def get_set_password(token):
 
 
 @auth.route("/verify/resend", methods=["POST"])
+@rate_limit("mailaction", 5, 60*60, limit_user=False, limit_ip=True)
 def resend_verify():
     pass
 
-@auth.route("/verify/<token>", methods=["GET"])
+@auth.route("/verify/<token>")
 def verify(token):
     """
     Verify users email

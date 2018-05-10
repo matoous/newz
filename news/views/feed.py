@@ -6,6 +6,7 @@ from news.lib.access import feed_admin_required
 from news.lib.db.query import LinkQuery
 from news.lib.filters import min_score_filter
 from news.lib.pagination import paginate
+from news.lib.ratelimit import rate_limit
 from news.lib.rss import rss_entries, rss_feed_builder, rss_page
 from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
@@ -57,28 +58,36 @@ def get_feed_rss(feed):
     return rss_page(feed, links)
 
 
-@feed_blueprint.route("/f/<feed:feed>/add", methods=['POST', 'GET'])
+@feed_blueprint.route("/f/<feed:feed>/add")
 @login_required
 def add_link(feed):
     form = LinkForm()
-    if request.method == 'POST':
-        if form.validate(feed, current_user):
-            link = form.link
-            link.commit()
+    return render_template("new_link.html", form=form, feed=feed, md_parser=True)
 
-            return redirect('/f/{feed}'.format(feed=feed.slug))
+
+@feed_blueprint.route("/f/<feed:feed>/add", methods=['POST'])
+@login_required
+@rate_limit("submit", 5, 5*60, limit_user=True, limit_ip=False)
+def post_add_link(feed):
+    form = LinkForm()
+    if form.validate(feed, current_user):
+        link = form.link
+        link.commit()
+        return redirect('/f/{feed}'.format(feed=feed.slug))
 
     return render_template("new_link.html", form=form, feed=feed, md_parser=True)
 
+
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/remove", methods=['POST'])
 @feed_admin_required
-def remove_link():
+def remove_link(feed, link_slug):
     # TODO
     pass
 
 
 @feed_blueprint.route("/l/<link>/vote/<vote_str>")
 @login_required
+@rate_limit("vote", 20, 100, limit_user=True, limit_ip=False)
 def do_vote(link=None, vote_str=None):
     link = Link.where('slug', link).first()
     vote = vote_type_from_string(vote_str)
@@ -93,6 +102,7 @@ def do_vote(link=None, vote_str=None):
 
 @feed_blueprint.route("/f/<feed:feed>/subscribe")
 @login_required
+@rate_limit("subscription", 20, 180, limit_user=True, limit_ip=False)
 def subscribe(feed):
     subscribed = current_user.subscribe(feed)
     if not subscribed:
@@ -102,6 +112,7 @@ def subscribe(feed):
 
 @feed_blueprint.route("/f/<feed:feed>/unsubscribe")
 @login_required
+@rate_limit("subscription", 20, 180, limit_user=True, limit_ip=False)
 def unsubscribe(feed):
     current_user.unsubscribe(feed)
     return "Unsubscribed"
