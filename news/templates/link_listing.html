@@ -26,8 +26,8 @@
                 by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
             </div>
             <div class="options">
-                <a href="">save</a>
-                <a href="">report</a>
+                <a href="{{ link.route }}/save">save</a>
+                <a href="{{ link.route }}/report">report</a>
             </div>
                                         {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                                 <div class="admin-options">

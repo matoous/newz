@@ -184,6 +184,7 @@ class LinkForm(Form):
 class SavedLink(Model):
     __table__ = 'saved_links'
     __fillable__ = ['user_id', 'link_id']
+    __incrementing__ = False
 
     @classmethod
     def create_table(cls):
@@ -214,7 +215,7 @@ class SavedLink(Model):
         return "sl:"
 
     @classmethod
-    def by_feed(cls, user):
+    def by_user(cls, user):
         return cls.where('user_id', user.id).get()
 
     def commit(self):

@@ -9,7 +9,7 @@ from news.lib.utils.confidence import confidence
 from news.models.comment import Comment
 from news.models.feed import Feed
 from news.models.feed_admin import FeedAdmin
-from news.models.link import Link
+from news.models.link import Link, SavedLink
 from news.models.report import Report
 from news.models.subscriptions import create_subscriptions_table
 from news.models.token import DisposableToken
@@ -60,6 +60,7 @@ def make_app():
         #create_default_feeds()
         #FeedAdmin.create_table()
         #Report.create_table()
+        #SavedLink.create_table()
         pass
 
     return app

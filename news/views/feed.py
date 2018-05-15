@@ -11,7 +11,7 @@ from news.lib.rss import rss_entries, rss_feed_builder, rss_page
 from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
 from news.models.feed_admin import FeedAdmin
-from news.models.link import LinkForm, Link
+from news.models.link import LinkForm, Link, SavedLink
 from news.models.report import ReportForm, Report
 from news.models.user import User
 from news.models.vote import LinkVote, vote_type_from_string, CommentVote
@@ -81,8 +81,11 @@ def post_add_link(feed):
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/remove", methods=['POST'])
 @feed_admin_required
 def remove_link(feed, link_slug):
-    # TODO
-    pass
+    link = Link.by_slug(link_slug)
+    if link is None:
+        abort(404)
+    link.delete()
+    return redirect('/f/{feed}'.format(feed=feed.slug))
 
 
 @feed_blueprint.route("/l/<link>/vote/<vote_str>")
@@ -141,6 +144,16 @@ def comment_link(feed, link_slug=None):
     if comment_form.validate(current_user, link):
         comment = comment_form.comment
         comment.commit()
+    return redirect('/f/{}/{}'.format(feed.slug, link_slug))
+
+@login_required
+@feed_blueprint.route("/f/<feed:feed>/<link_slug>/save")
+def save_link(feed, link_slug=None):
+    link = Link.by_slug(link_slug)
+    if link is None:
+        abort(404)
+    saved_link = SavedLink(user_id=current_user.id, link_id=link.id)
+    saved_link.commit()
     return redirect('/f/{}/{}'.format(feed.slug, link_slug))
 
 
