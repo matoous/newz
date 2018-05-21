@@ -94,3 +94,9 @@ triggerFeedDescription = function(){
     document.querySelector('.feed').classList.toggle('hidden');
     document.querySelector('#description-trigger').innerHTML = document.querySelector('#description-trigger').innerHTML.toLowerCase().includes("hide") ? "Display feed details" : "Hide feed details";
 };
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+             .register('./static/scripts/service-worker.js')
+             .then(function() { console.log('Service Worker Registered'); });
+  }

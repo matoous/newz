@@ -12,9 +12,11 @@
                 {{ link.title }}
             </a>
         </h2>
-        <div>
+        {% if link.trimmed_summary %}
+        <div class="link-summ">
             {{ link.trimmed_summary }}
         </div>
+        {% endif %}
         <div class="bottom-line">
             <div class="comments">
                 <a href="/f/{{ link.feed.slug }}/{{ link.slug }}">{{ link.comments_count }} comments</a>

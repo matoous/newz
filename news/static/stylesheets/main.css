@@ -759,6 +759,16 @@ section {
   text-align: center;
   margin: 0;
 }
+@media screen and (max-width: 1024px) {
+  .links {
+    /* Desktop */
+  }
+  .links .link {
+    padding-bottom: 24px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 24px!important;
+  }
+}
 .links .menu {
   display: flex;
   flex-direction: row;
@@ -863,25 +873,28 @@ section {
   height: 20px;
   width: 20px;
 }
+.links .link .link-summ {
+  margin-bottom: 6px;
+}
 .links .link .bottom-line {
   font-size: .8em;
   font-family: 'Roboto Condensed', sans-serif;
-  margin-top: 8px;
+  color: #777;
 }
 .links .link .bottom-line div {
   display: inline-block;
 }
 .links .link .bottom-line a {
-  color: black;
+  color: #777;
 }
 .links .link .bottom-line .comments {
   font-weight: bold;
 }
 .links .link .bottom-line .comments a {
-  color: #555;
+  color: #999;
 }
 .links .link .bottom-line .date {
-  margin-left: 32px;
+  margin-left: 16px;
 }
 .links .link .bottom-line .options {
   margin-left: 16px;

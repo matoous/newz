@@ -1,5 +1,6 @@
 from flask_wtf import Form
 from orator import Model, accessor
+from orator.exceptions.query import QueryException
 from orator.orm import morph_many
 from slugify import slugify
 from wtforms import StringField, TextAreaField
@@ -20,7 +21,7 @@ MAX_IN_CACHE = 1000
 
 class Link(Base):
     __table__ = 'links'
-    __fillable__ = ['title', 'slug', 'text', 'user_id', 'url', 'feed_id', 'id',
+    __fillable__ = ['title', 'slug', 'text', 'user_id', 'url', 'feed_id', 'id', 'image',
                     'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
     __searchable__ = ['id', 'title', 'text', 'url', 'user_id', 'feed_id', 'created_at']
 
@@ -32,6 +33,7 @@ class Link(Base):
             table.string('title', 128)
             table.string('slug', 150).unique()
             table.text('text').nullable()
+            table.text('image').nullable()
             table.text('url')
             table.integer('user_id').unsigned()
             table.datetime('created_at')
@@ -219,6 +221,9 @@ class SavedLink(Model):
         return cls.where('user_id', user.id).get()
 
     def commit(self):
-        self.save()
-        # TODO
-        # q.enqueue(_name_, self, result_ttl=0)
+        try:
+            self.save()
+            # TODO
+            # q.enqueue(_name_, self, result_ttl=0)
+        except QueryException as e:
+            print("already saved")

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ user.name }}
+{% endblock %}
+
+{% block body %}
+    <section>
+        <div class="container">
+            <h2>Saved Links</h2>
+            <div class="links">
+                {% for saved_link in links %}
+                    {% with link=saved_link.link %}
+                        {% include 'link_listing.html' %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div class="">
+                {% if less_links !=  None %}
+                    <a href="?count={{ less_links }}">
+                        Previous
+                    </a>
+                {% endif %}
+                {% if more_links != None %}
+                    <a href="?count={{ more_links }}">
+                        Next
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

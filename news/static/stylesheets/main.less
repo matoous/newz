@@ -332,6 +332,13 @@ section {
 }
 
 .links {
+  @media screen and (max-width: 1024px) /* Desktop */ {
+    .link {
+      padding-bottom: 24px;
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 24px!important;
+    }
+  }
   .menu {
     display: flex;
     flex-direction: row;
@@ -451,29 +458,32 @@ section {
         }
       }
     }
+    .link-summ{
+      margin-bottom: 6px;
+    }
 
     .bottom-line {
       font-size: .8em;
       font-family: 'Roboto Condensed', sans-serif;
-      margin-top: 8px;
+      color: #777;
 
       div {
         display: inline-block;
       }
 
       a {
-        color: black;
+        color: #777;
       }
 
       .comments {
         font-weight: bold;
         a {
-        color: #555;
+          color: #999;
         }
       }
 
       .date {
-        margin-left: 32px;
+        margin-left: 16px;
       }
 
       .options {
