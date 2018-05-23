@@ -43,7 +43,7 @@ def make_app():
 
     #sentry.init_app(app)
     #importHN()
-    #cache.clear()
+    cache.clear()
 
     #for feed in Feed.get():
      #   feed.commit()

@@ -5,6 +5,7 @@ from flask_login import current_user
 from news.lib.normalized_listing import trending_links, best_links, new_links
 from news.lib.pagination import paginate
 from news.lib.rss import rss_entries
+from news.models.forms import ContactUsForm
 from news.models.link import Link
 
 web = Blueprint('web', __name__, template_folder='/templates')
@@ -89,8 +90,15 @@ def get_how_it_works():
 
 @web.route('/contact')
 def get_contact():
-    return render_template("contact.html")
+    form = ContactUsForm()
+    return render_template("contact.html", form=form)
 
+@web.route('/contact', methods=['POST'])
+def post_contact():
+    form = ContactUsForm()
+    if form.validate_on_submit():
+        pass
+    return render_template("contact.html", form=form)
 
 @web.route('/help')
 def get_help():

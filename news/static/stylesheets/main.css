@@ -50,6 +50,7 @@ form textarea {
   padding-bottom: 24px;
 }
 .one-page-form {
+  padding: 0 20px;
   margin: 64px auto 74px auto;
   max-width: 420px;
 }
@@ -250,6 +251,7 @@ input[type=submit].small {
 }
 .profile {
   margin-bottom: 42px;
+  padding: 0 20px;
 }
 .profile .profile-head {
   position: relative;
@@ -293,6 +295,9 @@ input[type=submit].small {
 }
 .profile-section {
   margin-bottom: 32px;
+}
+.profile-menu {
+  padding: 0 20px;
 }
 .settings {
   font-family: 'Roboto Condensed', sans-serif;
@@ -546,7 +551,6 @@ section {
 }
 .page-container {
   max-width: 100%;
-  padding: 20px;
 }
 .main-nav {
   position: relative;
@@ -728,7 +732,6 @@ section {
 }
 .container {
   max-width: 1024px;
-  padding: 0 10px;
   margin: 0 auto;
   box-sizing: border-box;
 }
@@ -776,6 +779,7 @@ section {
   font-size: 1rem;
   font-family: 'Roboto Condensed', sans-serif;
   align-content: space-between;
+  padding: 0 20px;
 }
 .links .menu .subscribe {
   margin-left: 6px;
@@ -838,16 +842,19 @@ section {
 }
 .links .link {
   margin-bottom: 16px;
-  display: flex;
-  flex-direction: row;
 }
 .links .link .link-feed {
   font-family: 'Roboto Condensed', sans-serif;
   font-size: .8em;
   margin-bottom: -2px;
 }
-.links .link .link-body {
+.links .link .link-text {
   flex-grow: 1;
+}
+.links .link .link-body {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: row;
 }
 .links .link .link-rating {
   width: 42px;
@@ -874,6 +881,7 @@ section {
   width: 20px;
 }
 .links .link .link-summ {
+  font-size: 0.875rem;
   margin-bottom: 6px;
 }
 .links .link .bottom-line {
@@ -911,8 +919,10 @@ section {
   font-weight: 300;
   letter-spacing: -1px;
 }
+.link-card {
+  padding: 0 16px;
+}
 .link-card .link-head {
-  max-width: 720px;
   margin-bottom: 32px;
 }
 .link-card .link-feed {
@@ -925,15 +935,21 @@ section {
   color: #555555;
 }
 .link-card .link-title {
-  font-weight: bold;
-  font-size: 46px;
+  font-size: 28px;
+  min-font-size: 24px;
   margin-bottom: 12px;
+}
+.link-card .link-title h1 {
+  margin: 16px 0;
 }
 .link-card .link-title a {
   color: black;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: 'Lora', serif;
 }
 .link-card .link-summary {
-  font-size: 20px;
+  font-size: 18px;
   margin: 20px 0 32px;
 }
 .link-card .link-info {
@@ -947,6 +963,9 @@ section {
 }
 .link-card .link-info div {
   position: relative;
+}
+.pb {
+  padding: 0 20px;
 }
 .link-add-comment {
   margin: 32px 0;
@@ -1012,6 +1031,7 @@ section {
 }
 .page-navigation {
   margin-top: 32px;
+  padding: 0 20px;
 }
 .page-navigation a {
   color: black;
@@ -1020,6 +1040,7 @@ section {
 .single-comment {
   background-color: rgba(100, 120, 140, 0.1);
   padding: 6px;
+  margin: 0 20px;
   border-radius: 4px;
   margin-bottom: 22px;
 }
@@ -1051,6 +1072,7 @@ section {
   font-size: 13px;
   margin-top: 8px;
   flex-wrap: wrap;
+  padding: 0 20px;
 }
 .feed-options > div {
   margin-right: 12px;

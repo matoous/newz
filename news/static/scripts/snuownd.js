@@ -1812,7 +1812,7 @@
 		/* looking for the matching closing bracket */
 		for (level = 1; i < data.length; i++) {
 			if (data[i] == '\n') text_has_nl = 1;
-			else if (data[i - 1] == '\\')
+			else if (data[i - 1] == '\\') continue;
 			else if (data[i] == '[') level++;
 			else if (data[i] == ']') {
 				level--;

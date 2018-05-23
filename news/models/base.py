@@ -1,10 +1,12 @@
+from datetime import datetime
+
 from orator import Model
 from redis_lock import Lock
 
 from news.lib.cache import conn, cache
 from news.lib.db.db import db
 from news.lib.queue import redis_conn
-from news.lib.utils.time_utils import time_ago
+import timeago
 
 CACHE_EXPIRE_TIME = 12 * 60 * 60
 
@@ -127,7 +129,7 @@ class Base(Model):
         return {x : self.get_attribute(x) for x in self.__class__.__searchable__}
 
     def time_ago(self):
-        return time_ago(self.created_at)
+        return timeago.format(self.created_at, datetime.utcnow())
 
     @property
     def route(self):

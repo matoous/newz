@@ -22,9 +22,9 @@
         </div>
         <div class="profile">
             <div class="profile-head">
-                <div class="profile-avatar">
+                <!--<div class="profile-avatar">
                     <img src="/static/images/testingprof.png">
-                </div>
+                </div>-->
                 <div class="profile-name">
                     {% if user.full_name %}
                     <h1 class="full-name">{{ user.full_name }}</h1>
@@ -49,10 +49,10 @@
         </div>
         {% if administrations|length > 0 %}
                     <div class="profile-section">
-            <h2>Admin of</h2>
+            <h2 class="pb">Admin of</h2>
             <div class="administrations">
                 {% for administration in administrations %}
-                    <div class="s-feed">
+                    <div class="s-feed pb">
                                 <h2>
                                     <a href="{{ administration.feed.url }}">
                                             {{ administration.feed.name }}
@@ -76,7 +76,7 @@
         </div>
     {% endif %}
         <div class="profile-section">
-            <h2>Best Links</h2>
+            <h2 class="pb">Best Links</h2>
             <div class="links">
                 {% for link in links %}
                     {% with link=link %}
@@ -91,7 +91,7 @@
         {% endif %}
         </div>
         <div class="profile-section">
-            <h2>Best Comments</h2>
+            <h2 class="pb">Best Comments</h2>
         <div class="comments">
                         {% for comment in comments %}
                 {% with comment=comment %}

@@ -71,7 +71,6 @@ section {
 
 .page-container {
   max-width: 100%;
-  padding: 20px;
 }
 
 .main-nav {
@@ -288,7 +287,6 @@ section {
 
 .container {
   max-width: 1024px;
-  padding: 0 10px;
   margin: 0 auto;
   box-sizing: border-box;
 }
@@ -346,6 +344,7 @@ section {
     font-size: 1rem;
     font-family: 'Roboto Condensed', sans-serif;
     align-content: space-between;
+    padding: 0 20px;
     .subscribe {
       margin-left: 6px;
       text-align: center;
@@ -416,16 +415,19 @@ section {
   }
   .link {
     margin-bottom: 16px;
-    display: flex;
-    flex-direction: row;
     .link-feed {
       font-family: 'Roboto Condensed', sans-serif;
       font-size: .8em;
       margin-bottom: -2px;
     }
+    .link-text {
+      flex-grow: 1;
+    }
 
     .link-body {
-      flex-grow: 1;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: row;
     }
     .link-rating {
       width: 42px;
@@ -459,6 +461,7 @@ section {
       }
     }
     .link-summ{
+      font-size: 0.875rem;
       margin-bottom: 6px;
     }
 
@@ -507,8 +510,8 @@ section {
 }
 
 .link-card {
+  padding: 0 16px;
   .link-head {
-    max-width: 720px;
     margin-bottom: 32px;
   }
   .link-feed {
@@ -521,15 +524,21 @@ section {
     }
   }
   .link-title {
-    font-weight: bold;
-    font-size: 46px;
+    font-size: 28px;
+    min-font-size: 24px;
     margin-bottom: 12px;
+    h1{
+      margin: 16px 0;
+    }
     a {
       color: black;
+      text-decoration: none;
+      font-weight: bold;
+      font-family: 'Lora', serif;
     }
   }
   .link-summary {
-    font-size: 20px;
+    font-size: 18px;
     margin: 20px 0 32px;
   }
   .link-info {
@@ -545,6 +554,11 @@ section {
       position: relative;
     }
   }
+}
+
+
+.pb {
+  padding: 0 20px;
 }
 
 .link-add-comment {
@@ -623,6 +637,7 @@ section {
 
 .page-navigation {
   margin-top: 32px;
+  padding: 0 20px;
 
   a {
     color: black;
@@ -633,6 +648,7 @@ section {
 .single-comment {
   background-color: rgba(100, 120, 140, 0.1);
   padding: 6px;
+  margin: 0 20px;
   border-radius: 4px;
   margin-bottom: 22px;
 }
@@ -675,6 +691,7 @@ section {
   font-size: 13px;
   margin-top: 8px;
   flex-wrap: wrap;
+  padding: 0 20px;
 
   > div {
     margin-right: 12px;

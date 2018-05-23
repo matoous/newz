@@ -40,7 +40,7 @@ handleUrlChange = function(){
 };
 
 generatePreview = function(){
-    const md = document.querySelector('#summary').value;
+    const md = document.querySelector('#text').value;
     document.querySelector('#preview').innerHTML = SnuOwnd.getParser().render(md);
 };
 
@@ -96,7 +96,7 @@ triggerFeedDescription = function(){
 };
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-             .register('./static/scripts/service-worker.js')
-             .then(function() { console.log('Service Worker Registered'); });
+    // navigator.serviceWorker
+    //          .register('./static/scripts/service-worker.js')
+    //          .then(function() { console.log('Service Worker Registered'); });
   }

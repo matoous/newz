@@ -10,7 +10,6 @@ from news.lib.comments import add_new_comment
 from news.lib.db.db import schema
 from news.lib.queue import q
 from news.lib.utils.confidence import confidence
-from news.lib.utils.time_utils import time_ago
 from news.models.base import Base
 from news.models.report import Report
 
@@ -92,9 +91,6 @@ class Comment(Base):
     @morph_many('reportable')
     def reports(self):
         return Report
-
-    def time_ago(self):
-        return time_ago(self.created_at)
 
     @property
     def score(self):

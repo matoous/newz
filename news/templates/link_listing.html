@@ -1,86 +1,88 @@
 <div class="link">
     <div class="link-body">
-        {% if not single_feed %}
-        <div class="link-feed">
-            <a href="/f/{{link.feed.slug}}">
-                {{ link.feed.name }}
-            </a>
-        </div>
-        {% endif %}
-        <h2>
-            <a href="{{ link.url }}">
-                {{ link.title }}
-            </a>
-        </h2>
-        {% if link.trimmed_summary %}
-        <div class="link-summ">
-            {{ link.trimmed_summary }}
-        </div>
-        {% endif %}
-        <div class="bottom-line">
-            <div class="comments">
-                <a href="/f/{{ link.feed.slug }}/{{ link.slug }}">{{ link.comments_count }} comments</a>
-            </div>
-            <div class="date">
-                {{ link.time_ago() }}
-            </div>
-            <div class="author">
-                by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
-            </div>
-            <div class="options">
-                <a href="{{ link.route }}/save">save</a>
-                <a href="{{ link.route }}/report">report</a>
-            </div>
-                                        {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
-                                <div class="admin-options">
-                                    <form class="non-form" method="post" action="/f/{{ link.feed.slug }}/remove">
-                                        <input type="hidden" name="slug" value="{{ link.slug }}">
-                                        <input type="submit" value="remove">
-                                    </form>
-                                </div>
-                                            <div class="admin-options">
-                                        <a href="">{{ link.reported }} reports</a>
-                                            </div>
-                            {% endif %}
-        </div>
-    </div>
-    <div class="link-rating">
-        <div class="up">
-            {% if link.vote_by(current_user) %}
-            {% if link.vote_by(current_user).is_upvote %}
-            <a href="/l/{{link.slug}}/vote/unvote">
-                <img class="voted" src="/static/images/play-clicked.svg">
-            </a>
-            {% else %}
-            <a href="/l/{{link.slug}}/vote/upvote">
-                <img src="/static/images/play.svg">
-            </a>
+        <div class="link-text">
+            {% if not single_feed %}
+                <div class="link-feed">
+                    <a href="/f/{{ link.feed.slug }}">
+                        {{ link.feed.name }}
+                    </a>
+                </div>
             {% endif %}
-            {% else %}
-            <a href="/l/{{link.slug}}/vote/upvote">
-                <img src="/static/images/play.svg">
-            </a>
+            <h2>
+                <a href="{{ link.url }}">
+                    {{ link.title }}
+                </a>
+            </h2>
+            {% if link.trimmed_summary %}
+                <div class="link-summ">
+                    {{ link.trimmed_summary }}
+                </div>
             {% endif %}
+            <div class="bottom-line">
+                <div class="comments">
+                    <a href="/f/{{ link.feed.slug }}/{{ link.slug }}">{{ link.comments_count }} comments</a>
+                </div>
+                <div class="date">
+                    {{ link.time_ago() }}
+                </div>
+                <div class="author">
+                    by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
+                </div>
+                <div class="options">
+                    <a href="{{ link.route }}/save">save</a>
+                    <a href="{{ link.route }}/report">report</a>
+                </div>
+                {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
+                    <div class="admin-options">
+                        <form class="non-form" method="post" action="/f/{{ link.feed.slug }}/remove">
+                            <input type="hidden" name="slug" value="{{ link.slug }}">
+                            <input type="submit" value="remove">
+                        </form>
+                    </div>
+                    <div class="admin-options">
+                        <a href="">{{ link.reported }} reports</a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        <div class="score">
-            {{ link.score }}
-        </div>
-        <div class="down">
-            {% if link.vote_by(current_user) %}
-            {% if link.vote_by(current_user).is_downvote %}
-            <a href="/l/{{link.slug}}/vote/unvote">
-                <img class="voted" src="/static/images/play-clicked.svg">
-            </a>
-            {% else %}
-            <a href="/l/{{link.slug}}/vote/downvote">
-                <img src="/static/images/play.svg">
-            </a>
-            {% endif %}
-            {% else %}
-            <a href="/l/{{link.slug}}/vote/downvote">
-                <img src="/static/images/play.svg">
-            </a>
-            {% endif %}
+        <div class="link-rating">
+            <div class="up">
+                {% if link.vote_by(current_user) %}
+                    {% if link.vote_by(current_user).is_upvote %}
+                        <a href="/l/{{ link.slug }}/vote/unvote">
+                            <img class="voted" src="/static/images/play-clicked.svg">
+                        </a>
+                    {% else %}
+                        <a href="/l/{{ link.slug }}/vote/upvote">
+                            <img src="/static/images/play.svg">
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="/l/{{ link.slug }}/vote/upvote">
+                        <img src="/static/images/play.svg">
+                    </a>
+                {% endif %}
+            </div>
+            <div class="score">
+                {{ link.score }}
+            </div>
+            <div class="down">
+                {% if link.vote_by(current_user) %}
+                    {% if link.vote_by(current_user).is_downvote %}
+                        <a href="/l/{{ link.slug }}/vote/unvote">
+                            <img class="voted" src="/static/images/play-clicked.svg">
+                        </a>
+                    {% else %}
+                        <a href="/l/{{ link.slug }}/vote/downvote">
+                            <img src="/static/images/play.svg">
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="/l/{{ link.slug }}/vote/downvote">
+                        <img src="/static/images/play.svg">
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
