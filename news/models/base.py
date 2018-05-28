@@ -134,3 +134,28 @@ class Base(Model):
     @property
     def route(self):
         raise NotImplemented
+
+    @classmethod
+    def by_id(cls, id):
+        item = cls.load_from_cache(id)
+        if item is not None:
+            return item
+        item = cls.where('id', id).first()
+        if item is not None:
+            item.write_to_cache()
+        return item
+
+    @classmethod
+    def by_ids(cls, ids):
+        # pipe the ids so we get results faster
+        pipe = conn.pipeline()
+        for id in ids:
+            pipe.get(id)
+        items = pipe.execute()
+
+        # fetch missing items
+        for idx, id in enumerate(ids):
+            if items[idx] is None:
+                items[idx] = cls.by_id(id)
+
+        return items

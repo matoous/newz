@@ -2,6 +2,7 @@ from feedgen.feed import FeedGenerator
 from flask import Blueprint, render_template, request
 from flask_login import current_user
 
+from news.lib.app import app
 from news.lib.normalized_listing import trending_links, best_links, new_links
 from news.lib.pagination import paginate
 from news.lib.rss import rss_entries
@@ -134,3 +135,7 @@ def get_rules():
 @web.route('/jobs')
 def get_jobs():
     return render_template("jobs.html")
+
+@app.errorhandler(404)
+def error_404(e):
+    return render_template("404.html"), 404

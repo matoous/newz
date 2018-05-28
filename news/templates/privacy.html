@@ -9,10 +9,11 @@
         <div class="container">
             <div class="privacy">
                 <h2>
-                    Onefeed Privacy Policy
+                    {{ config.NAME }} Privacy Policy
                 </h2>
                 <p>
-                    Welcome to Globaltimes website (the "Site", "Website") which is operated by Matouš Dzivjak ("We").
+                    Welcome to {{ config.NAME }} website (the "Site", "Website") which is operated by Matouš Dzivjak
+                    ("We").
                     This Privacy Policy sets forth Globaltimes policy
                     with respect to personally identifiable data (“Personal Data”) and certain other information
                     that is collected from users of the Site.
@@ -36,45 +37,58 @@
                     We collect information from you when you register on our site, contact us or enter information on
                     our site.
                 </p>
-                <div class='grayText'><strong>How do we use your information? </strong></div>
-                <br/>
-                <div class='innerText'> We may use the information we collect from you when you register, make a
-                    purchase, sign up for our newsletter, respond to a survey or marketing communication, surf the
-                    website, or use certain other site features in the following ways:<br><br></div>
-                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To personalize your
-                    experience and to allow us to deliver the type of content and product offerings in which you are
-                    most interested.
-                </div>
-                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To improve our website
-                    in order to better serve you.
-                </div>
-                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To send periodic
-                    emails regarding your order or other products and services.
-                </div>
-                <span id='infoPro'></span><br>
-                <div class='grayText'><strong>How do we protect your information?</strong></div>
-                <br/>
-                <div class='innerText'>We do not use vulnerability scanning and/or scanning to PCI standards.</div>
-                <div class='innerText'>We only provide articles and information. We never ask for credit card
+                <p>
+                    <b>
+                        How do we use your information?
+                    </b>
+                </p>
+                <p>
+                    We may use the information we collectfrom you when when you register on our Site, contact us, enter
+                    information on
+                    our Site, sign up for our newsletter, surf the Website, or use certain other site features in the
+                    following
+                    ways:
+                </p>
+                <p>
+                    To personalize your experience and to allow us to deliver the type of content in which you are
+                    most interested. We currently don't do this.
+                </p>
+                <p>
+                    To improve our website in order to better serve you.
+                </p>
+                <p>
+                    To send periodic emails regarding our services.
+                </p>
+                <p>
+                    <b>
+                        How do we protect your information?
+                    </b>
+                </p>
+                <p>
+                    We do not use vulnerability scanning and/or scanning to PCI standards.
+                </p>
+                <p>
+                    We only provide articles and information. We never ask for credit card
                     numbers.
-                </div>
-                <div class='innerText'>We do not use Malware Scanning.<br><br></div>
-                <div class='innerText'>Your personal information is contained behind secured networks and is only
+                </p>
+                <p>
+                    We do not use Malware Scanning.
+                </p>
+                <p>
+                    Your personal information is contained behind secured networks and is only
                     accessible by a limited number of persons who have special access rights to such systems, and
-                    are required to keep the information confidential. In addition, all sensitive/credit information
+                    are required to keep the information confidential. In addition, all sensitive information
                     you supply is encrypted via Secure Socket Layer (SSL) technology.
-                </div>
-                <br>
-                <div class='innerText'>We implement a variety of security measures when a user enters, submits, or
+                </p>
+                <p>
+                    We implement a variety of security measures when a user enters, submits, or
                     accesses their information to maintain the safety of your personal information.
-                </div>
-                <br>
-                <div class='innerText'>All transactions are processed through a gateway provider and are not stored
-                    or processed on our servers.
-                </div>
-                <span id='coUs'></span><br>
-                <div class='grayText'><strong>Do we use 'cookies'?</strong></div>
-                <br/>
+                </p>
+                <p>
+                    <b>
+                        Do we use 'cookies'?
+                    </b>
+                </p>
                 <div class='innerText'>Yes. Cookies are small files that a site or its service provider transfers to
                     your computer's hard drive through your Web browser (if you allow) that enables the site's or
                     service provider's systems to recognize your browser and capture and remember certain
@@ -218,20 +232,23 @@
                 <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Allow users to
                     unsubscribe by using the link at the bottom of each email.
                 </div>
-                <div class='innerText'><strong><br>If at any time you would like to unsubscribe from receiving
-                    future emails, you can email us at</strong></div>
-                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Follow the
-                    instructions at the bottom of each email.
-                </div>
-                and we will promptly remove you from <strong>ALL</strong> correspondence.
+                <p>
+                    If at any time you would like to unsubscribe from receiving
+                    future emails, follow the instructions at the bottom of each email.
+                    and we will promptly remove you from <strong>ALL</strong> correspondence.
+                </p>
+                <p>
+                    <b>Contacting Us</b>
+                </p>
+                <p>
+                    If there are any questions regarding this privacy policy, you may
+                    <a href="mailto:{{ config.CONTACT_MAIL }}">contact us</a>.
+                </p>
+                <p>
+                    Last Edited on 2018-05-21
+                </p>
+
             </div>
-            <br><span id='ourCon'></span><br>
-            <div class='blueText'><strong>Contacting Us</strong></div>
-            <br/>
-            <div class='innerText'>If there are any questions regarding this privacy policy, you may contact us
-                using the information below.<br><br></div>
-            <div class='innerText'>https://onefeed.com</div>
-            <div class='innerText'><br>Last Edited on 2018-05-21</div>
         </div>
     </section>
 {% endblock %}

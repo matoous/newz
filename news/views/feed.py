@@ -38,8 +38,8 @@ def get_feed(feed, sort=None):
     if sort is None:
         sort = feed.default_sort
 
-    lids, has_less, has_more = paginate(LinkQuery(feed_id=feed.id, sort=sort).fetch_ids(), 20)
-    links = [Link.by_id(link_id) for link_id in lids]
+    ids, has_less, has_more = paginate(LinkQuery(feed_id=feed.id, sort=sort).fetch_ids(), 20)
+    links = Link.by_ids(ids)
 
     if sort == 'new':
         links = filter(min_score_filter(current_user.p_min_link_score), links)
@@ -53,8 +53,8 @@ def get_feed(feed, sort=None):
 
 @feed_blueprint.route('/f/<feed:feed>/rss')
 def get_feed_rss(feed):
-    lids, _, _ = paginate(LinkQuery(feed_id=feed.id, sort='trending').fetch_ids(), 30)
-    links = [Link.by_id(link_id) for link_id in lids]
+    ids, _, _ = paginate(LinkQuery(feed_id=feed.id, sort='trending').fetch_ids(), 30)
+    links = Link.by_ids(ids)
     return rss_page(feed, links)
 
 

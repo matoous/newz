@@ -89,23 +89,6 @@ class Link(Base):
         return Link.by_id(id)
 
 
-    @classmethod
-    def by_id(cls, id):
-        l = cls.load_from_cache(id)
-        if l is not None:
-            return l
-        l = cls.where('id', id).first()
-        if l is not None:
-            l.write_to_cache()
-        return l
-
-    @classmethod
-    def by_ids(cls, ids):
-        pipe = conn.pipeline()
-        for id in ids:
-            pipe.get(id)
-        return pipe.execute()
-
     @accessor
     def user(self):
         from news.models.user import User
