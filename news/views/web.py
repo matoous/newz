@@ -20,12 +20,14 @@ def get_home():
     else:
         links = trending_links(DEFAULT_FEEDS)
     paginated_ids, has_less, has_more = paginate(links, 20)
+    links = Link.by_ids(paginated_ids)
     return render_template("index.html",
-                           links=[Link.by_id(link_id) for link_id in paginated_ids],
+                           links=links,
                            show_logo=True,
                            less_links=has_less,
                            more_links=has_more,
                            title="Home")
+
 
 @web.route('/rss')
 def get_home_rss():
@@ -34,6 +36,7 @@ def get_home_rss():
     else:
         links = trending_links(DEFAULT_FEEDS)
     paginated_ids, _, _ = paginate(links, 30)
+    links = Link.by_ids(paginated_ids)
 
     # TODO maybe do through fake feed (that's what reddit does and it actually makes sense)
     fg = FeedGenerator()
@@ -43,7 +46,7 @@ def get_home_rss():
     fg.description("Global news agrregator!")
     fg.language("en")
 
-    for entry in rss_entries([Link.by_id(link_id) for link_id in paginated_ids]):
+    for entry in rss_entries(links):
         fg.add_entry(entry)
 
     return fg.rss_str(pretty=True)
@@ -53,8 +56,10 @@ def get_home_rss():
 def get_new_links():
     links = new_links(DEFAULT_FEEDS)
     paginated_ids, has_less, has_more = paginate(links, 20)
+    links = Link.by_ids(paginated_ids)
+
     return render_template("index.html",
-                           links=[Link.by_id(link_id) for link_id in paginated_ids],
+                           links=links,
                            less_links=has_less,
                            more_links=has_more,
                            title="New")
@@ -65,8 +70,10 @@ def get_best_links():
     time = request.args.get('time')
     links = best_links(DEFAULT_FEEDS, time_limit=time if time else 'all')
     paginated_ids, has_less, has_more = paginate(links, 20)
+    links = Link.by_ids(paginated_ids)
+
     return render_template("index.html",
-                           links=[Link.by_id(link_id) for link_id in paginated_ids],
+                           links=links,
                            less_links=has_less,
                            more_links=has_more,
                            title="Best")
@@ -76,8 +83,10 @@ def get_best_links():
 def get_trending_links():
     links = trending_links(DEFAULT_FEEDS)
     paginated_ids, has_less, has_more = paginate(links, 20)
+    links = Link.by_ids(paginated_ids)
+
     return render_template("index.html",
-                           links=[Link.by_id(link_id) for link_id in paginated_ids],
+                           links=links,
                            less_links=has_less,
                            more_links=has_more,
                            title="Trending")
@@ -93,12 +102,14 @@ def get_contact():
     form = ContactUsForm()
     return render_template("contact.html", form=form)
 
+
 @web.route('/contact', methods=['POST'])
 def post_contact():
     form = ContactUsForm()
     if form.validate_on_submit():
         pass
     return render_template("contact.html", form=form)
+
 
 @web.route('/help')
 def get_help():
@@ -114,10 +125,11 @@ def get_terms():
 def get_privacy():
     return render_template("privacy.html")
 
+
 @web.route('/rules')
 def get_rules():
-
     return render_template("rules.html")
+
 
 @web.route('/jobs')
 def get_jobs():

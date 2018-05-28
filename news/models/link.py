@@ -6,7 +6,7 @@ from slugify import slugify
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, URL
 
-from news.lib.cache import cache
+from news.lib.cache import cache, conn
 from news.lib.db.db import schema
 from news.lib.db.query import add_to_queries
 from news.lib.db.sorts import sorts
@@ -98,6 +98,13 @@ class Link(Base):
         if l is not None:
             l.write_to_cache()
         return l
+
+    @classmethod
+    def by_ids(cls, ids):
+        pipe = conn.pipeline()
+        for id in ids:
+            pipe.get(id)
+        return pipe.execute()
 
     @accessor
     def user(self):
