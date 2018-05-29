@@ -12,7 +12,7 @@ from wtforms.validators import DataRequired, URL, Length
 
 from news.config.config import GODS
 from news.lib.app import app
-from news.lib.cache import cache
+from news.lib.cache import cache, conn
 from news.lib.db.db import schema
 from news.lib.login import login_manager
 from news.lib.mail import reset_email, send_mail
@@ -107,11 +107,11 @@ class User(Base):
     def session_token(self):
         return self._accessor_cache['session_token']
 
-    def login(self):
+    def login(self, remember_me=False):
         token = DisposableToken.get()
         self._accessor_cache["session_token"] = token.id
         cache.set('us:{}'.format(self.session_token), self.id)
-        login_user(self)
+        login_user(self, remember=remember_me)
 
     def logout(self):
         cache.delete('us:{}'.format(self.session_token))
@@ -296,6 +296,7 @@ class SignUpForm(Form):
 class LoginForm(Form):
     username_or_email = StringField('Username or email', [DataRequired()], render_kw={'placeholder': 'Username or email'})
     password = PasswordField('Password', [DataRequired()], render_kw={'placeholder': 'Password'})
+    remember_me = BooleanField('Remember me')
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)

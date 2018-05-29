@@ -63,6 +63,14 @@ form textarea {
 .one-page-form input {
   width: 100%;
 }
+.one-page-form input[type='checkbox'] {
+  width: inherit;
+  float: left;
+  margin-top: -4px;
+}
+.one-page-form .remember_me label {
+  font-size: .9rem;
+}
 fieldset {
   padding: 0;
   border: none;
@@ -1076,5 +1084,11 @@ section {
 }
 .feed-options > div {
   margin-right: 12px;
+}
+.404 {
+  padding: 0 32px;
+}
+.404 h1 {
+  margin-bottom: 26px;
 }
 /*# sourceMappingURL=main.css.map */

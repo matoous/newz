@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from flask import Blueprint, render_template, redirect, request
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from news.models.user import PreferencesForm, ProfileForm, PasswordForm, EmailForm
 
@@ -10,6 +10,7 @@ settings = Blueprint('settings', __name__, template_folder=Path(os.path.dirname(
 
 
 @settings.route("/settings", methods=['GET', 'POST'])
+@login_required
 def index():
     form = PreferencesForm()
     if request.method == 'POST' and form.validate():
@@ -18,6 +19,7 @@ def index():
 
 
 @settings.route("/settings/profile")
+@login_required
 def get_profile_settings():
     form = ProfileForm()
     form.full_name.data = current_user.full_name
@@ -27,6 +29,7 @@ def get_profile_settings():
 
 
 @settings.route("/settings/profile", methods=['POST'])
+@login_required
 def post_profile_settings():
     form = ProfileForm()
     if form.validate():
@@ -39,6 +42,7 @@ def post_profile_settings():
 
 
 @settings.route("/settings/account")
+@login_required
 def get_account_settings():
     pw_form = PasswordForm(current_user)
     email_form = EmailForm(current_user)
@@ -46,6 +50,7 @@ def get_account_settings():
 
 
 @settings.route("/settings/password", methods=['POST'])
+@login_required
 def post_new_password():
     # TODO rate limit
     pw_form = PasswordForm(current_user)
@@ -57,6 +62,7 @@ def post_new_password():
 
 
 @settings.route("/settings/account", methods=['POST'])
+@login_required
 def post_account_settings():
     pw_form = PasswordForm(current_user)
     email_form = EmailForm(current_user)
@@ -64,12 +70,14 @@ def post_account_settings():
 
 
 @settings.route("/settings/preferences")
+@login_required
 def get_preferences_settings():
     form = PreferencesForm()
     return render_template("settings-preferences.html", form=form)
 
 
 @settings.route("/settings/preferences", methods=['POST'])
+@login_required
 def post_preferences_settings():
     form = PreferencesForm()
     return render_template("settings-preferences.html", form=form)

@@ -22,6 +22,10 @@
                 <div class="f-row">
                     {{ form.password }}
                 </div>
+                <div class="f-row remember_me">
+                    {{ form.remember_me }}
+                    {{ form.remember_me.label }}
+                </div>
                 {{ form.csrf_token }}
                 <input type="submit" value="Sign In">
             </fieldset>

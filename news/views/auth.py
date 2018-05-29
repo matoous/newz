@@ -50,7 +50,7 @@ def post_login():
 
     form = LoginForm()
     if form.validate():
-        form.user.login()
+        form.user.login(form.remember_me.data)
         return redirect('/')
     return render_template("login.html", form=form, show_logo=True, hide_menues=True)
 
