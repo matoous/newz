@@ -28,10 +28,12 @@
                 <div class="author">
                     by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
                 </div>
+            {% if current_user.is_authenticated %}
                 <div class="options">
                     <a href="{{ link.route }}/save">save</a>
                     <a href="{{ link.route }}/report">report</a>
                 </div>
+            {% endif %}
                 {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                     <div class="admin-options">
                         <form class="non-form" method="post" action="/f/{{ link.feed.slug }}/remove">

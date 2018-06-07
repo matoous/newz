@@ -69,6 +69,10 @@ class Feed(Base):
     def url(self):
         return "/f/{}".format(self.slug)
 
+    @property
+    def route(self):
+        return "/f/{}".format(self.slug)
+
     @classmethod
     def _cache_prefix(cls):
         return "f:"

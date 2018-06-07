@@ -30,7 +30,7 @@
                             <a href="/f/{{ feed.slug }}/subscribe">Subscribe</a>
                         </div>
                     {% endif %}
-                    {% if current_user.is_feed_admin(feed) %}
+                    {% if current_user.is_authenticated and current_user.is_feed_admin(feed) %}
                         <div>
                             <a href="/f/{{ feed.slug }}/admin">Admin</a>
                         </div>

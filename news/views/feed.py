@@ -8,6 +8,7 @@ from news.lib.filters import min_score_filter
 from news.lib.pagination import paginate
 from news.lib.ratelimit import rate_limit
 from news.lib.rss import rss_entries, rss_feed_builder, rss_page
+from news.lib.utils.redirect import redirect_back
 from news.models.comment import CommentForm, SortedComments, Comment
 from news.models.feed import FeedForm, Feed
 from news.models.feed_admin import FeedAdmin
@@ -100,17 +101,15 @@ def do_vote(link=None, vote_str=None):
     vote = LinkVote(user_id=current_user.id, link_id=link.id, vote_type=vote)
     vote.apply()
 
-    return "voted"
+    return redirect(redirect_back(link.route))
 
 
 @feed_blueprint.route("/f/<feed:feed>/subscribe")
 @login_required
 @rate_limit("subscription", 20, 180, limit_user=True, limit_ip=False)
 def subscribe(feed):
-    subscribed = current_user.subscribe(feed)
-    if not subscribed:
-        return "Subscribe NOT OK"
-    return "Subscribed"
+    current_user.subscribe(feed)
+    return redirect(redirect_back(feed.route))
 
 
 @feed_blueprint.route("/f/<feed:feed>/unsubscribe")
@@ -118,7 +117,7 @@ def subscribe(feed):
 @rate_limit("subscription", 20, 180, limit_user=True, limit_ip=False)
 def unsubscribe(feed):
     current_user.unsubscribe(feed)
-    return "Unsubscribed"
+    return redirect(redirect_back(feed.route))
 
 
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>")
@@ -177,15 +176,16 @@ def comment_link(feed, link_slug=None):
         comment.commit()
     return redirect('/f/{}/{}'.format(feed.slug, link_slug))
 
-@login_required
+
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/save")
+@login_required
 def save_link(feed, link_slug=None):
     link = Link.by_slug(link_slug)
     if link is None:
         abort(404)
     saved_link = SavedLink(user_id=current_user.id, link_id=link.id)
     saved_link.commit()
-    return redirect('/f/{}/{}'.format(feed.slug, link_slug))
+    return redirect(redirect_back(link.route))
 
 @feed_blueprint.route("/c/<id>/report")
 @login_required
