@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Reset Password
+{% endblock %}
+
+{% block body %}
+<div class="page-container">
+    <div class="one-page-form">
+        <form class="report-form" method="post" action="{{ thing.route }}/report" id="report-comment-form">
+                <h2>Report</h2>
+                <fieldset>
+                    <input id="report_comment_id" title="think_id" type="hidden" name="think_id">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <ol>
+                        <li>
+                            <input id="breaks_rules" type="radio" name="reason" value="breaks_rules">
+                            <label for="breaks_rules">
+                                It break's {{ feed.name }} rules
+                            </label>
+                        </li>
+                        <li>
+                            <input id="spam" type="radio" name="reason" value="is_spam">
+                            <label for="is_spam">
+                                It is spam
+                            </label>
+                        </li>
+                        <li>
+                            <input id="offensive" type="radio" name="reason" value="is_offensive">
+                            <label for="is_offensive">
+                                It is offensive
+                            </label>
+                        </li>
+                        <li>
+                            <input id="other" type="radio" name="reason" value="other">
+                            <label for="other">
+                                Other problem
+                            </label>
+                        </li>
+                    </ol>
+                    <div>
+                        <label for="comment">Comment:</label>
+                        <textarea name="comment" title="comment"></textarea>
+                    </div>
+                    <div class="additional-info">
+                        Be sure to read <a href="/rules">General rules</a> and <a href="/f/{{ feed.name }}/rules">{{ feed.name }} rules</a> before you report.
+                    </div>
+                </fieldset>
+
+                <div class="form-navigation">
+                    <button class="small" onclick="return closeModal('report-modal')">
+                        Cancel
+                    </button>
+                    <button class="small" onclick="return reportCommentContinue(event);">
+                        Next
+                    </button>
+                </div>
+            </form>
+    </div>
+</div>
+{% endblock %}

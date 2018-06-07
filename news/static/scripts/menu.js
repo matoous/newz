@@ -44,22 +44,10 @@ generatePreview = function(){
     document.querySelector('#preview').innerHTML = SnuOwnd.getParser().render(md);
 };
 
-reportComment = function(id) {
-    const reportModal = document.getElementById('report-modal');
-    reportModal.style.display = "block";
-    reportModal.onclick = function (ev) {
-        if(ev.target === reportModal){
-            reportModal.style.display = "none";
-        }
-    };
-    console.log(id);
-    document.getElementById("report_comment_id").value = id;
-    return false;
-};
-
 closeModal = function(id) {
     const reportModal = document.getElementById(id);
     reportModal.style.display = "none";
+    return false;
 };
 
 setReplyTo = function(id){

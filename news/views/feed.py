@@ -134,6 +134,37 @@ def link_view(feed, link_slug=None):
                            get_comment=Comment.by_id)
 
 
+@feed_blueprint.route("/f/<feed:feed>/<link_slug>/report")
+@login_required
+def link_report(feed, link_slug=None):
+    link = Link.where('slug', link_slug).first()
+    if link is None:
+        abort(404)
+
+    report_form = ReportForm()
+    return render_template('report.html', thing=link, feed=feed, report_form=report_form)
+
+
+@feed_blueprint.route("/f/<feed:feed>/<link_slug>/report", methods=['POST'])
+@login_required
+@rate_limit("report", 5, 180, limit_user=True, limit_ip=False)
+def link_report_handle(feed, link_slug=None):
+    link = Link.where('slug', link_slug).first()
+    if link is None:
+        abort(404)
+
+    report_form = ReportForm()
+    if report_form.validate():
+        report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id,
+                        feed_id=link.feed.id)
+        link.reports().save(report)
+        link.incr('reported', 1)
+        flash("Thanks for your feedback!")
+        return redirect(link.route)
+
+    return render_template('report.html', thing=link, feed=feed, report_form=report_form)
+
+
 @login_required
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/comment", methods=['POST'])
 def comment_link(feed, link_slug=None):
@@ -156,21 +187,34 @@ def save_link(feed, link_slug=None):
     saved_link.commit()
     return redirect('/f/{}/{}'.format(feed.slug, link_slug))
 
-
-@feed_blueprint.route("/c/report", methods=['POST'])
+@feed_blueprint.route("/c/<id>/report")
 @login_required
-def report_comment():
+def comment_report(id):
+    comment = Comment.by_id(id)
+    if comment is None:
+        abort(404)
+
     report_form = ReportForm()
-    comment = None
+    return render_template('report.html', thing=comment, feed=comment.link.feed, report_form=report_form)
+
+
+@feed_blueprint.route("/c/<id>/report", methods=['POST'])
+@login_required
+def comment_report_handle(id):
+    comment = Comment.by_id(id)
+    if comment is None:
+        abort(404)
+
+    report_form = ReportForm()
     if report_form.validate():
-        comment = Comment.by_id(report_form.think_id.data)
-        if comment is None:
-            abort(404)
-        report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id, feed_id=comment.link.feed.id)
+        report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id,
+                        feed_id=comment.link.feed.id)
         comment.reports().save(report)
         comment.incr('reported', 1)
         flash("Thanks for your feedback!")
-    return redirect('/f/{}/{}'.format(comment.link.feed.slug, comment.link.slug)) if comment else abort(404)
+        return redirect(comment.link.route)
+
+    return render_template('report.html', thing=comment, feed=comment.link.feed, report_form=report_form)
 
 
 @feed_blueprint.route("/c/remove/<id>", methods=['POST'])

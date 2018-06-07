@@ -40,7 +40,7 @@ class Report(Model):
     def reported_thing(self):
         if self.reportable_type == "comments":
             return "comment"
-        if self.reported_thing == "links":
+        if self.reportable_type == "links":
             return "link"
         return None
 

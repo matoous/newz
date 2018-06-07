@@ -7,9 +7,17 @@
 {% block body %}
 <section>
     <div class="container">
-        <div class="404">
-            <h1 style="text-transform: none">Oops!</h1>
+        <div class="err404">
+            <h1>Oops!</h1>
             <h2>That page doesn't exist.</h2>
+            <div class="search pb">
+                    <form method="get" action="/search">
+                        <input name="q" type="text" autocomplete="off" placeholder="Search {{ config.NAME }}" required value="{{ q }}">
+                        <button type="submit">
+                            <img src="/static/images/search.svg" alt="S">
+                        </button>
+                    </form>
+                </div>
             <a href="/">Take me back to homepage.</a>
         </div>
     </div>

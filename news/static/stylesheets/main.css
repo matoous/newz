@@ -77,22 +77,21 @@ fieldset {
 }
 .report-form ol {
   list-style: none;
-  padding-left: 20px;
+  padding-left: 0;
 }
 .report-form input[type='radio'] {
-  padding: 0;
-  margin: 0;
   position: relative;
-  display: block;
+  width: 28px;
 }
 .report-form li {
   display: flex;
-  align-items: center;
+  align-items: left;
   flex-direction: row;
   margin-bottom: 6px;
 }
 .report-form li label {
   margin-left: 8px;
+  flex-grow: 1;
 }
 .form-navigation {
   display: flex;
@@ -486,6 +485,9 @@ table.unstyled th {
 }
 .modal-content.hidden {
   display: none;
+}
+.modal-content .additional-info a {
+  text-decoration: underline;
 }
 /* The Close Button */
 .close {
@@ -1085,10 +1087,16 @@ section {
 .feed-options > div {
   margin-right: 12px;
 }
-.404 {
+.err404 {
   padding: 0 32px;
 }
-.404 h1 {
+.err404 h1 {
+  font-size: 4.2rem;
   margin-bottom: 26px;
+  text-transform: uppercase;
+}
+.err404 .search {
+  padding: 0;
+  margin-bottom: 12px;
 }
 /*# sourceMappingURL=main.css.map */
