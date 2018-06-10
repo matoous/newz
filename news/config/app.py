@@ -36,7 +36,6 @@ def make_app():
     app.register_blueprint(search_blueprint)
 
     csrf.init_app(app)
-    limiter.init_app(app)
     cache.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)

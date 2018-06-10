@@ -109,8 +109,9 @@ class User(Base):
 
     def login(self, remember_me=False):
         token = DisposableToken.get()
-        self._accessor_cache["session_token"] = token.id
-        cache.set('us:{}'.format(self.session_token), self.id)
+        self._accessor_cache['session_token'] = token.id
+        session_key = 'us:{}'.format(self.session_token)
+        conn.set(session_key, self.id)
         login_user(self, remember=remember_me)
 
     def logout(self):
@@ -147,7 +148,7 @@ class User(Base):
     @staticmethod
     @login_manager.user_loader
     def load_user(session_id):
-        uid = cache.get('us:{}'.format(session_id))
+        uid = int(conn.get('us:{}'.format(session_id)))
 
         u = User.by_id(uid)
         if u is not None:
@@ -389,7 +390,7 @@ class ProfileForm(Form):
         return True
 
 class ResetForm(Form):
-    email = EmailField('Email', [DataRequired()])
+    email = EmailField('Email', [DataRequired()], render_kw={'placeholder': 'Email'})
 
     def validate(self):
         return True

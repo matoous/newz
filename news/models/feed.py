@@ -5,7 +5,7 @@ from rq.decorators import job
 from slugify import slugify
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length
-from mistletoe import markdown
+from markdown2 import markdown
 
 from news.lib.cache import cache
 from news.lib.db.db import schema
@@ -85,12 +85,21 @@ class Feed(Base):
     @mutator
     def rules(self, value):
         rules = markdown(value)
-        cache.set("rules:{}".format(self.id), rules)
+        cache.set(self.rules_cache_key, rules)
         self.set_raw_attribute('rules', value)
 
     @property
+    def rules_cache_key(self):
+        return "rules:{}".format(self.id)
+
+    @property
     def rules_html(self):
-        return cache.get("rules:{}".format(self.id)) or ""
+        rules = cache.get(self.rules_cache_key)
+        if rules is None:
+            rules = markdown(self.rules)
+            cache.set(self.rules_cache_key, rules)
+        return rules
+
 
     def commit(self):
         self.save()

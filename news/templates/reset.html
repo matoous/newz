@@ -7,17 +7,16 @@
 {% block body %}
 <div class="page-container">
     <div class="one-page-form">
-        <form action="/reset_password" method="POST">
+        <form action="/reset_password" method="POST" class="rpf">
             <h2>Reset your password</h2>
-            <div>
-                Enter your email address and we will send you a link to reset your password.
-            </div>
-            <p></p>
             <fieldset>
                 <div class="f-row">
                     {{ form.email }}
                 </div>
                 {{ form.csrf_token }}
+                            <div class="additional-info">
+                Enter your email address and we will send you a link to reset your password.
+            </div>
                 <input type="submit" value="Send">
             </fieldset>
         </form>
