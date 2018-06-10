@@ -80,6 +80,18 @@ class Comment(Base):
         from news.models.vote import CommentVote
         return CommentVote
 
+
+    def vote_by(self, user):
+        """
+        Get comment vote by user
+        :param user: user
+        :return: vote for comment by given user
+        """
+        from news.models.vote import CommentVote
+        if user.is_anonymous:
+            return None
+        return CommentVote.by_comment_and_user(self.id, user.id)
+
     @property
     def num_votes(self):
         """

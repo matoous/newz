@@ -21,6 +21,7 @@
                     </div>
                 </div>
                 <div class="feed-options">
+                {% if current_user.is_authenticated %}
                     {% if subscribed %}
                         <div>
                             <a href="/f/{{ feed.slug }}/unsubscribe">Unsubscribe</a>
@@ -30,7 +31,7 @@
                             <a href="/f/{{ feed.slug }}/subscribe">Subscribe</a>
                         </div>
                     {% endif %}
-                    {% if current_user.is_authenticated and current_user.is_feed_admin(feed) %}
+                    {% if current_user.is_feed_admin(feed) %}
                         <div>
                             <a href="/f/{{ feed.slug }}/admin">Admin</a>
                         </div>
@@ -42,6 +43,7 @@
                         <a id="description-trigger" href="" onclick="triggerFeedDescription(); return false;">Display
                             feed details</a>
                     </div>
+                {% endif %}
                 </div>
             </div>
             <div class="links">

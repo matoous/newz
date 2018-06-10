@@ -13,14 +13,26 @@
     <div class="comment" id="{{ comment.id }}">
         <div class="comment-voting">
             <div class="up">
+                {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_upvote %}
+                <a href="/c/{{ comment.id }}/vote/unvote">
+                    <img src="/static/images/play-light.svg">
+                </a>
+                {% else %}
                 <a href="/c/{{ comment.id }}/vote/upvote">
                     <img src="/static/images/play-light.svg">
                 </a>
+                {% endif %}
             </div>
             <div class="down">
+                {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_downvote %}
+                <a href="/c/{{ comment.id }}/vote/unvote">
+                    <img src="/static/images/play-light.svg">
+                </a>
+                {% else %}
                 <a href="/c/{{ comment.id }}/vote/downvote">
                     <img src="/static/images/play-light.svg">
                 </a>
+                {% endif %}
             </div>
         </div>
         <div class="comment-body">

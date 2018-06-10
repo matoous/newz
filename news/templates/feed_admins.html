@@ -27,7 +27,9 @@
                 {% for admin in admins %}
                     <tr>
                         <td>
+                            <a href="{{ admin.user.route }}">
                             {{ admin.user.username }}
+                            </a>
                         </td>
                         <td>
                             {{ admin.user.email }}

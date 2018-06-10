@@ -14,14 +14,16 @@
                     </div>
                     <div class="link-title">
                         <h1>
-                                                    <a href="{{ link.url }}">
-                            {{ link.title }}
-                        </a>
+                            <a href="{{ link.url }}">
+                                {{ link.title }}
+                            </a>
                         </h1>
                     </div>
-                    <div class="link-summary">
-                        {{ link.summary }}
-                    </div>
+                    {% if link.text %}
+                        <div class="link-summary">
+                            {{ link.text }}
+                        </div>
+                    {% endif %}
                     <div class="link-info">
                         <div class="rating">
                             <a href="/l/{{ link.slug }}/vote/upvote">Upvote</a>
@@ -52,14 +54,26 @@
                         <div class="comment" id="c{{ comment.id }}">
                             <div class="comment-voting">
                                 <div class="up">
-                                    <a href="/c/{{ comment.id }}/vote/upvote">
-                                        <img src="/static/images/play-light.svg">
-                                    </a>
+                                    {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_upvote %}
+                                        <a href="/c/{{ comment.id }}/vote/unvote">
+                                            <img src="/static/images/play-light.svg">
+                                        </a>
+                                    {% else %}
+                                        <a href="/c/{{ comment.id }}/vote/upvote">
+                                            <img src="/static/images/play-light.svg">
+                                        </a>
+                                    {% endif %}
                                 </div>
                                 <div class="down">
-                                    <a href="/c/{{ comment.id }}/vote/downvote">
-                                        <img src="/static/images/play-light.svg">
-                                    </a>
+                                    {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_downvote %}
+                                        <a href="/c/{{ comment.id }}/vote/unvote">
+                                            <img src="/static/images/play-light.svg">
+                                        </a>
+                                    {% else %}
+                                        <a href="/c/{{ comment.id }}/vote/downvote">
+                                            <img src="/static/images/play-light.svg">
+                                        </a>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="comment-body">
@@ -80,7 +94,8 @@
                                 <div class="comment-comment"></div>
                                 <div class="comment-options">
                                     <a href="#" onclick="return commentComment('{{ comment.id }}')">reply</a>
-                                    <a href="/c/{{ comment.id }}/report" onclick="return reportComment({{ comment.id }})">report</a>
+                                    <a href="/c/{{ comment.id }}/report"
+                                       onclick="return reportComment({{ comment.id }})">report</a>
                                     {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                                         <div class="admin-options">
                                             <form class="non-form" method="post"

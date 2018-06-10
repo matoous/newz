@@ -1,7 +1,7 @@
 from orator import Model, accessor
 from orator.orm import belongs_to
 
-from news.lib.cache import cache
+from news.lib.cache import cache, conn
 from news.lib.cache_updates import update_link
 from news.lib.comments import update_comment
 from news.lib.db.db import schema
@@ -9,6 +9,7 @@ from news.lib.queue import q
 from news.models.comment import Comment
 from news.models.link import Link
 from news.models.user import User
+from pickle import dump, dumps, HIGHEST_PROTOCOL, loads
 
 UPVOTE = 1
 UNVOTE = 0
@@ -107,12 +108,8 @@ class LinkVote(Vote):
     @classmethod
     def by_link_and_user(cls, link_id, user_id):
         cache_key = cls._cache_key(link_id, user_id)
-        v = cache.get(cache_key)
-        if v is not None:
-            return v
-        v = cls.where('user_id', user_id).where('link_id', link_id).first()
-        cache.set(cache_key, v)
-        return v
+        vote = conn.get(cache_key)
+        return loads(vote) if vote else None
 
     def apply(self):
         previous_vote = LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).first()
@@ -124,10 +121,7 @@ class LinkVote(Vote):
             self.link.decr(previous_vote.affected_attribute, 1)
 
         if self.affected_attribute:
-            print(self.affected_attribute)
             self.link.incr(self.affected_attribute, 1)
-
-        print(self.__dict__)
 
         if previous_vote is None:
             self.save()
@@ -135,7 +129,7 @@ class LinkVote(Vote):
             LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).update({'vote_type': self.vote_type})
 
         cache_key = LinkVote._cache_key(self.link_id, self.user_id)
-        cache.set(cache_key, self)
+        conn.set(cache_key, dumps(self, protocol=HIGHEST_PROTOCOL))
 
         if self.link.num_votes < 20 or self.link.num_votes % 8 == 0:
             q.enqueue(update_link, self.link, result_ttl=0)
@@ -180,12 +174,8 @@ class CommentVote(Vote):
     @classmethod
     def by_comment_and_user(cls, comment_id, user_id):
         cache_key = cls._cache_key(comment_id, user_id)
-        v = cache.get(cache_key)
-        if v is not None:
-            return v
-        v = cls.where('user_id', user_id).where('comment_id', comment_id).first()
-        cache.set(cache_key, v)
-        return v
+        vote = conn.get(cache_key)
+        return loads(vote) if vote else None
 
     def apply(self):
         previous_vote = CommentVote.where('user_id', self.user_id).where('comment_id', self.comment_id).first()
@@ -204,6 +194,7 @@ class CommentVote(Vote):
             CommentVote.where('user_id', self.user_id).where('comment_id', self.comment_id).update({'vote_type': self.vote_type})
 
         cache_key = CommentVote._cache_key(self.comment_id, self.user_id)
-        cache.set(cache_key, self)
+        conn.set(cache_key, dumps(self, protocol=HIGHEST_PROTOCOL))
         if self.comment.num_votes < 20 or self.comment.num_votes % 8 == 0:
             q.enqueue(update_comment, self.comment, result_ttl=0)
+
