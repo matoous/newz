@@ -38,6 +38,11 @@ class Base(Model):
 
     @property
     def _lock_key(self):
+        """
+        Get lock key for given model
+        Mainly used for read - modify - write procedures
+        :return: lock key
+        """
         return "lock:".format(self._cache_key)
 
     @classmethod
@@ -125,6 +130,11 @@ class Base(Model):
                 self.write_to_cache()
 
     def to_solr(self):
+        """
+        Convert object to it's solr representation
+        Attributes stored in solr can be modified by class __searchable__ property which is list of attributes to store
+        :return:
+        """
         assert self.__class__.__searchable__
         return {x : self.get_attribute(x) for x in self.__class__.__searchable__}
 
@@ -133,6 +143,10 @@ class Base(Model):
 
     @property
     def route(self):
+        """
+        Get items url for access
+        All viewable items should implement this method
+        """
         raise NotImplemented
 
     @classmethod
@@ -157,7 +171,13 @@ class Base(Model):
 
     @classmethod
     def by_ids(cls, ids):
-        # pipe the ids so we get results faster
+        """
+        Get items by ids
+        Uses pipe which is faster then loading the items one by one
+        # TODO load from cache, or save the objects with "conn" not "cache", this method now doesn't work
+        :param ids: list of ids of items to get
+        :return: items
+        """
         pipe = conn.pipeline()
         for id in ids:
             pipe.get(id)

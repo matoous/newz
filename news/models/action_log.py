@@ -2,6 +2,10 @@ from news.lib.db.db import schema
 
 
 class Action:
+    """
+    For logging admins action so other admins/gods can check
+    """
+
     __table__ = 'actions'
     __fillable__ = ['action', 'data', 'user_id', 'feed_id']
 

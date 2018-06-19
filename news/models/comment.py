@@ -143,6 +143,8 @@ class Comment(Base):
     def route(self):
         return "/c/{}".format(self.id)
 
+    # TODO implement delete(self) so the comments get actually removed or just change the test to [REMOVED] or smthng
+
 
 class TreeNotBuildException(Exception):
     pass

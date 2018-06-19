@@ -111,8 +111,6 @@ fieldset {
 }
 .md {
   position: relative;
-  /* https://github.com/mrmrs/fluidity */
-  /* === A bit of a gross hack so we can have bleeding divs/blockquotes. */
   /*  === End gross hack */
 }
 .md p {
@@ -184,7 +182,7 @@ fieldset {
 }
 .md h1 {
   text-transform: none;
-  padding: 0!important;
+  padding: 0 !important;
 }
 .md p {
   color: #333;

@@ -9,6 +9,12 @@ from news.models.base import Base
 
 
 class Ban(Base):
+    """
+    Ban user
+    Bans are issued per user per feed
+    Bans are permanently cached in redis, so they need to do be loaded in case of cache failure
+    TODO maybe ban user completely or delete him if he has too many bans
+    """
     __table__ = 'bans'
     __fillable__ = ['reason', 'feed_id', 'user_id', 'until']
     __incrementing__ = False

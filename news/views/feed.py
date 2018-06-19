@@ -1,4 +1,3 @@
-import time
 from datetime import datetime, timedelta
 
 from flask import Blueprint, redirect, render_template, request, abort, flash
@@ -26,6 +25,10 @@ feed_blueprint = Blueprint('feed', __name__, template_folder='/templates')
 @feed_blueprint.route("/new_feed", methods=['GET', 'POST'])
 @login_required
 def new_feed():
+    """
+    Creates new feed
+    :return:
+    """
     form = FeedForm()
     if request.method == 'POST' and form.validate():
         feed = form.feed
@@ -38,6 +41,13 @@ def new_feed():
 @feed_blueprint.route('/f/<feed:feed>/<any(trending, new, best):sort>')
 @not_banned
 def get_feed(feed, sort=None):
+    """
+    Default feed page
+    Sort can be specified by user or default to user's preferred sort or to feed default sort
+    :param feed: feed
+    :param sort: sort
+    :return:
+    """
     if (sort is None or sort not in ['trending', 'new', 'best']) and current_user.is_authenticated:
         sort = current_user.preferred_sort
     if sort is None:
@@ -59,6 +69,12 @@ def get_feed(feed, sort=None):
 @feed_blueprint.route('/f/<feed:feed>/rss')
 @not_banned
 def get_feed_rss(feed):
+    """
+    Returns the feed in rss form
+    TODO add support for different sort
+    :param feed: feed
+    :return:
+    """
     ids, _, _ = paginate(LinkQuery(feed_id=feed.id, sort='trending').fetch_ids(), 30)
     links = Link.by_ids(ids)
     return rss_page(feed, links)
@@ -77,6 +93,11 @@ def add_link(feed):
 @not_banned
 @rate_limit("submit", 5, 5*60, limit_user=True, limit_ip=False)
 def post_add_link(feed):
+    """
+    Post link to given feed
+    :param feed: feed
+    :return:
+    """
     form = LinkForm()
     if form.validate(feed, current_user):
         link = form.link
@@ -89,17 +110,32 @@ def post_add_link(feed):
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/remove", methods=['POST'])
 @feed_admin_required
 def remove_link(feed, link_slug):
+    """
+    Removes link from given feed
+    This is a hard delete, so be careful
+    :param feed: feed
+    :param link_slug: link slug
+    :return:
+    """
     link = Link.by_slug(link_slug)
     if link is None:
         abort(404)
     link.delete()
-    return redirect('/f/{feed}'.format(feed=feed.slug))
+    return redirect(redirect_back(feed.route))
 
 
 @feed_blueprint.route("/l/<link>/vote/<vote_str>")
 @login_required
 @rate_limit("vote", 20, 100, limit_user=True, limit_ip=False)
 def do_vote(link=None, vote_str=None):
+    """
+    Vote on link
+    All kinds of votes are handled here (up, down, unvote)
+    TODO don't do it only by link slug but by feed+link slug so we can change the PK to feed+slug
+    :param link: link
+    :param vote_str:  vote type
+    :return:
+    """
     link = Link.where('slug', link).first()
     vote = vote_type_from_string(vote_str)
     if link is None or vote is None:
@@ -116,6 +152,11 @@ def do_vote(link=None, vote_str=None):
 @not_banned
 @rate_limit("subscription", 20, 180, limit_user=True, limit_ip=False)
 def subscribe(feed):
+    """
+    Subscribe user to given feed
+    :param feed: feed to subscribe to
+    :return:
+    """
     current_user.subscribe(feed)
     return redirect(redirect_back(feed.route))
 
@@ -125,21 +166,32 @@ def subscribe(feed):
 @not_banned
 @rate_limit("subscription", 20, 180, limit_user=True, limit_ip=False)
 def unsubscribe(feed):
+    """
+    Unsubscribe user from given feed
+    :param feed: feed to unsubscribe from
+    :return:
+    """
     current_user.unsubscribe(feed)
     return redirect(redirect_back(feed.route))
 
 
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>")
 @not_banned
-def link_view(feed, link_slug=None):
+def get_link(feed, link_slug=None):
+    """
+    Default view page for link
+    :param feed: feed
+    :param link_slug: link slug
+    :return:
+    """
     link = Link.where('slug', link_slug).first()
     if link is None:
         abort(404)
 
-    comment_form = CommentForm()
-
+    # Currently supports only one type of sorting for comments
     sorted_comments = SortedComments(link).get_full_tree()
-    return render_template('link.html', link=link, feed=feed, comment_form=comment_form, comments=sorted_comments,
+
+    return render_template('link.html', link=link, feed=feed, comment_form=CommentForm(), comments=sorted_comments,
                            get_comment=Comment.by_id)
 
 
@@ -147,12 +199,17 @@ def link_view(feed, link_slug=None):
 @login_required
 @not_banned
 def link_report(feed, link_slug=None):
+    """
+    Report given link for breaking the rules or being a dick
+    :param feed: feed
+    :param link_slug: link slug
+    :return:
+    """
     link = Link.where('slug', link_slug).first()
     if link is None:
         abort(404)
 
-    report_form = ReportForm()
-    return render_template('report.html', thing=link, feed=feed, report_form=report_form)
+    return render_template('report.html', thing=link, feed=feed, report_form=ReportForm())
 
 
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/report", methods=['POST'])
@@ -160,16 +217,28 @@ def link_report(feed, link_slug=None):
 @not_banned
 @rate_limit("report", 5, 180, limit_user=True, limit_ip=False)
 def link_report_handle(feed, link_slug=None):
+    """
+    Handle the link report
+    Redirect to link on successful report (TODO mayve redirect back)
+    Show the form if there are some mistakes
+    :param feed: feed
+    :param link_slug: link slug
+    :return:
+    """
     link = Link.where('slug', link_slug).first()
     if link is None:
         abort(404)
 
     report_form = ReportForm()
+
     if report_form.validate():
         report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id,
                         feed_id=link.feed.id)
+
+        # TODO do it all in one function in report
         link.reports().save(report)
         link.incr('reported', 1)
+
         flash("Thanks for your feedback!")
         return redirect(link.route)
 
@@ -180,41 +249,69 @@ def link_report_handle(feed, link_slug=None):
 @not_banned
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/comment", methods=['POST'])
 def comment_link(feed, link_slug=None):
+    """
+    Handle comment on link
+
+    :param feed:
+    :param link_slug:
+    :return:
+    """
     link = Link.where('slug', link_slug).first()
     if link is None:
         abort(404)
+
     comment_form = CommentForm()
     if comment_form.validate(current_user, link):
+        # TODO one universal style for doing this in whole app, maybe form.get_model()
         comment = comment_form.comment
         comment.commit()
-    return redirect('/f/{}/{}'.format(feed.slug, link_slug))
+
+    return redirect(link.route)
 
 
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/save")
 @login_required
 @not_banned
 def save_link(feed, link_slug=None):
+    """
+    Save link to saved links
+    :param feed: feed
+    :param link_slug: link slug
+    :return:
+    """
     link = Link.by_slug(link_slug)
     if link is None:
         abort(404)
+
+    # save the link
     saved_link = SavedLink(user_id=current_user.id, link_id=link.id)
     saved_link.commit()
+
     return redirect(redirect_back(link.route))
 
 @feed_blueprint.route("/c/<id>/report")
 @login_required
 def comment_report(id):
+    """
+    Report comment
+    :param id: comment id
+    :return:
+    """
     comment = Comment.by_id(id)
     if comment is None:
         abort(404)
 
-    report_form = ReportForm()
-    return render_template('report.html', thing=comment, feed=comment.link.feed, report_form=report_form)
+    return render_template('report.html', thing=comment, feed=comment.link.feed, report_form=ReportForm())
 
 
 @feed_blueprint.route("/c/<id>/report", methods=['POST'])
 @login_required
 def comment_report_handle(id):
+    """
+    Handle comment report
+    :param id: comment id
+    :return:
+    """
     comment = Comment.by_id(id)
     if comment is None:
         abort(404)
@@ -223,8 +320,11 @@ def comment_report_handle(id):
     if report_form.validate():
         report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id,
                         feed_id=comment.link.feed.id)
+
+        # todo do this in one function (same as link report)
         comment.reports().save(report)
         comment.incr('reported', 1)
+
         flash("Thanks for your feedback!")
         return redirect(comment.link.route)
 
@@ -234,17 +334,33 @@ def comment_report_handle(id):
 @feed_blueprint.route("/c/remove/<id>", methods=['POST'])
 @feed_admin_required
 def remove_comment(id):
+    """
+    Remove comment
+    :param id: comment id
+    :return:
+    """
     comment = Comment.by_id(id)
     if comment is None:
         abort(404)
+
+    # save the path where to go
+    redirect_to = redirect_back(comment.route)
     comment.delete()
-    return redirect('/f/{}/{}'.format(comment.link.feed.slug, comment.link.slug)) if comment else abort(404)
+
+    return redirect(redirect_to)
 
 
 @feed_blueprint.route("/c/<comment_id>/vote/<vote_str>")
 @login_required
 def do_comment_vote(comment_id=None, vote_str=None):
+    """
+    Vote on comment
+    :param comment_id: comment id
+    :param vote_str: vote type
+    :return:
+    """
     comment = Comment.by_id(comment_id)
+
     vote = vote_type_from_string(vote_str)
     if comment is None or vote is None:
         abort(404)
@@ -278,6 +394,11 @@ def do_add_admin(feed):
 @feed_blueprint.route("/f/<feed:feed>/admins/")
 @feed_admin_required
 def get_feed_admins(feed):
+    """
+    Get all feed admins
+    :param feed: feed
+    :return:
+    """
     admins = FeedAdmin.by_feed_id(feed.id)
     return render_template("feed_admins.html", admins=admins, feed=feed)
 
@@ -285,6 +406,12 @@ def get_feed_admins(feed):
 @feed_blueprint.route("/f/<feed:feed>/admin")
 @feed_admin_required
 def get_feed_admin(feed):
+    """
+    Get administration page
+    User can change rules/description here etc
+    :param feed: feed
+    :return:
+    """
     form = FeedForm()
     form.fill(feed)
     return render_template("feed_admin.html", feed=feed, form=form)
@@ -293,8 +420,14 @@ def get_feed_admin(feed):
 @feed_blueprint.route("/f/<feed:feed>/admin", methods=['POST'])
 @feed_admin_required
 def post_feed_admin(feed):
+    """
+    Handle feed info change
+    :param feed: feed
+    :return:
+    """
     form = FeedForm()
     if form.validate():
+        # TODO change things only if they really change
         feed.name = form.name.data
         feed.description = form.description.data
         feed.rules = form.rules.data
@@ -307,6 +440,11 @@ def post_feed_admin(feed):
 @feed_blueprint.route("/f/<feed:feed>/bans")
 @feed_admin_required
 def get_feed_bans(feed):
+    """
+    Get bans on given feed
+    :param feed: feed
+    :return:
+    """
     bans = Ban.where('feed_id', feed.id).get()
 
     return render_template("feed_bans.html", feed=feed, bans=bans)

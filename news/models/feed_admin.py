@@ -36,6 +36,7 @@ class FeedAdmin(Base):
 
     @classmethod
     def by_feed_id(cls, feed_id):
+        # TODO caching
         """
         Find feed admins by feed id
         :param feed_id: feed id
@@ -45,6 +46,7 @@ class FeedAdmin(Base):
 
     @classmethod
     def by_user_id(cls, user_id):
+        # TODO caching
         """
         Finds users administrations for feeds
         :param user_id: user_id
@@ -54,6 +56,7 @@ class FeedAdmin(Base):
 
     @classmethod
     def by_user_and_feed_id(cls, user_id, feed_id):
+        # TODO caching
         """
         Finds single feed administration by user and feed id
         :param user_id: user id
