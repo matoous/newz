@@ -1,4 +1,5 @@
 from flask_wtf import Form
+from markdown2 import markdown
 from orator import accessor
 from orator.orm import has_many, morph_many
 from redis_lock import Lock
@@ -347,7 +348,8 @@ class CommentForm(Form):
 
     def validate(self, user, link):
         # todo add validation
-        self.comment = Comment(text=self.text.data,
+        # TODO prevent script insertion
+        self.comment = Comment(text=markdown(self.text.data, safe_mode="escape"),
                                parent_id=int(self.parent_id.data) if self.parent_id.data != '' else None,
                                user_id=user.id,
                                link_id=link.id)

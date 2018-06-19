@@ -2,4 +2,34 @@
 
 {% block admin_content %}
             <h1>Feed Bans</h1>
+    <table>
+    <thead>
+    <tr>
+        <td>
+            Name
+        </td>
+        <td>
+            Until
+        </td>
+        <td>
+            Reason
+        </td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for ban in bans %}
+        <tr>
+        <td>
+            {{ ban.user.name }}
+        </td>
+        <td>
+            {{ ban.until }}
+        </td>
+        <td>
+            {{ ban.reason }}
+        </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
 {% endblock %}

@@ -84,7 +84,7 @@ class Feed(Base):
 
     @mutator
     def rules(self, value):
-        rules = markdown(value)
+        rules = markdown(value, safe_mode="escape")
         cache.set(self.rules_cache_key, rules)
         self.set_raw_attribute('rules', value)
 
@@ -96,7 +96,7 @@ class Feed(Base):
     def rules_html(self):
         rules = cache.get(self.rules_cache_key)
         if rules is None:
-            rules = markdown(self.rules)
+            rules = markdown(self.rules) if self.rules else ""
             cache.set(self.rules_cache_key, rules)
         return rules
 

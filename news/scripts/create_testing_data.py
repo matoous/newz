@@ -3,6 +3,7 @@ from slugify import slugify
 from news.models.feed import Feed
 from news.models.link import Link
 from news.models.user import User
+from news.models.vote import CommentVote, LinkVote
 
 
 def create_default_feeds():
@@ -129,3 +130,12 @@ def importHN():
             ll.commit()
         except Exception as e:
             pass
+
+def loadVotes():
+    cvotes = CommentVote.get()
+    for v in cvotes:
+        v._write_to_cache()
+
+    lvotes = LinkVote.get()
+    for v in lvotes:
+        v._write_to_cache()

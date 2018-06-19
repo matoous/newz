@@ -49,19 +49,19 @@
             <div class="links">
                 <div class="menu">
                     <div class="sorting">
-                        Trending
+                        <div class="selected-sort">{{ sort }}</div>
                         <ul>
-                            <li>
+                            <li class="{% if sort == 'trending' %}selected{% endif %}">
                                 <a href="/f/{{ feed.slug }}/trending">
                                     Trending
                                 </a>
                             </li>
-                            <li>
+                            <li class="{% if sort == 'new' %}selected{% endif %}">
                                 <a href="/f/{{ feed.slug }}/new">
                                     New
                                 </a>
                             </li>
-                            <li>
+                            <li class="{% if sort == 'best' %}selected{% endif %}">
                                 <a href="/f/{{ feed.slug }}/best">
                                     Best
                                 </a>

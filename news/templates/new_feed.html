@@ -8,6 +8,7 @@
 <form action="/new_feed" method="POST">
     {{ form.name }}
     {{ form.description }}
+        {{ form.rules }}
     {{ form.csrf_token }}
     <input type="submit" value="Create feed">
 </form>

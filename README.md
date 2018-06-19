@@ -30,6 +30,11 @@ things and views just use function provided by these components.
 
 Function should be named by method name + underscore + what thay do, e.g.: get_feed_links or post_new_link
 
+### Things that are persisted in redis and need special care
+
+* votes (there's load_votes function in scripts in case the votes need to be re-fetched)
+* bans
+
 ### Instalation
 
 Minimal requirements: Python3.6 and PostgreSQL

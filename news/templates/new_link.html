@@ -23,6 +23,9 @@
             <div class="f-row">
                 {{ form.text }}
             </div>
+            <div class="additional-info">
+                Be sure to follow the <a href="/rules">general rules</a> and feed specific rules which you can find below.
+            </div>
             <input type="submit" value="Create link">
             <button class="secondary" onclick="generatePreview()" type="button">Preview</button>
             <div class="f-row">
@@ -30,7 +33,6 @@
                 <div class="md">
                     {{ feed.rules_html|safe }}
                 </div>
-                <a href="/rules">General rules</a>
             </div>
         </fieldset>
     </form>

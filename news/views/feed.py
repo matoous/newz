@@ -1,16 +1,19 @@
-from flask import Blueprint, redirect, render_template, Response, request, abort, flash
-from flask_login import login_required, current_user
-from feedgen.feed import FeedGenerator
+import time
+from datetime import datetime, timedelta
 
-from news.lib.access import feed_admin_required
+from flask import Blueprint, redirect, render_template, request, abort, flash
+from flask_login import login_required, current_user
+
+from news.lib.access import feed_admin_required, not_banned
 from news.lib.db.query import LinkQuery
 from news.lib.filters import min_score_filter
 from news.lib.pagination import paginate
 from news.lib.ratelimit import rate_limit
-from news.lib.rss import rss_entries, rss_feed_builder, rss_page
+from news.lib.rss import rss_page
 from news.lib.utils.redirect import redirect_back
+from news.models.ban import BanForm, Ban
 from news.models.comment import CommentForm, SortedComments, Comment
-from news.models.feed import FeedForm, Feed
+from news.models.feed import FeedForm
 from news.models.feed_admin import FeedAdmin
 from news.models.link import LinkForm, Link, SavedLink
 from news.models.report import ReportForm, Report
@@ -33,6 +36,7 @@ def new_feed():
 
 @feed_blueprint.route('/f/<feed:feed>')
 @feed_blueprint.route('/f/<feed:feed>/<any(trending, new, best):sort>')
+@not_banned
 def get_feed(feed, sort=None):
     if (sort is None or sort not in ['trending', 'new', 'best']) and current_user.is_authenticated:
         sort = current_user.preferred_sort
@@ -53,6 +57,7 @@ def get_feed(feed, sort=None):
                            sort=sort)
 
 @feed_blueprint.route('/f/<feed:feed>/rss')
+@not_banned
 def get_feed_rss(feed):
     ids, _, _ = paginate(LinkQuery(feed_id=feed.id, sort='trending').fetch_ids(), 30)
     links = Link.by_ids(ids)
@@ -61,6 +66,7 @@ def get_feed_rss(feed):
 
 @feed_blueprint.route("/f/<feed:feed>/add")
 @login_required
+@not_banned
 def add_link(feed):
     form = LinkForm()
     return render_template("new_link.html", form=form, feed=feed, md_parser=True)
@@ -68,6 +74,7 @@ def add_link(feed):
 
 @feed_blueprint.route("/f/<feed:feed>/add", methods=['POST'])
 @login_required
+@not_banned
 @rate_limit("submit", 5, 5*60, limit_user=True, limit_ip=False)
 def post_add_link(feed):
     form = LinkForm()
@@ -106,6 +113,7 @@ def do_vote(link=None, vote_str=None):
 
 @feed_blueprint.route("/f/<feed:feed>/subscribe")
 @login_required
+@not_banned
 @rate_limit("subscription", 20, 180, limit_user=True, limit_ip=False)
 def subscribe(feed):
     current_user.subscribe(feed)
@@ -114,6 +122,7 @@ def subscribe(feed):
 
 @feed_blueprint.route("/f/<feed:feed>/unsubscribe")
 @login_required
+@not_banned
 @rate_limit("subscription", 20, 180, limit_user=True, limit_ip=False)
 def unsubscribe(feed):
     current_user.unsubscribe(feed)
@@ -121,6 +130,7 @@ def unsubscribe(feed):
 
 
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>")
+@not_banned
 def link_view(feed, link_slug=None):
     link = Link.where('slug', link_slug).first()
     if link is None:
@@ -135,6 +145,7 @@ def link_view(feed, link_slug=None):
 
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/report")
 @login_required
+@not_banned
 def link_report(feed, link_slug=None):
     link = Link.where('slug', link_slug).first()
     if link is None:
@@ -146,6 +157,7 @@ def link_report(feed, link_slug=None):
 
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/report", methods=['POST'])
 @login_required
+@not_banned
 @rate_limit("report", 5, 180, limit_user=True, limit_ip=False)
 def link_report_handle(feed, link_slug=None):
     link = Link.where('slug', link_slug).first()
@@ -165,6 +177,7 @@ def link_report_handle(feed, link_slug=None):
 
 
 @login_required
+@not_banned
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/comment", methods=['POST'])
 def comment_link(feed, link_slug=None):
     link = Link.where('slug', link_slug).first()
@@ -179,6 +192,7 @@ def comment_link(feed, link_slug=None):
 
 @feed_blueprint.route("/f/<feed:feed>/<link_slug>/save")
 @login_required
+@not_banned
 def save_link(feed, link_slug=None):
     link = Link.by_slug(link_slug)
     if link is None:
@@ -238,7 +252,7 @@ def do_comment_vote(comment_id=None, vote_str=None):
     vote = CommentVote(user_id=current_user.id, comment_id=comment.id, vote_type=vote)
     vote.apply()
 
-    return "voted"
+    return redirect(redirect_back(comment.link.route))
 
 
 @feed_blueprint.route("/f/<feed:feed>/add_admin", methods=['POST'])
@@ -293,7 +307,9 @@ def post_feed_admin(feed):
 @feed_blueprint.route("/f/<feed:feed>/bans")
 @feed_admin_required
 def get_feed_bans(feed):
-    return render_template("feed_bans.html", feed=feed)
+    bans = Ban.where('feed_id', feed.id).get()
+
+    return render_template("feed_bans.html", feed=feed, bans=bans)
 
 @feed_blueprint.route("/f/<feed:feed>/reports")
 @feed_admin_required
@@ -312,7 +328,34 @@ def get_feed_reports(feed):
 
     return render_template("feed_reports.html", feed=feed, reports=reports)
 
-@feed_blueprint.route("/f/<feed:feed>/ban", methods=['POST'])
+
+@feed_blueprint.route("/f/<feed:feed>/ban/<username>")
 @feed_admin_required
-def ban_user(feed):
-    pass
+def ban_user(feed, username):
+    user = User.by_username(username)
+    if user is None:
+        abort(404)
+
+    ban_form = BanForm()
+    ban_form.fill(user)
+
+    return render_template("ban_user.html", feed=feed, form=ban_form, user=user)
+
+
+@feed_blueprint.route("/f/<feed:feed>/ban/<username>", methods=['POST'])
+@feed_admin_required
+def handle_ban_user(feed, username):
+    user = User.by_username(username)
+    if user is None:
+        abort(404)
+
+    ban_form = BanForm()
+    ban_form.fill(user)
+
+    if ban_form.validate():
+        expire = datetime.utcnow() + timedelta(seconds=ban_form.get_duration())
+        ban = Ban(reason=ban_form.reason.data, user_id=ban_form.user_id.data, feed_id=feed.id, until=expire)
+        ban.apply()
+        return redirect(feed.route + "/bans")
+
+    return render_template("ban_user.html", feed=feed, form=ban_form, user=user)

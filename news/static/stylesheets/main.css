@@ -117,7 +117,7 @@ fieldset {
 }
 .md p {
   font-size: 1rem;
-  margin-bottom: 1.3rem;
+  margin: 0.5rem 0;
 }
 .md h1,
 .md h2,
@@ -172,7 +172,7 @@ fieldset {
   width: 100%;
 }
 .md blockquote {
-  margin-left: 6px;
+  margin: 6px;
   padding-left: 10px;
   border-left: 3px solid #ccc;
 }
@@ -294,6 +294,10 @@ input[type=submit].small {
 }
 .profile-menu {
   padding: 0 20px;
+}
+.profile-menu a {
+  color: black;
+  margin-right: 12px;
 }
 .settings {
   font-family: 'Roboto Condensed', sans-serif;
@@ -816,6 +820,9 @@ section {
   box-sizing: border-box;
   min-width: 120px;
 }
+.links .menu .sorting .selected-sort {
+  text-transform: capitalize;
+}
 .links .menu .sorting:hover ul {
   display: block;
 }
@@ -838,6 +845,10 @@ section {
 }
 .links .menu .sorting ul li a {
   color: black;
+}
+.links .menu .sorting ul li.selected a {
+  cursor: inherit;
+  text-decoration: none;
 }
 .links .link {
   margin-bottom: 16px;

@@ -137,12 +137,22 @@ class Base(Model):
 
     @classmethod
     def by_id(cls, id):
+        """
+        Tries to load the item from cache and if it fails from DB
+        items that are permanently stored in cache should overwrite this method
+        :param id:
+        :return:
+        """
+        # try to load from cache
         item = cls.load_from_cache(id)
         if item is not None:
             return item
+
+        # check db on fail
         item = cls.where('id', id).first()
         if item is not None:
             item.write_to_cache()
+
         return item
 
     @classmethod

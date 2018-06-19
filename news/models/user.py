@@ -18,6 +18,7 @@ from news.lib.login import login_manager
 from news.lib.mail import reset_email, send_mail
 from news.lib.queue import redis_conn, q
 from news.lib.verifications import EmailVerification
+from news.models.ban import Ban
 from news.models.base import Base
 from news.models.feed_admin import FeedAdmin
 from news.models.token import DisposableToken
@@ -66,9 +67,6 @@ class User(Base):
     def __repr__(self):
         return '<User %r>' % self.username
 
-    def __init__(self, **kwargs):
-        super(User, self).__init__(**kwargs)
-
     def __eq__(self, other):
         if not isinstance(other, User):
             return False
@@ -88,9 +86,7 @@ class User(Base):
 
     @property
     def name(self):
-        if self.full_name is not None:
-            return self.full_name
-        return self.username
+        return self.full_name if self.full_name is not None else self.username
 
     def set_password(self, password):
         self.set_attribute('password', bcrypt.hash(password))
@@ -99,9 +95,7 @@ class User(Base):
         return bcrypt.verify(password, self.password)
 
     def get_id(self):
-        if self.session_token is not None:
-            return self.session_token
-        return ''
+        return self.session_token or ''
 
     @accessor
     def session_token(self):
@@ -111,6 +105,7 @@ class User(Base):
         token = DisposableToken.get()
         self._accessor_cache['session_token'] = token.id
         session_key = 'us:{}'.format(self.session_token)
+        # TODO maybe expire the session key after some time?
         conn.set(session_key, self.id)
         login_user(self, remember=remember_me)
 
@@ -127,6 +122,7 @@ class User(Base):
         verification.create()
 
         # maybe some more setups for new user
+        # TODO subscribe to some default feeds
 
     def change_email(self, email):
         """
@@ -140,10 +136,11 @@ class User(Base):
 
             # update
             self.save()
+            self.write_to_cache()
 
-            # send verification
-            verification = EmailVerification(self)
-            verification.create()
+        # send verification
+        verification = EmailVerification(self)
+        verification.create()
 
     @staticmethod
     @login_manager.user_loader
@@ -213,6 +210,9 @@ class User(Base):
         if self.feed_subs >= MAX_SUBSCRIPTIONS_FREE:
             return False
 
+        if Ban.by_user_and_feed(self, feed) is not None:
+            return False
+
         self.feeds().attach(feed)
         self.incr('feed_subs', 1)
 
@@ -256,6 +256,9 @@ class User(Base):
             return False
         feed_admin = FeedAdmin.by_user_and_feed_id(self.id, feed.id)
         return feed_admin.god if feed_admin is not None else False
+
+    def is_baned_from(self, feed):
+        return Ban.by_user_and_feed(self, feed) is not None
 
     @property
     def route(self):

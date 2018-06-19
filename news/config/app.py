@@ -6,6 +6,7 @@ from news.lib.limiter import limiter
 from news.lib.mail import mail
 from news.lib.sentry import sentry
 from news.lib.utils.confidence import confidence
+from news.models.ban import Ban
 from news.models.comment import Comment
 from news.models.feed import Feed
 from news.models.feed_admin import FeedAdmin
@@ -15,7 +16,7 @@ from news.models.subscriptions import create_subscriptions_table
 from news.models.token import DisposableToken
 from news.models.user import User
 from news.models.vote import LinkVote, CommentVote
-from news.scripts.create_testing_data import create_default_feeds, importHN
+from news.scripts.create_testing_data import create_default_feeds, importHN, loadVotes
 from news.views.auth import auth
 from news.views.feed import feed_blueprint
 from news.views.settings import settings
@@ -42,7 +43,6 @@ def make_app():
 
     #sentry.init_app(app)
     #importHN()
-    #cache.clear()
 
     #for feed in Feed.get():
      #   feed.commit()
@@ -60,6 +60,7 @@ def make_app():
         #FeedAdmin.create_table()
         #Report.create_table()
         #SavedLink.create_table()
+        #Ban.create_table()
         pass
 
     return app

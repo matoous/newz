@@ -383,6 +383,10 @@ section {
       box-sizing: border-box;
       min-width: 120px;
 
+      .selected-sort {
+        text-transform: capitalize;
+      }
+
       &:hover {
         ul {
           display: block;
@@ -408,6 +412,13 @@ section {
 
           a {
             color: black;
+          }
+
+          &.selected {
+            a {
+              cursor: inherit;
+              text-decoration: none;
+            }
           }
         }
       }

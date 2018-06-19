@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Reset Password
+{% endblock %}
+
+{% block body %}
+<div class="page-container">
+    <div class="one-page-form wide">
+        <form class="ban-form" method="post" action="{{ feed.route }}/ban/{{ user.username }}">
+                <h2>Ban user</h2>
+                <fieldset>
+                    <div class="f-row">
+                        User: <b>{{ user.name }}</b>
+                    </div>
+                    {{ form.errors }}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    {{ form.user_id }}
+                    <div class="f-row">
+                        {{ form.reason.label }}
+                        {{ form.reason }}
+                    </div>
+                    <div class="f-row">
+                        {{ form.duration.label }}
+                    {{ form.duration }}
+                    </div>
+                </fieldset>
+                    <button class="small" type="submit">
+                        Ban
+                    </button>
+            </form>
+    </div>
+</div>
+{% endblock %}

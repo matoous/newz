@@ -111,6 +111,10 @@ class LinkVote(Vote):
         vote = conn.get(cache_key)
         return loads(vote) if vote else None
 
+    def _write_to_cache(self):
+        cache_key = LinkVote._cache_key(self.link_id, self.user_id)
+        conn.set(cache_key, dumps(self, protocol=HIGHEST_PROTOCOL))
+
     def apply(self):
         previous_vote = LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).first()
 
@@ -128,8 +132,7 @@ class LinkVote(Vote):
         else:
             LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).update({'vote_type': self.vote_type})
 
-        cache_key = LinkVote._cache_key(self.link_id, self.user_id)
-        conn.set(cache_key, dumps(self, protocol=HIGHEST_PROTOCOL))
+        self._write_to_cache()
 
         if self.link.num_votes < 20 or self.link.num_votes % 8 == 0:
             q.enqueue(update_link, self.link, result_ttl=0)
@@ -177,6 +180,10 @@ class CommentVote(Vote):
         vote = conn.get(cache_key)
         return loads(vote) if vote else None
 
+    def _write_to_cache(self):
+        cache_key = CommentVote._cache_key(self.comment_id, self.user_id)
+        conn.set(cache_key, dumps(self, protocol=HIGHEST_PROTOCOL))
+
     def apply(self):
         previous_vote = CommentVote.where('user_id', self.user_id).where('comment_id', self.comment_id).first()
         if previous_vote and previous_vote.vote_type == self.vote_type:
@@ -193,8 +200,8 @@ class CommentVote(Vote):
         else:
             CommentVote.where('user_id', self.user_id).where('comment_id', self.comment_id).update({'vote_type': self.vote_type})
 
-        cache_key = CommentVote._cache_key(self.comment_id, self.user_id)
-        conn.set(cache_key, dumps(self, protocol=HIGHEST_PROTOCOL))
+        self._write_to_cache()
+
         if self.comment.num_votes < 20 or self.comment.num_votes % 8 == 0:
             q.enqueue(update_comment, self.comment, result_ttl=0)
 
