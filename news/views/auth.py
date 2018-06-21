@@ -8,8 +8,7 @@ from news.models.user import SignUpForm, LoginForm, User, ResetForm, PasswordRes
 auth = Blueprint('auth', __name__, template_folder='/templates')
 
 
-@auth.route("/join", methods=['GET', 'POST'])
-@rate_limit("join", 3, 60*60, limit_user=False, limit_ip=True)
+@auth.route("/join")
 def signup():
     """
     Sign Up new user
@@ -18,25 +17,38 @@ def signup():
     if current_user.is_authenticated:
         return redirect("/")
 
-    form = SignUpForm()
-    if form.validate_on_submit():
-        user = form.user
-        user.register()
-        return redirect('/')
-    return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
+    return render_template("signup.html", form=SignUpForm(), show_logo=True, hide_menues=True)
 
-
-@auth.route("/login")
-def login():
+@auth.route("/join", methods=['POST'])
+@rate_limit("join", 100, 60*60, limit_user=False, limit_ip=True)
+def post_signup():
     """
-    Login existing user
+    Sign Up new user
     :return:
     """
     if current_user.is_authenticated:
         return redirect("/")
 
-    form = LoginForm()
-    return render_template("login.html", form=form, show_logo=True, hide_menues=True)
+    form = SignUpForm()
+    if form.validate():
+        user = form.user()
+        user.register()
+        return redirect('/')
+
+    return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
+
+
+
+@auth.route("/login")
+def login():
+    """
+    Get login form
+    :return:
+    """
+    if current_user.is_authenticated:
+        return redirect("/")
+
+    return render_template("login.html", form=LoginForm(), show_logo=True, hide_menues=True)
 
 @auth.route("/login", methods=["POST"])
 @rate_limit("login", 10, 300, limit_user=False, limit_ip=True)
@@ -46,12 +58,14 @@ def post_login():
     :return:
     """
     if current_user.is_authenticated:
-        return redirect("/")
+        return redirect('/')
 
     form = LoginForm()
     if form.validate():
-        form.user.login(form.remember_me.data)
+        user = form.user()
+        user.login(form.remember_me.data)
         return redirect('/')
+
     return render_template("login.html", form=form, show_logo=True, hide_menues=True)
 
 

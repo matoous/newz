@@ -16,6 +16,11 @@
                 Don't have an account? <a href="/join">Sign up</a>
             </p>
             <fieldset>
+                {% if form.errors['general'] %}
+                    <div class="form-error">
+                        {{ form.errors['general'] }}
+                    </div>
+                {% endif %}
                 <div class="f-row">
                     {{ form.username_or_email }}
                 </div>

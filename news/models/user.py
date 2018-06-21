@@ -9,7 +9,7 @@ from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
 from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField, BooleanField
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.validators import DataRequired, URL, Length
+from wtforms.validators import DataRequired, URL, Length, ValidationError
 
 from news.config.config import GODS
 from news.lib.app import app
@@ -18,6 +18,7 @@ from news.lib.db.db import schema
 from news.lib.login import login_manager
 from news.lib.mail import reset_email, send_mail
 from news.lib.queue import redis_conn, q
+from news.lib.validators import UniqueUsername, UniqueEmail
 from news.lib.verifications import EmailVerification
 from news.models.ban import Ban
 from news.models.base import Base, CACHE_EXPIRE_TIME
@@ -305,65 +306,66 @@ class User(Base):
         return "/u/{}".format(self.username)
 
 class SignUpForm(Form):
-    username = StringField('Username', [DataRequired(), Length(min=3,max=20)], render_kw={'placeholder': 'Username'})
-    email = EmailField('Email', [DataRequired()], render_kw={'placeholder': 'Email'})
-    password = PasswordField('Password', [DataRequired(), Length(min=6)], render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
 
-    def __init__(self, *args, **kwargs):
-        Form.__init__(self, *args, **kwargs)
-        self.user = None
+    username = StringField('Username',
+                           [DataRequired(message='You have to select username'),
+                            Length(min=3,max=20, message='Username must be between 3 and 20 characters long'),
+                            UniqueUsername(message='This username is already taken')],
+                           render_kw={'placeholder': 'Username'})
+    email = EmailField('Email',
+                       [DataRequired('You have to enter your email'),
+                        UniqueEmail()],
+                       render_kw={'placeholder': 'Email'})
+    password = PasswordField('Password',
+                             [DataRequired('You have to choose password'),
+                              Length(min=6, message='Password must be at least 6 characters long')],
+                             render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
 
-    def validate(self):
-        rv = Form.validate(self)
-        if not rv:
-            return False
-
-        users = User.where('username', self.username.data).or_where('email', self.email.data).get()
-        if len(users) > 0:
-            for user in users:
-                if user.email == self.email.data:
-                    self.email.errors.append('This email is already taken')
-                if user.username == self.username.data:
-                    self.username.errors.append('This username is already taken')
-            return False
-
-        if len(self.password.data) < 6:
-            self.password.errors.append("Password must be at least 6 characters long")
-            return False
-
+    def user(self):
         user = User(username=self.username.data, email=self.email.data)
         user.set_password(self.password.data)
-        self.user = user
-        return True
+        return user
 
 
 class LoginForm(Form):
-    username_or_email = StringField('Username or email', [DataRequired()], render_kw={'placeholder': 'Username or email'})
-    password = PasswordField('Password', [DataRequired()], render_kw={'placeholder': 'Password'})
+    username_or_email = StringField('Username or email',
+                                    [DataRequired(message='Enter you email or username')],
+                                    render_kw={'placeholder': 'Username or email'})
+    password = PasswordField('Password',
+                             [DataRequired(message='Incorrect username or password')],
+                             render_kw={'placeholder': 'Password'})
     remember_me = BooleanField('Remember me')
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
-        self.user = None
+        self._user = None
 
     def validate(self):
         rv = Form.validate(self)
-
-        self.user = None
         if not rv:
+            self.errors['general'] = 'Invalid username or password'
             return False
+
+        # try to find user, from DB explicitly
         if '@' in self.username_or_email.data:
-            self.user = User.where('email', self.username_or_email.data).first()
+            self._user = User.where('email', self.username_or_email.data).first()
         else:
-            self.user = User.where('username', self.username_or_email.data).first()
-        if self.user is None:
-            self.errors['general'] = "Invalid username or password"
+            self._user = User.where('username', self.username_or_email.data).first()
+
+        # no user found
+        if self._user is None:
+            self.errors['general'] = 'Invalid username or password'
             return False
-        if not self.user.check_password(self.password.data):
-            self.errors['general'] = "Invalid username or password"
+
+        # wrong password
+        if not self._user.check_password(self.password.data):
+            self.errors['general'] = 'Invalid username or password'
             return False
+
         return True
 
+    def user(self):
+        return self._user
 
 class PreferencesForm(Form):
     subscribe = BooleanField('Subscribe to newsletter')
@@ -385,22 +387,29 @@ class PreferencesForm(Form):
 
 
 class PasswordForm(Form):
-    new_password = PasswordField('New password', [Length(min=6)], render_kw={'autocomplete': "new-password"})
-    new_password_again = PasswordField('New password again', render_kw={'autocomplete': "new-password"})
+    new_password = PasswordField('New password',
+                             [DataRequired('You have to choose password'),
+                              Length(min=6, message='Password must be at least 6 characters long')],
+                             render_kw={'placeholder': 'New password', 'autocomplete': "new-password"})
+    new_password_again = PasswordField('New password again',
+                             [DataRequired('You have to choose password'),
+                              Length(min=6, message='Password must be at least 6 characters long')],
+                             render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
     old_password = PasswordField('Old password', render_kw={'autocomplete': 'off'})
 
     def __init__(self, user, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
-        self.user = user
+        self._user = user
 
     def validate(self):
-        if not self.user.check_password(self.old_password.data):
-            print("wrong pw")
+        if not self._user.check_password(self.old_password.data):
             self.errors['password'] = 'Invalid password'
             return False
+
         if not self.new_password.data == self.new_password_again.data:
             self.errors['passwords'] = 'Passwords don\'t match'
             return False
+
         return True
 
 

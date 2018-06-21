@@ -16,12 +16,33 @@
                 Already have an account? <a href="/login">Sign in</a>
             </p>
             <fieldset>
+                {% if form.username.errors %}
+                    {% for error in form.username.errors %}
+                    <div class="form-error">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
                 <div class="f-row">
                     {{ form.username }}
                 </div>
+                {% if form.email.errors %}
+                    {% for error in form.email.errors %}
+                    <div class="form-error">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
                 <div class="f-row">
                     {{ form.email }}
                 </div>
+                {% if form.password.errors %}
+                    {% for error in form.password.errors %}
+                    <div class="form-error">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
                 <div class="f-row">
                     {{ form.password }}
                 </div>

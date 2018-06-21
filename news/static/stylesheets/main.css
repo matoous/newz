@@ -15,6 +15,11 @@
 form {
   font-family: 'Roboto Condensed', sans-serif;
 }
+form .form-error {
+  color: red;
+  padding-bottom: 6px;
+  font-size: .8em;
+}
 form > p {
   font-size: .8em;
 }
