@@ -1,3 +1,5 @@
+from typing import Optional
+
 from flask_wtf import Form
 from orator import mutator
 from orator.orm import belongs_to_many
@@ -7,11 +9,11 @@ from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length
 from markdown2 import markdown
 
-from news.lib.cache import cache
+from news.lib.cache import cache, conn
 from news.lib.db.db import schema
 from news.lib.queue import redis_conn, q
 from news.lib.solr import add_feed_to_search
-from news.models.base import Base
+from news.models.base import Base, CACHE_EXPIRE_TIME
 from news.models.link import Link
 
 
@@ -46,31 +48,66 @@ class Feed(Base):
     def b_id(self):
         return self.id.to_bytes(8, 'big')
 
-    def links_query(self, sort='trending'):
+    def links_query(self, sort: str = 'trending') -> Link:
         return Link.by_feed(self, sort)
 
     @classmethod
-    def by_slug(cls, slug):
-        # TODO cache
+    def by_slug(cls, slug: str) -> Optional['Feed']:
+        """
+        Get feed by slug
+        TODO now it needs two roundtrips, would be nice if it would be possible to do it in one
+        :param username: slug
+        :return:
+        """
+        cache_key = 'fslug:{}'.format(slug)
+
+        # check username cache
+        in_cache = conn.get(cache_key)
+        uid = int(in_cache) if in_cache else None
+
+        # return user on success
+        if uid is not None:
+            return Feed.by_id(uid)
+
+        # try to load user from DB on failure
         feed = Feed.where('slug', slug).first()
+
+        # cache the result
+        if feed is not None:
+            conn.set(cache_key, feed.id)
+            conn.expire(cache_key, CACHE_EXPIRE_TIME)
+            feed.write_to_cache()
+
         return feed
 
     @classmethod
-    def by_id(cls, id):
+    def by_id(cls, id: str) -> 'Feed':
+        """
+        Find feed by id
+        :param id: id
+        :return: feed or None
+        """
         f = cls.load_from_cache(id)
+
+        # return cached result if possible
         if f is not None:
             return f
+
+        # try to find feed in DB
         f = Feed.where('id', id).first()
+
+        # cache the result
         if f is not None:
             f.write_to_cache()
+
         return f
 
     @property
-    def url(self):
+    def url(self) -> str:
         return "/f/{}".format(self.slug)
 
     @property
-    def route(self):
+    def route(self) -> str:
         return "/f/{}".format(self.slug)
 
     @classmethod
@@ -109,7 +146,6 @@ class Feed(Base):
 class FeedForm(Form):
     name = StringField('Name', [DataRequired(), Length(max=128, min=3)])
     description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
-    # TODO add rules to "create new feed"
     rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
 
 

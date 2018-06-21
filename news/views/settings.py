@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import Blueprint, render_template, redirect, request
 from flask_login import current_user, login_required
 
+from news.lib.ratelimit import rate_limit
 from news.models.user import PreferencesForm, ProfileForm, PasswordForm, EmailForm
 
 settings = Blueprint('settings', __name__, template_folder=Path(os.path.dirname(os.path.realpath(__file__))).parent.__str__() + "/templates")
@@ -46,13 +47,14 @@ def post_profile_settings():
 def get_account_settings():
     pw_form = PasswordForm(current_user)
     email_form = EmailForm(current_user)
+    # TODO implement
     return render_template("settings-account.html", pw_form=pw_form, email_form=email_form)
 
 
 @settings.route("/settings/password", methods=['POST'])
 @login_required
+@rate_limit("pwchange", 5, 60*60, limit_user=True, limit_ip=False)
 def post_new_password():
-    # TODO rate limit
     pw_form = PasswordForm(current_user)
     if pw_form.validate():
         current_user.set_password(pw_form.new_password.data)

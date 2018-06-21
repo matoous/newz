@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from orator import Model
 from redis_lock import Lock
@@ -20,15 +21,16 @@ class Base(Model):
     """
 
     @classmethod
-    def _cache_prefix(cls):
+    def _cache_prefix(cls) -> str:
         """
         Cache prefix for model, must be unique to prevent conflicts
+        :rtype: str
         :return: cache prefix
         """
         return cls.__name__ + '_'
 
     @property
-    def _cache_key(self):
+    def _cache_key(self) -> str:
         """
         Cache key for model
         :return: cache key for object
@@ -37,7 +39,7 @@ class Base(Model):
         return "{prefix}{id}".format(prefix=prefix, id=self.id)
 
     @property
-    def _lock_key(self):
+    def _lock_key(self) -> str:
         """
         Get lock key for given model
         Mainly used for read - modify - write procedures
@@ -46,7 +48,7 @@ class Base(Model):
         return "lock:".format(self._cache_key)
 
     @classmethod
-    def _cache_key_from_id(cls, id):
+    def _cache_key_from_id(cls, id: str) -> str:
         """
         Generate cache key from thing id
         :param id: thing id
@@ -55,7 +57,7 @@ class Base(Model):
         prefix = cls._cache_prefix()
         return "{prefix}{id}".format(prefix=prefix, id=id)
 
-    def get_read_modify_write_lock(self):
+    def get_read_modify_write_lock(self) -> Lock:
         """
         Gets read/modify/write lock for given things
         Used when updating in cache or database
@@ -85,7 +87,7 @@ class Base(Model):
         pipe.execute()
 
     @classmethod
-    def load_from_cache(cls, id):
+    def load_from_cache(cls, id: str) -> object:
         """
         Load model from cache
         :param id: id
@@ -99,7 +101,7 @@ class Base(Model):
         obj.set_exists(True)
         return obj
 
-    def incr(self, attr, amp=1):
+    def incr(self, attr: str, amp: int = 1):
         """
         Increment given attribute
         Increments model in both database and redis
@@ -114,7 +116,7 @@ class Base(Model):
                 self.__class__.where('id', self.id).increment(attr, amp)
                 self.write_to_cache()
 
-    def decr(self, attr, amp=1):
+    def decr(self, attr: str, amp: int = 1):
         """
         Decrement given attribute
         Decrements model in both database and redis
@@ -129,7 +131,7 @@ class Base(Model):
                 self.__class__.where('id', self.id).decrement(attr, amp)
                 self.write_to_cache()
 
-    def to_solr(self):
+    def to_solr(self) -> dict:
         """
         Convert object to it's solr representation
         Attributes stored in solr can be modified by class __searchable__ property which is list of attributes to store
@@ -150,7 +152,7 @@ class Base(Model):
         raise NotImplemented
 
     @classmethod
-    def by_id(cls, id):
+    def by_id(cls, id: str) -> object:
         """
         Tries to load the item from cache and if it fails from DB
         items that are permanently stored in cache should overwrite this method
@@ -170,14 +172,14 @@ class Base(Model):
         return item
 
     @classmethod
-    def by_ids(cls, ids):
+    def by_ids(cls, ids: List[str]) -> List[object]:
         """
         Get items by ids
         Uses pipe which is faster then loading the items one by one
-        # TODO load from cache, or save the objects with "conn" not "cache", this method now doesn't work
         :param ids: list of ids of items to get
         :return: items
         """
+        # TODO maybe use MGET cmd
         pipe = conn.pipeline()
         for id in ids:
             pipe.get(id)
@@ -189,3 +191,12 @@ class Base(Model):
                 items[idx] = cls.by_id(id)
 
         return items
+
+    def update(self, _attributes=None, **attributes):
+        """
+        Update the item in database but also write the changes to cache
+        :param _attributes:
+        :param attributes:
+        """
+        super().update(_attributes, **attributes)
+        self.write_to_cache()

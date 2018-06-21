@@ -1056,7 +1056,10 @@ section {
   display: inline-block;
   margin-left: 16px;
   padding: 4px;
-  background-color: yellow;
+}
+.admin-options span {
+  color: #666666;
+  margin-right: 6px;
 }
 .search-page .search {
   margin-bottom: 16px;

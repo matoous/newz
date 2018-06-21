@@ -1,5 +1,6 @@
 from datetime import datetime
 from secrets import token_urlsafe
+from typing import Optional, List
 
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
@@ -19,7 +20,7 @@ from news.lib.mail import reset_email, send_mail
 from news.lib.queue import redis_conn, q
 from news.lib.verifications import EmailVerification
 from news.models.ban import Ban
-from news.models.base import Base
+from news.models.base import Base, CACHE_EXPIRE_TIME
 from news.models.feed_admin import FeedAdmin
 from news.models.token import DisposableToken
 
@@ -73,35 +74,35 @@ class User(Base):
         return self.id == other.id
 
     @property
-    def is_active(self):
+    def is_active(self) -> bool:
         return True
 
     @property
-    def is_authenticated(self):
+    def is_authenticated(self) -> bool:
         return True
 
     @property
-    def is_anonymous(self):
+    def is_anonymous(self) -> bool:
         return False
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.full_name if self.full_name is not None else self.username
 
-    def set_password(self, password):
+    def set_password(self, password: str):
         self.set_attribute('password', bcrypt.hash(password))
 
-    def check_password(self, password):
+    def check_password(self, password: str) -> bool:
         return bcrypt.verify(password, self.password)
 
-    def get_id(self):
+    def get_id(self) -> str:
         return self.session_token or ''
 
     @accessor
     def session_token(self):
         return self._accessor_cache['session_token']
 
-    def login(self, remember_me=False):
+    def login(self, remember_me: bool = False):
         token = DisposableToken.get()
         self._accessor_cache['session_token'] = token.id
         session_key = 'us:{}'.format(self.session_token)
@@ -124,7 +125,7 @@ class User(Base):
         # maybe some more setups for new user
         # TODO subscribe to some default feeds
 
-    def change_email(self, email):
+    def change_email(self, email: str):
         """
         Change users email under lock and send email for re-verification of his email
         :param email:
@@ -144,7 +145,7 @@ class User(Base):
 
     @staticmethod
     @login_manager.user_loader
-    def load_user(session_id):
+    def load_user(session_id: str) -> Optional['User']:
         uid = int(conn.get('us:{}'.format(session_id)))
 
         u = User.by_id(uid)
@@ -153,7 +154,7 @@ class User(Base):
         return u
 
     @classmethod
-    def by_id(cls, id):
+    def by_id(cls, id: int) -> Optional['User']:
         u = cls.load_from_cache(id)
         if u is not None:
             return u
@@ -171,8 +172,8 @@ class User(Base):
         return "u:"
 
     @property
-    def age(self):
-        return self.created_at - datetime.utcnow()
+    def age(self) -> datetime:
+        return datetime.utcnow() - self.created_at
 
     @belongs_to_many('feeds_users')
     def feeds(self):
@@ -190,7 +191,11 @@ class User(Base):
         return Comment
 
     @accessor
-    def subscribed_feed_ids(self):
+    def subscribed_feed_ids(self) -> List[str]:
+        """
+        Get users subscribed feed ids
+        :return: list of ids
+        """
         key = 'subs:{}'.format(self.id)
         ids = cache.get(key)
         if ids is None:
@@ -199,14 +204,25 @@ class User(Base):
         return ids
 
     @accessor
-    def subscribed_feeds(self):
+    def subscribed_feeds(self) -> List[object]:
         from news.models.feed import Feed
         return [Feed.by_id(x) for x in self.subscribed_feed_ids]
 
-    def subscribed_to(self, feed):
+    def subscribed_to(self, feed: object) -> bool:
+        """
+        Check if user is subscribed to given feed
+        :param feed: feed
+        :return: is user subscribed to the feed
+        """
         return feed.id in self.subscribed_feed_ids
 
     def subscribe(self, feed):
+        """
+        Subscribe user to given feed
+        TODO allow users to by 'pro' and have more than max subscriptions
+        :param feed: feed to subscribe
+        :return:
+        """
         if self.feed_subs >= MAX_SUBSCRIPTIONS_FREE:
             return False
 
@@ -238,15 +254,39 @@ class User(Base):
         return True
 
     @classmethod
-    def by_username(cls, username):
-        return User.where('username', username).first()
+    def by_username(cls, username: str) -> Optional['User']:
+        """
+        Get user by username
+        :param username: username
+        :return:
+        """
+        cache_key = 'uname:{}'.format(username)
 
-    def is_god(self):
+        # check username cache
+        in_cache = conn.get(cache_key)
+        uid = int(in_cache) if in_cache else None
+
+        # return user on success
+        if uid is not None:
+            return User.by_id(uid)
+
+        # try to load user from DB on failure
+        u = User.where('username', username).first()
+
+        # cache the result
+        if u is not None:
+            conn.set(cache_key, u.id)
+            conn.expire(cache_key, CACHE_EXPIRE_TIME)
+            u.write_to_cache()
+
+        return u
+
+    def is_god(self) -> bool:
         if not self.is_authenticated:
             return False
         return self.username in GODS
 
-    def is_feed_admin(self, feed):
+    def is_feed_admin(self, feed: object) -> bool:
         if not self.is_authenticated:
             return False
         return FeedAdmin.by_user_and_feed_id(self.id, feed.id) is not None

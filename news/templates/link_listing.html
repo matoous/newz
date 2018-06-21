@@ -36,13 +36,13 @@
                 {% endif %}
                 {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                     <div class="admin-options">
-                        <form class="non-form" method="post" action="/f/{{ link.feed.slug }}/remove">
-                            <input type="hidden" name="slug" value="{{ link.slug }}">
-                            <input type="submit" value="remove">
-                        </form>
-                    </div>
-                    <div class="admin-options">
-                        <a href="">{{ link.reported }} reports</a>
+                        <span>Admin:</span>
+                        <a href="/f/{{ link.feed.slug }}/remove">
+                            remove
+                        </a>
+                        <a href="{{ link.feed.route }}/reports">
+                            {{ link.reported }} reports
+                        </a>
                     </div>
                 {% endif %}
             </div>

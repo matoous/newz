@@ -219,7 +219,7 @@ def link_report(feed, link_slug=None):
 def link_report_handle(feed, link_slug=None):
     """
     Handle the link report
-    Redirect to link on successful report (TODO mayve redirect back)
+    Redirect to link on successful report
     Show the form if there are some mistakes
     :param feed: feed
     :param link_slug: link slug
@@ -240,7 +240,7 @@ def link_report_handle(feed, link_slug=None):
         link.incr('reported', 1)
 
         flash("Thanks for your feedback!")
-        return redirect(link.route)
+        return redirect(redirect_back(link.route))
 
     return render_template('report.html', thing=link, feed=feed, report_form=report_form)
 
@@ -426,14 +426,23 @@ def post_feed_admin(feed):
     :return:
     """
     form = FeedForm()
+
     if form.validate():
-        # TODO change things only if they really change
-        feed.name = form.name.data
-        feed.description = form.description.data
-        feed.rules = form.rules.data
-        feed.update()
-        feed.write_to_cache()
+        needs_update = False
+
+        if feed.description != form.description.data:
+            feed.description = form.description.data
+            needs_update = True
+
+        if feed.rules != form.rules.data:
+            feed.rules = form.rules.data
+            needs_update = True
+
+        if needs_update:
+            feed.update()
+
         return redirect('/f/{}/admin'.format(feed.slug))
+
     return render_template("feed_admin.html", feed=feed, form=form)
 
 
