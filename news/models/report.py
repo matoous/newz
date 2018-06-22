@@ -1,10 +1,10 @@
 from flask_wtf import Form
-from orator import Model, accessor
+from orator import Model, accessor, Schema
 from orator.orm import morph_to
 from wtforms import TextAreaField, RadioField, IntegerField
 from wtforms.validators import Length
 
-from news.lib.db.db import schema
+from news.lib.db.db import db
 
 
 class Report(Model):
@@ -13,6 +13,7 @@ class Report(Model):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('reports')
         with schema.create('reports') as table:
             table.increments('id').unsigned()

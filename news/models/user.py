@@ -1,10 +1,11 @@
 from datetime import datetime
+from pickle import dumps, loads
 from secrets import token_urlsafe
 from typing import Optional, List
 
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
-from orator import accessor
+from orator import accessor, Schema
 from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
 from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField, BooleanField
@@ -13,11 +14,11 @@ from wtforms.validators import DataRequired, URL, Length, ValidationError
 
 from news.config.config import GODS
 from news.lib.app import app
-from news.lib.cache import cache, conn
-from news.lib.db.db import schema
+from news.lib.cache import cache, cache
+from news.lib.db.db import db
 from news.lib.login import login_manager
 from news.lib.mail import reset_email, send_mail
-from news.lib.queue import redis_conn, q
+from news.lib.task_queue import redis_conn, q
 from news.lib.validators import UniqueUsername, UniqueEmail
 from news.lib.verifications import EmailVerification
 from news.models.ban import Ban
@@ -40,6 +41,7 @@ class User(Base):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('users')
         with schema.create('users') as table:
             table.increments('id').unsigned()
@@ -107,8 +109,9 @@ class User(Base):
         token = DisposableToken.get()
         self._accessor_cache['session_token'] = token.id
         session_key = 'us:{}'.format(self.session_token)
-        # TODO maybe expire the session key after some time?
-        conn.set(session_key, self.id)
+        cache.set(session_key, self.id)
+        if not remember_me:
+            cache.expire(session_key, 60 * 60 * 2)
         login_user(self, remember=remember_me)
 
     def logout(self):
@@ -147,7 +150,12 @@ class User(Base):
     @staticmethod
     @login_manager.user_loader
     def load_user(session_id: str) -> Optional['User']:
-        uid = int(conn.get('us:{}'.format(session_id)))
+        user_id = cache.get('us:{}'.format(session_id))
+
+        if not user_id:
+            return None
+
+        uid = int(user_id)
 
         u = User.by_id(uid)
         if u is not None:
@@ -264,7 +272,7 @@ class User(Base):
         cache_key = 'uname:{}'.format(username)
 
         # check username cache
-        in_cache = conn.get(cache_key)
+        in_cache = cache.get(cache_key, raw=True)
         uid = int(in_cache) if in_cache else None
 
         # return user on success
@@ -276,8 +284,8 @@ class User(Base):
 
         # cache the result
         if u is not None:
-            conn.set(cache_key, u.id)
-            conn.expire(cache_key, CACHE_EXPIRE_TIME)
+            cache.set(cache_key, u.id, raw=True)
+            cache.expire(cache_key, CACHE_EXPIRE_TIME)
             u.write_to_cache()
 
         return u

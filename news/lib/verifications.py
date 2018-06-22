@@ -2,7 +2,7 @@ from secrets import token_urlsafe
 
 from news.lib.app import app
 from news.lib.mail import registration_email, send_mail
-from news.lib.queue import q, redis_conn
+from news.lib.task_queue import q, redis_conn
 
 EMAIL_VERIFICATION_EXPIRE = 60*60* 48  # 48 hours
 

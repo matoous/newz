@@ -1,6 +1,6 @@
-from orator import accessor
+from orator import accessor, Schema
 
-from news.lib.db.db import schema
+from news.lib.db.db import db
 from news.models.base import Base
 
 
@@ -15,6 +15,7 @@ class FeedAdmin(Base):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('feed_admins')
         with schema.create('feed_admins') as table:
             table.boolean('god').default(False)

@@ -1,12 +1,12 @@
 from datetime import datetime
+from pickle import dumps, loads
 from typing import List
 
 from orator import Model
 from redis_lock import Lock
 
-from news.lib.cache import conn, cache
+from news.lib.cache import cache
 from news.lib.db.db import db
-from news.lib.queue import redis_conn
 import timeago
 
 CACHE_EXPIRE_TIME = 12 * 60 * 60
@@ -63,7 +63,7 @@ class Base(Model):
         Used when updating in cache or database
         :return: RedisLock
         """
-        return Lock(conn, self._lock_key)
+        return Lock(cache.conn, self._lock_key)
 
     def update_from_cache(self):
         """
@@ -81,8 +81,8 @@ class Base(Model):
         __hidden__ attribute on class (more in documentation of orator)
         """
         # save token to redis for limited time
-        pipe = redis_conn.pipeline()
-        pipe.set(self._cache_key, self.serialize())
+        pipe = cache.pipeline()
+        pipe.set(self._cache_key, dumps(self.serialize()))
         pipe.expire(self._cache_key, CACHE_EXPIRE_TIME)
         pipe.execute()
 
@@ -180,7 +180,7 @@ class Base(Model):
         :return: items
         """
         # TODO maybe use MGET cmd
-        pipe = conn.pipeline()
+        pipe = cache.pipeline()
         for id in ids:
             pipe.get(id)
         items = pipe.execute()

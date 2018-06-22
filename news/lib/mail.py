@@ -3,7 +3,7 @@ from flask_mail import Mail, Message
 from rq.decorators import job
 
 from news.lib.app import app
-from news.lib.queue import redis_conn
+from news.lib.task_queue import redis_conn
 
 mail = Mail()
 

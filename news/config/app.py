@@ -1,5 +1,10 @@
-from news.lib.db.db import db, schema
+import os
+
+from babel import dates
+
 from news.lib.cache import cache
+from news.lib.converters import FeedConverter
+from news.lib.db.db import db
 from news.lib.csrf import csrf
 from news.lib.login import login_manager
 from news.lib.limiter import limiter
@@ -23,11 +28,32 @@ from news.views.settings import settings
 from news.views.user import user_blueprint
 from news.views.web import web
 from news.views.search import search_blueprint
-from flask import Flask
-
+from dotenv import load_dotenv
 
 def make_app():
     from news.lib.app import app
+
+
+
+    load_dotenv()
+
+    def format_datetime(value, format='medium'):
+        if format == 'full':
+            format = "d. MMMM y 'at' HH:mm"
+        elif format == 'medium':
+            format = "dd.MM.y HH:mm"
+        return dates.format_datetime(value, format)
+
+    app.jinja_env.filters['datetime'] = format_datetime
+    app.url_map.converters['feed'] = FeedConverter
+
+    db.init_app(app)
+    csrf.init_app(app)
+    cache.init_app(app)
+    login_manager.init_app(app)
+    mail.init_app(app)
+
+    #loadVotes()
 
     app.register_blueprint(web)
     app.register_blueprint(auth)
@@ -36,10 +62,6 @@ def make_app():
     app.register_blueprint(user_blueprint)
     app.register_blueprint(search_blueprint)
 
-    csrf.init_app(app)
-    cache.init_app(app)
-    login_manager.init_app(app)
-    mail.init_app(app)
 
     #sentry.init_app(app)
     #importHN()

@@ -1,9 +1,11 @@
+from pickle import dumps, loads
+
 from redis_lock import Lock
 from rq.decorators import job
 
-from news.lib.cache import cache, conn
+from news.lib.cache import cache, cache
 from news.lib.db.sorts import sorts
-from news.lib.queue import redis_conn
+from news.lib.task_queue import redis_conn
 from news.lib.sorts import sort_tuples
 from news.lib.utils.time_utils import epoch_seconds
 
@@ -51,11 +53,11 @@ class LinkQuery:
 
     @property
     def _cache_key(self):
-        return "query:{}.{}.{}".format(self.feed_id, self.sort, self.time)
+        return "cquery:{}.{}.{}".format(self.feed_id, self.sort, self.time)
 
     @property
     def _lock_key(self):
-        return "lock:q:{}.{}.{}".format(self.feed_id, self.sort, self.time)
+        return "lock:cquery:{}.{}.{}".format(self.feed_id, self.sort, self.time)
 
     def _save(self):
         """
@@ -82,7 +84,7 @@ class LinkQuery:
         Delete given links from query
         :param links: links
         """
-        with Lock(conn, self._lock_key):
+        with Lock(cache.conn, self._lock_key):
             # fetch fresh data from cache
             data = cache.get(self._cache_key) or []
             lids = set(x.id for x in links)
@@ -99,7 +101,7 @@ class LinkQuery:
         :return: updated list of [id, sort value...] tuples
         """
         # read - write - modify
-        with Lock(conn, self._lock_key):
+        with Lock(cache.conn, self._lock_key):
             data = cache.get(self._cache_key) or []
             item_tuples = [self._tupler(link) for link in links] or []
 

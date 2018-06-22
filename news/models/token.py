@@ -1,9 +1,9 @@
 from base64 import urlsafe_b64encode
 from os import urandom
 
-from orator import Model
+from orator import Model, Schema
 
-from news.lib.db.db import schema
+from news.lib.db.db import db
 
 
 def generate_token(size):
@@ -18,6 +18,7 @@ class DisposableToken(Model):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('tokens')
         with schema.create('tokens') as table:
             table.string('id', 40)

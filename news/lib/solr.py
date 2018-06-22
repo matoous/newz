@@ -2,7 +2,7 @@ import pysolr as pysolr
 from rq.decorators import job
 
 from news.lib.app import app
-from news.lib.queue import redis_conn
+from news.lib.task_queue import redis_conn
 
 linksolr = pysolr.Solr(app.config['SOLR_URL'] + '/links', timeout=10)
 usersolr = pysolr.Solr(app.config['SOLR_URL'] + '/users', timeout=10)

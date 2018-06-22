@@ -1,7 +1,7 @@
 from typing import Optional
 
 from flask_wtf import Form
-from orator import mutator
+from orator import mutator, Schema
 from orator.orm import belongs_to_many
 from rq.decorators import job
 from slugify import slugify
@@ -9,9 +9,9 @@ from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length
 from markdown2 import markdown
 
-from news.lib.cache import cache, conn
-from news.lib.db.db import schema
-from news.lib.queue import redis_conn, q
+from news.lib.cache import cache, cache
+from news.lib.db.db import db
+from news.lib.task_queue import redis_conn, q
 from news.lib.solr import add_feed_to_search
 from news.models.base import Base, CACHE_EXPIRE_TIME
 from news.models.link import Link
@@ -24,6 +24,7 @@ class Feed(Base):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('feeds')
         with schema.create('feeds') as table:
             table.increments('id').unsigned()
@@ -61,8 +62,8 @@ class Feed(Base):
         """
         cache_key = 'fslug:{}'.format(slug)
 
-        # check username cache
-        in_cache = conn.get(cache_key)
+        # check feed slug cache
+        in_cache = cache.get(cache_key, raw=True)
         uid = int(in_cache) if in_cache else None
 
         # return user on success
@@ -74,8 +75,8 @@ class Feed(Base):
 
         # cache the result
         if feed is not None:
-            conn.set(cache_key, feed.id)
-            conn.expire(cache_key, CACHE_EXPIRE_TIME)
+            cache.set(cache_key, feed.id, raw=True)
+            cache.expire(cache_key, CACHE_EXPIRE_TIME)
             feed.write_to_cache()
 
         return feed

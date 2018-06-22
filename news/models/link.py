@@ -1,16 +1,16 @@
 from flask_wtf import Form
-from orator import Model, accessor
+from orator import Model, accessor, Schema
 from orator.exceptions.query import QueryException
 from orator.orm import morph_many
 from slugify import slugify
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, URL
 
-from news.lib.cache import cache, conn
-from news.lib.db.db import schema
+from news.lib.cache import cache, cache
+from news.lib.db.db import db
 from news.lib.db.query import add_to_queries
 from news.lib.db.sorts import sorts
-from news.lib.queue import q
+from news.lib.task_queue import q
 from news.lib.solr import new_link_queue
 from news.lib.sorts import hot
 from news.models.base import Base
@@ -27,6 +27,7 @@ class Link(Base):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('links')
         with schema.create('links') as table:
             table.big_increments('id').unsigned()
@@ -76,12 +77,13 @@ class Link(Base):
     @classmethod
     def by_slug(cls, slug):
         # TODO should be by slug and feed id so the slugs dont have to be unique
-        id = cache.get("link_id:{}".format(slug))
+        cache_key = "lslug:{}".format(slug)
+        id = cache.get(cache_key, raw=True)
 
         if id is None:
             link = Link.where('slug', slug).first()
             id = link.id if link is not None else ""
-            cache.set('lstoid:{}'.format(slug), id)
+            cache.set(cache_key, id, raw=True)
 
         if id == "":
             return None
@@ -133,6 +135,7 @@ class Link(Base):
 
         # cache needs array of objects, not a orator collection
         res = [f for f in q.limit(1000).get()]
+        # TODO this is stupid
         cache.set(cache_key, res)
         return res
 

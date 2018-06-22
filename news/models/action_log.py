@@ -1,4 +1,6 @@
-from news.lib.db.db import schema
+from orator import Schema
+
+from news.lib.db.db import db
 
 
 class Action:
@@ -11,6 +13,7 @@ class Action:
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('actions')
         with schema.create('actions') as table:
             table.increments('id').unsigned()

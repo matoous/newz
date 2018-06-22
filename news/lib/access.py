@@ -18,6 +18,11 @@ def feed_admin_required(func):
     return check
 
 def not_banned(func):
+    """
+    Check that user is not banned from given feed
+    :param func: view to wrap
+    :return: wrapped view
+    """
     @wraps(func)
     def check(feed, *args, **kwargs):
         from news.models.ban import Ban

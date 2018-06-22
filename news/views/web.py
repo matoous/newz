@@ -11,7 +11,7 @@ from news.models.link import Link
 
 web = Blueprint('web', __name__, template_folder='/templates')
 
-DEFAULT_FEEDS = [i for i in range(50)]
+DEFAULT_FEEDS = [1,2,6,7]
 
 
 @web.route('/')

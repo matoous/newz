@@ -1,7 +1,7 @@
 from rq.decorators import job
 
 from news.lib.db.query import LinkQuery
-from news.lib.queue import redis_conn
+from news.lib.task_queue import redis_conn
 
 
 @job('medium', connection=redis_conn)

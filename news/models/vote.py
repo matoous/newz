@@ -1,11 +1,11 @@
-from orator import Model, accessor
+from orator import Model, accessor, Schema
 from orator.orm import belongs_to
 
-from news.lib.cache import cache, conn
+from news.lib.cache import cache
 from news.lib.cache_updates import update_link
 from news.lib.comments import update_comment
-from news.lib.db.db import schema
-from news.lib.queue import q
+from news.lib.db.db import db
+from news.lib.task_queue import q
 from news.models.comment import Comment
 from news.models.link import Link
 from news.models.user import User
@@ -74,6 +74,7 @@ class LinkVote(Vote):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('link_votes')
         with schema.create('link_votes') as table:
             table.integer('user_id').unsigned()
@@ -108,12 +109,11 @@ class LinkVote(Vote):
     @classmethod
     def by_link_and_user(cls, link_id, user_id):
         cache_key = cls._cache_key(link_id, user_id)
-        vote = conn.get(cache_key)
-        return loads(vote) if vote else None
+        return cache.get(cache_key)
 
     def _write_to_cache(self):
         cache_key = LinkVote._cache_key(self.link_id, self.user_id)
-        conn.set(cache_key, dumps(self, protocol=HIGHEST_PROTOCOL))
+        cache.set(cache_key, self)
 
     def apply(self):
         previous_vote = LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).first()
@@ -149,6 +149,7 @@ class CommentVote(Vote):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('comment_votes')
         with schema.create('comment_votes') as table:
             table.integer('user_id').unsigned()
@@ -177,12 +178,11 @@ class CommentVote(Vote):
     @classmethod
     def by_comment_and_user(cls, comment_id, user_id):
         cache_key = cls._cache_key(comment_id, user_id)
-        vote = conn.get(cache_key)
-        return loads(vote) if vote else None
+        return cache.get(cache_key)
 
     def _write_to_cache(self):
         cache_key = CommentVote._cache_key(self.comment_id, self.user_id)
-        conn.set(cache_key, dumps(self, protocol=HIGHEST_PROTOCOL))
+        cache.set(cache_key, self)
 
     def apply(self):
         previous_vote = CommentVote.where('user_id', self.user_id).where('comment_id', self.comment_id).first()

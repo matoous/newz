@@ -4,7 +4,7 @@ from flask import request
 from flask_login import current_user
 from werkzeug.exceptions import abort
 
-from news.lib.cache import conn
+from news.lib.cache import cache
 
 
 def rate_limit(prefix, limit, seconds, limit_user=True, limit_ip=True, key_func=None):
@@ -31,11 +31,11 @@ def rate_limit(prefix, limit, seconds, limit_user=True, limit_ip=True, key_func=
 
             # check limits
             for limit_key in to_limit:
-                val = conn.incr(limit_key)
+                val = cache.incr(limit_key)
 
                 # limit is new or expired before
                 if val == 1:
-                    conn.expire(limit_key, seconds)
+                    cache.expire(limit_key, seconds)
 
                 # limit surpassed
                 elif val > limit:

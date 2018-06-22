@@ -1,15 +1,17 @@
+from pickle import dumps, loads
+
 from flask_wtf import Form
 from markdown2 import markdown
-from orator import accessor
+from orator import accessor, Schema
 from orator.orm import has_many, morph_many
 from redis_lock import Lock
 from wtforms import HiddenField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
-from news.lib.cache import cache, conn
+from news.lib.cache import cache, cache
 from news.lib.comments import add_new_comment
-from news.lib.db.db import schema
-from news.lib.queue import q
+from news.lib.db.db import db
+from news.lib.task_queue import q
 from news.lib.utils.confidence import confidence
 from news.models.base import Base
 from news.models.report import Report
@@ -24,6 +26,7 @@ class Comment(Base):
         """
         Creates database table for comments
         """
+        schema = Schema(db)
         schema.drop_if_exists('comments')
         with schema.create('comments') as table:
             table.big_increments('id').unsigned()
@@ -122,24 +125,6 @@ class Comment(Base):
         self.ups = self.downs = 0
         q.enqueue(add_new_comment, self.link, self, result_ttl=0)
 
-    @classmethod
-    def by_id(cls, id):
-        """
-        Gets comment by id from cache
-        Writes comment to cache on cache miss
-        :param id: comment id
-        :return: comment
-        """
-        c = cls.load_from_cache(id)
-        if c is not None:
-            return c
-        c = cls.where('id', id).first()
-
-        if c is not None:
-            c.write_to_cache()
-            conn.expire(c._cache_key, 7 * 24 * 60 * 60)  # expire after week
-        return c
-
     @property
     def route(self):
         return "/c/{}".format(self.id)
@@ -189,7 +174,7 @@ class CommentTreeCache:
         :param link: link
         :param comment: comment
         """
-        with Lock(conn, cls._lock_key(link)):
+        with Lock(cache.conn, cls._lock_key(link)):
             tree = cls.load_tree(link)
             if not tree:
                 raise TreeNotBuildException
@@ -204,7 +189,7 @@ class CommentTreeCache:
         :param comments: comments
         :return:
         """
-        with Lock(conn, cls._lock_key(link)): # todo lock in CommentTree not here, so we dont fetch all comments more times on miss
+        with Lock(cache.conn, cls._lock_key(link)): # todo lock in CommentTree not here, so we dont fetch all comments more times on miss
             tree = {}
             for comment in comments:
                 tree.setdefault(comment.parent_id, []).append(comment.id)
@@ -214,8 +199,7 @@ class CommentTreeCache:
 
     @classmethod
     def load_tree(cls, link):
-        tree = cache.get(cls._cache_key(link))
-        return tree
+        return cache.get(cls._cache_key(link))
 
 
 class CommentTree:
@@ -295,7 +279,7 @@ class SortedComments:
         """
         cache_key = cls._cache_key(link, comment.parent_id)
         # update comment under read - write - modify lock
-        with Lock(conn, cls._lock_key(link, comment.parent_id)):
+        with Lock(cache.conn, cls._lock_key(link, comment.parent_id)):
             comments = cache.get(cache_key) or []
             added = False
 

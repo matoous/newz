@@ -1,10 +1,10 @@
 from flask_wtf import Form
-from orator import accessor
+from orator import accessor, Schema
 from wtforms import SelectField, HiddenField, TextAreaField
 from wtforms.validators import DataRequired
 
-from news.lib.cache import conn
-from news.lib.db.db import schema
+from news.lib.cache import cache
+from news.lib.db.db import db
 from news.models.base import Base
 
 
@@ -21,6 +21,7 @@ class Ban(Base):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('bans')
         with schema.create('bans') as table:
             table.string('reason')
@@ -67,7 +68,7 @@ class Ban(Base):
         self.write_to_cache()
 
     def write_to_cache(self):
-        conn.set(self.id, 'y')
+        cache.set(self.id, 'y')
 
     @classmethod
     def by_user_and_feed(cls, user, feed):
@@ -75,7 +76,7 @@ class Ban(Base):
 
     @classmethod
     def by_user_and_feed_id(cls, user_id, feed_id):
-        return conn.get(cls.cache_key(user_id, feed_id))
+        return cache.get(cls.cache_key(user_id, feed_id))
 
     @classmethod
     def by_user(cls, user):

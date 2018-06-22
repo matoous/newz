@@ -25,12 +25,19 @@ app.config['SOLR_URL'] = 'http://localhost:8983/solr'
 
 app.config['NAME'] = 'Never Ending News'
 
-def format_datetime(value, format='medium'):
-    if format == 'full':
-        format="d. MMMM y 'at' HH:mm"
-    elif format == 'medium':
-        format="dd.MM.y HH:mm"
-    return dates.format_datetime(value, format)
 
-app.jinja_env.filters['datetime'] = format_datetime
-app.url_map.converters['feed'] = FeedConverter
+app.config['ORATOR_DATABASES'] = {
+        'default': 'postgres',
+        'postgres': {
+            'driver': 'postgres',
+            'host': 'localhost',
+            'database': 'newsfeed',
+            'user': 'postgres',
+            'password': 'postgres',
+            'prefix': '',
+        },
+    }
+
+app.config['REDIS'] = {
+        'URL': 'redis://localhost:6379/10',
+    }
