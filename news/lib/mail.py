@@ -1,8 +1,7 @@
-from flask import render_template
+from flask import render_template, current_app
 from flask_mail import Mail, Message
 from rq.decorators import job
 
-from news.lib.app import app
 from news.lib.task_queue import redis_conn
 
 mail = Mail()
@@ -25,7 +24,7 @@ def registration_email(user, url):
     :return: prepared email
     """
     msg = Message("Please confirm your account",
-                  sender=app.config['MAIL_DEFAULT_SENDER'],
+                  sender=current_app.config['MAIL_DEFAULT_SENDER'],
                   recipients=[user.email])
     msg.body = render_template("mails/registration.txt", user=user, url=url)
     return msg
@@ -38,7 +37,7 @@ def reset_email(user, url):
     :return: prepared email
     """
     msg = Message("You can reset your password on following link",
-                  sender=app.config['MAIL_DEFAULT_SENDER'],
+                  sender=current_app.config['MAIL_DEFAULT_SENDER'],
                   recipients=[user.email])
     msg.body = render_template("mails/reset.txt", user=user, url=url, new_reset=app.config['ME'] + "/reset_password")
     return msg

@@ -2,7 +2,7 @@ import time
 
 from flask import Blueprint, request, redirect, render_template
 
-from news.lib.solr import linksolr, feedsolr
+from news.lib.solr import solr
 from news.models.feed import Feed
 from news.models.link import Link
 
@@ -14,13 +14,13 @@ def search():
     q = request.args.get('q')
 
     start = time.perf_counter()
-    x = linksolr.search('text:{} title:{}'.format(q, q), **{
+    x = solr.linksolr.search('text:{} title:{}'.format(q, q), **{
         'hl.fl': '*',
         'hl': 'on',
         'hl.snippets': 1,
         'hl.fragsize': 0,
     })
-    y = feedsolr.search('name:{} description:{}'.format(q, q), **{
+    y = solr.feedsolr.search('name:{} description:{}'.format(q, q), **{
         'hl.fl': '*',
         'hl': 'on',
         'hl.snippets': 1,

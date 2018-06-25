@@ -9,11 +9,11 @@ from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length
 from markdown2 import markdown
 
-from news.lib.cache import cache, cache
+from news.lib.cache import cache
 from news.lib.db.db import db
 from news.lib.task_queue import redis_conn, q
 from news.lib.solr import add_feed_to_search
-from news.models.base import Base, CACHE_EXPIRE_TIME
+from news.models.base import Base
 from news.models.link import Link
 
 
@@ -76,7 +76,6 @@ class Feed(Base):
         # cache the result
         if feed is not None:
             cache.set(cache_key, feed.id, raw=True)
-            cache.expire(cache_key, CACHE_EXPIRE_TIME)
             feed.write_to_cache()
 
         return feed

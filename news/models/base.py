@@ -81,10 +81,8 @@ class Base(Model):
         __hidden__ attribute on class (more in documentation of orator)
         """
         # save token to redis for limited time
-        pipe = cache.pipeline()
-        pipe.set(self._cache_key, dumps(self.serialize()))
-        pipe.expire(self._cache_key, CACHE_EXPIRE_TIME)
-        pipe.execute()
+        cache.set(self._cache_key, self.serialize())
+
 
     @classmethod
     def load_from_cache(cls, id: str) -> object:

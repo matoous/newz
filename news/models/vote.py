@@ -9,7 +9,6 @@ from news.lib.task_queue import q
 from news.models.comment import Comment
 from news.models.link import Link
 from news.models.user import User
-from pickle import dump, dumps, HIGHEST_PROTOCOL, loads
 
 UPVOTE = 1
 UNVOTE = 0
@@ -90,6 +89,9 @@ class LinkVote(Vote):
     def __ne__(self, other):
         return not self == other
 
+    def __repr__(self):
+        return "<LinkVote {}:{} {}>".format(self.user_id, self.link_id, self.vote_type)
+
     @accessor
     def user(self):
         return User.by_id(self.user_id)
@@ -112,8 +114,8 @@ class LinkVote(Vote):
         return cache.get(cache_key)
 
     def _write_to_cache(self):
-        cache_key = LinkVote._cache_key(self.link_id, self.user_id)
-        cache.set(cache_key, self)
+        cache_key = self.__class__._cache_key(self.link_id, self.user_id)
+        cache.set(cache_key, self, ttl=0)
 
     def apply(self):
         previous_vote = LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).first()
@@ -146,6 +148,9 @@ class CommentVote(Vote):
 
     def thing(self):
         return None
+
+    def __repr__(self):
+        return "<CommentVote {}:{} {}>".format(self.user_id, self.comment_id, self.vote_type)
 
     @classmethod
     def create_table(cls):
@@ -181,8 +186,8 @@ class CommentVote(Vote):
         return cache.get(cache_key)
 
     def _write_to_cache(self):
-        cache_key = CommentVote._cache_key(self.comment_id, self.user_id)
-        cache.set(cache_key, self)
+        cache_key = self.__class__._cache_key(self.comment_id, self.user_id)
+        cache.set(cache_key, self, ttl=0)
 
     def apply(self):
         previous_vote = CommentVote.where('user_id', self.user_id).where('comment_id', self.comment_id).first()

@@ -3,6 +3,7 @@ from pickle import dumps, loads
 from secrets import token_urlsafe
 from typing import Optional, List
 
+from flask import current_app
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import Form
 from orator import accessor, Schema
@@ -12,9 +13,7 @@ from wtforms import StringField, PasswordField, SelectField, IntegerField, TextA
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import DataRequired, URL, Length, ValidationError
 
-from news.config.config import GODS
-from news.lib.app import app
-from news.lib.cache import cache, cache
+from news.lib.cache import cache
 from news.lib.db.db import db
 from news.lib.login import login_manager
 from news.lib.mail import reset_email, send_mail
@@ -22,7 +21,7 @@ from news.lib.task_queue import redis_conn, q
 from news.lib.validators import UniqueUsername, UniqueEmail
 from news.lib.verifications import EmailVerification
 from news.models.ban import Ban
-from news.models.base import Base, CACHE_EXPIRE_TIME
+from news.models.base import Base
 from news.models.feed_admin import FeedAdmin
 from news.models.token import DisposableToken
 
@@ -109,9 +108,7 @@ class User(Base):
         token = DisposableToken.get()
         self._accessor_cache['session_token'] = token.id
         session_key = 'us:{}'.format(self.session_token)
-        cache.set(session_key, self.id)
-        if not remember_me:
-            cache.expire(session_key, 60 * 60 * 2)
+        cache.set(session_key, self.id, ttl=0 if remember_me else 60 * 60 * 2, raw=True)
         login_user(self, remember=remember_me)
 
     def logout(self):
@@ -150,7 +147,7 @@ class User(Base):
     @staticmethod
     @login_manager.user_loader
     def load_user(session_id: str) -> Optional['User']:
-        user_id = cache.get('us:{}'.format(session_id))
+        user_id = cache.get('us:{}'.format(session_id), raw=True)
 
         if not user_id:
             return None
@@ -285,7 +282,6 @@ class User(Base):
         # cache the result
         if u is not None:
             cache.set(cache_key, u.id, raw=True)
-            cache.expire(cache_key, CACHE_EXPIRE_TIME)
             u.write_to_cache()
 
         return u
@@ -293,7 +289,7 @@ class User(Base):
     def is_god(self) -> bool:
         if not self.is_authenticated:
             return False
-        return self.username in GODS
+        return self.username in current_app.config['GODS']
 
     def is_feed_admin(self, feed: object) -> bool:
         if not self.is_authenticated:
@@ -481,7 +477,7 @@ class PasswordReset:
         Checks if given verification exists
         :return:
         """
-        return redis_conn.get(self._cache_key) is not None
+        return cache.get(self._cache_key, raw=True) is not None
 
     @property
     def user_id(self):
@@ -489,7 +485,7 @@ class PasswordReset:
         Returns ID of user for whom this verification applies
         :return: user ID
         """
-        return int(redis_conn.get(self._cache_key))
+        return int(cache.get(self._cache_key, raw=True))
 
     @property
     def _cache_key(self):
@@ -505,7 +501,7 @@ class PasswordReset:
         Formatted URL with verification link
         :return:
         """
-        return "{}/reset_password/{}".format(app.config['ME'], self.token)
+        return "{}/reset_password/{}".format(current_app.config['ME'], self.token)
 
     def create(self):
         """
@@ -517,10 +513,7 @@ class PasswordReset:
         self.token = token_urlsafe(16)
 
         # save token to redis for limited time
-        pipe = redis_conn.pipeline()
-        pipe.set(self._cache_key, self.user.id)
-        pipe.expire(self._cache_key, PASSWORD_RESET_EXPIRE)
-        pipe.execute()
+        cache.set(self._cache_key, self.user.id, ttl=PASSWORD_RESET_EXPIRE, raw=True)
 
         # send email with verification link
         msg = reset_email(self.user, self._url)

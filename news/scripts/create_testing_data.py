@@ -1,5 +1,8 @@
+from pickle import dumps
+
 from slugify import slugify
 
+from news.lib.cache import cache
 from news.models.feed import Feed
 from news.models.link import Link
 from news.models.user import User
@@ -132,10 +135,19 @@ def importHN():
             pass
 
 def loadVotes():
+    print('Loading CommentVotes to cache...')
     cvotes = CommentVote.get()
+    pipe = cache.pipeline()
     for v in cvotes:
-        v._write_to_cache()
+        cache_key = CommentVote._cache_key(v.comment_id, v.user_id)
+        pipe.set(cache_key, dumps(v))
+    pipe.execute()
+    print('Done')
 
+    print('Loading LinkVotes to cache...')
     lvotes = LinkVote.get()
     for v in lvotes:
-        v._write_to_cache()
+        cache_key = LinkVote._cache_key(v.link_id, v.user_id)
+        pipe.set(cache_key, dumps(v))
+    pipe.execute()
+    print('Done')

@@ -3,7 +3,7 @@ from pickle import dumps, loads
 from redis_lock import Lock
 from rq.decorators import job
 
-from news.lib.cache import cache, cache
+from news.lib.cache import cache
 from news.lib.db.sorts import sorts
 from news.lib.task_queue import redis_conn
 from news.lib.sorts import sort_tuples
