@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, render_template
+from flask import abort, render_template
 from flask_login import login_required, current_user
 
 from news.lib.pagination import paginate
@@ -7,11 +7,8 @@ from news.models.feed_admin import FeedAdmin
 from news.models.link import Link, SavedLink
 from news.models.user import User
 
-user_blueprint = Blueprint('user', __name__, template_folder='/templates')
 
-
-@user_blueprint.route("/u/<username>")
-def get_users_profile(username):
+def users_profile(username):
     user = User.by_username(username)
     if user is None:
         abort(404)
@@ -27,8 +24,7 @@ def get_users_profile(username):
                            administrations=administrations)
 
 
-@user_blueprint.route("/u/<username>/comments")
-def get_users_comments(username):
+def users_comments(username):
     user = User.by_username(username)
     if user is None:
         abort(404)
@@ -36,8 +32,7 @@ def get_users_comments(username):
     return render_template("profile_comments.html", user=user, comments=comments, less_comments=less, more_comments=more)
 
 
-@user_blueprint.route("/u/<username>/posts")
-def get_users_posts(username):
+def users_posts(username):
     user = User.by_username(username)
     if user is None:
         abort(404)
@@ -45,9 +40,8 @@ def get_users_posts(username):
     return render_template("profile_posts.html", user=user, links=links, less_links=less, more_links=more)
 
 
-@user_blueprint.route("/saved")
 @login_required
-def get_saved_links():
+def saved_links():
     saved_links = SavedLink.by_user(current_user)
     links, less, more = paginate(saved_links, 20)
     return render_template("saved_links.html", user=current_user, links=links, less_links=less, more_links=more)

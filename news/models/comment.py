@@ -127,7 +127,7 @@ class Comment(Base):
 
     @property
     def route(self):
-        return "/c/{}".format(self.id)
+        return '/c/{}'.format(self.id)
 
     # TODO implement delete(self) so the comments get actually removed or just change the test to [REMOVED] or smthng
 

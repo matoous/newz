@@ -518,3 +518,6 @@ class PasswordReset:
         # send email with verification link
         msg = reset_email(self.user, self._url)
         q.enqueue(send_mail, msg, result_ttl=0)
+
+    def delete(self):
+        cache.delete(self._cache_key)

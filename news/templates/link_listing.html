@@ -3,7 +3,7 @@
         <div class="link-text">
             {% if not single_feed %}
                 <div class="link-feed">
-                    <a href="/f/{{ link.feed.slug }}">
+                    <a href="{{ link.feed.route }}">
                         {{ link.feed.name }}
                     </a>
                 </div>
@@ -20,13 +20,13 @@
             {% endif %}
             <div class="bottom-line">
                 <div class="comments">
-                    <a href="/f/{{ link.feed.slug }}/{{ link.slug }}">{{ link.comments_count }} comments</a>
+                    <a href="{{ link.route }}">{{ link.comments_count }} comments</a>
                 </div>
                 <div class="date">
                     {{ link.time_ago() }}
                 </div>
                 <div class="author">
-                    by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
+                    by <a href="{{ link.user.route }}">{{ link.user.name }}</a>
                 </div>
                 {% if current_user.is_authenticated %}
                     <div class="options">
@@ -37,7 +37,7 @@
                 {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                     <div class="admin-options">
                         <span>Admin:</span>
-                        <a href="/f/{{ link.feed.slug }}/remove">
+                        <a href="{{ link.feed.route }}/remove">
                             remove
                         </a>
                         <a href="{{ link.feed.route }}/reports">
@@ -50,11 +50,11 @@
         <div class="link-rating">
             <div class="up">
                 {% if link.vote_by(current_user) and link.vote_by(current_user).is_upvote %}
-                    <a href="/l/{{ link.slug }}/vote/unvote">
+                    <a href="{{ link.route }}/vote/unvote">
                         <img class="voted" src="/static/images/play-clicked.svg">
                     </a>
                 {% else %}
-                    <a href="/l/{{ link.slug }}/vote/upvote">
+                    <a href="{{ link.route }}/vote/upvote">
                         <img src="/static/images/play.svg">
                     </a>
                 {% endif %}
@@ -64,11 +64,11 @@
             </div>
             <div class="down">
                 {% if link.vote_by(current_user) and link.vote_by(current_user).is_downvote %}
-                    <a href="/l/{{ link.slug }}/vote/unvote">
+                    <a href="{{ link.route }}/vote/unvote">
                         <img class="voted" src="/static/images/play-clicked.svg">
                     </a>
                 {% else %}
-                    <a href="/l/{{ link.slug }}/vote/downvote">
+                    <a href="{{ link.route }}/vote/downvote">
                         <img src="/static/images/play.svg">
                     </a>
                 {% endif %}

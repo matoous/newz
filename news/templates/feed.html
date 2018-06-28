@@ -24,20 +24,20 @@
                 {% if current_user.is_authenticated %}
                     {% if subscribed %}
                         <div>
-                            <a href="/f/{{ feed.slug }}/unsubscribe">Unsubscribe</a>
+                            <a href="{{ feed.route }}/unsubscribe">Unsubscribe</a>
                         </div>
                     {% else %}
                         <div>
-                            <a href="/f/{{ feed.slug }}/subscribe">Subscribe</a>
+                            <a href="{{ feed.route }}/subscribe">Subscribe</a>
                         </div>
                     {% endif %}
                     {% if current_user.is_feed_admin(feed) %}
                         <div>
-                            <a href="/f/{{ feed.slug }}/admin">Admin</a>
+                            <a href="{{ feed.route }}/admin">Admin</a>
                         </div>
                     {% endif %}
                     <div>
-                        <a href="/f/{{ feed.slug }}/add">Submit</a>
+                        <a href="{{ feed.route }}/add">Submit</a>
                     </div>
                     <div>
                         <a id="description-trigger" href="" onclick="triggerFeedDescription(); return false;">Display
@@ -52,17 +52,17 @@
                         <div class="selected-sort">{{ sort }}</div>
                         <ul>
                             <li class="{% if sort == 'trending' %}selected{% endif %}">
-                                <a href="/f/{{ feed.slug }}/trending">
+                                <a href="{{ feed.route }}/trending">
                                     Trending
                                 </a>
                             </li>
                             <li class="{% if sort == 'new' %}selected{% endif %}">
-                                <a href="/f/{{ feed.slug }}/new">
+                                <a href="{{ feed.route }}/new">
                                     New
                                 </a>
                             </li>
                             <li class="{% if sort == 'best' %}selected{% endif %}">
-                                <a href="/f/{{ feed.slug }}/best">
+                                <a href="{{ feed.route }}/best">
                                     Best
                                 </a>
                             </li>

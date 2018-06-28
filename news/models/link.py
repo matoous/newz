@@ -150,7 +150,7 @@ class Link(Base):
 
     @property
     def route(self):
-        return "/f/{}/{}".format(self.feed.slug, self.slug)
+        return "/l/{}".format(self.slug)
 
 
 

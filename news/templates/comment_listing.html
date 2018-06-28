@@ -1,12 +1,12 @@
 <div class="single-comment">
     <div class="link-name">
-        <a href="/f/{{ comment.link.feed.slug }}/{{ comment.link.slug }}">
+        <a href="{{ comment.link.route }}">
             {{ comment.link.title }}
         </a>
         |
-        by <a href="/u/{{ comment.link.user.username }}">{{ comment.link.user.name }}</a>
+        by <a href="{{ comment.link.user.route }}">{{ comment.link.user.name }}</a>
         |
-        <a href="/f/{{ comment.link.feed.slug }}">
+        <a href="{{ comment.link.feed.route }}">
             {{ comment.link.feed.name }}
         </a>
     </div>
@@ -14,22 +14,22 @@
         <div class="comment-voting">
             <div class="up">
                 {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_upvote %}
-                <a href="/c/{{ comment.id }}/vote/unvote">
+                <a href="{{ comment.route }}/vote/unvote">
                     <img src="/static/images/play-light.svg">
                 </a>
                 {% else %}
-                <a href="/c/{{ comment.id }}/vote/upvote">
+                <a href="{{ comment.route }}/vote/upvote">
                     <img src="/static/images/play-light.svg">
                 </a>
                 {% endif %}
             </div>
             <div class="down">
                 {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_downvote %}
-                <a href="/c/{{ comment.id }}/vote/unvote">
+                <a href="{{ comment.route }}/vote/unvote">
                     <img src="/static/images/play-light.svg">
                 </a>
                 {% else %}
-                <a href="/c/{{ comment.id }}/vote/downvote">
+                <a href="{{ comment.route }}/vote/downvote">
                     <img src="/static/images/play-light.svg">
                 </a>
                 {% endif %}
@@ -38,7 +38,7 @@
         <div class="comment-body">
             <div class="comment-header">
                             <span>
-                                <a href="/u/{{ comment.user.username }}">{{ comment.user.name }}</a>
+                                <a href="{{ comment.user.route }}">{{ comment.user.name }}</a>
                             </span>
                 <span>
                                 {{ comment.score }} points
@@ -52,7 +52,7 @@
             </div>
             <div class="comment-options">
                 <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a>
-                <a href="/c/{{ comment.id }}/report">report</a>
+                <a href="{{ comment.route }}/report">report</a>
             </div>
         </div>
     </div>

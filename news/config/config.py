@@ -24,18 +24,18 @@ def load_config(app):
     app.config['GODS'] = {'matoous'}
 
     # MAIL CONFIG
-    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+    app.config['MAIL_SERVER'] = get_string('MAIL_SERVER', 'smtp.gmail.com')
     app.config['MAIL_PORT'] = get_int('MAIL_PORT', 465)
     app.config['MAIL_USE_SSL'] = get_bool('MAIL_USE_SSL', True)
-    app.config['MAIL_USERNAME'] = 'matoousmaster@gmail.com'
-    app.config['MAIL_PASSWORD'] = 'wfrylwazkglasodn'
-    app.config['MAIL_DEFAULT_SENDER'] = 'matoousmaster@gmail.com'
-    app.config['MAIL_URL'] = app.config['URL']
-    app.config['CONTACT_EMAIL'] = 'contact' + "@" + app.config['MAIL_URL']
+    app.config['MAIL_USERNAME'] = get_string('matoousmaster@gmail.com')
+    app.config['MAIL_PASSWORD'] = get_string('wfrylwazkglasodn')
+    app.config['MAIL_DEFAULT_SENDER'] = get_string('matoousmaster@gmail.com')
+    app.config['MAIL_URL'] = get_string('MAIL_URL', app.config['URL'])
+    app.config['CONTACT_EMAIL'] = "{}@{}".format(get_string('CONTACT_EMAIL', 'contact'), app.config['MAIL_URL'])
 
 
     # SENTRY CONFIG
-    app.config['DSN'] = 'https://12a16a3e55454d369b85ae76b8d70db2:32c22327ed7a407baa89f5e212f86cd0@sentry.io/1186847'
+    app.config['DSN'] = get_string('SENTRY_URL', 'https://12a16a3e55454d369b85ae76b8d70db2:32c22327ed7a407baa89f5e212f86cd0@sentry.io/1186847')
 
     # DATABASE CONFIG
     app.config['ORATOR_DATABASES'] = {
@@ -67,7 +67,9 @@ def register_functions(app):
         elif format == 'medium':
             format = "dd.MM.y HH:mm"
         return dates.format_datetime(value, format)
-
     app.jinja_env.filters['datetime'] = format_datetime
-    from news.lib.converters import FeedConverter
+
+    from news.lib.converters import FeedConverter, LinkConverter, CommentConverter
     app.url_map.converters['feed'] = FeedConverter
+    app.url_map.converters['link'] = LinkConverter
+    app.url_map.converters['comment'] = CommentConverter

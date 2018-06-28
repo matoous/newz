@@ -10,7 +10,7 @@
             <div class="link-card">
                 <div class="link-head">
                     <div class="link-feed">
-                        <a href="/f/{{ link.feed.slug }}">{{ link.feed.name }}</a>
+                        <a href="{{ link.feed.route }}">{{ link.feed.name }}</a>
                     </div>
                     <div class="link-title">
                         <h1>
@@ -26,12 +26,12 @@
                     {% endif %}
                     <div class="link-info">
                         <div class="rating">
-                            <a href="/l/{{ link.slug }}/vote/upvote">Upvote</a>
+                            <a href="{{ link.route }}/vote/upvote">Upvote</a>
                             {{ link.score }}
-                            <a href="/l/{{ link.slug }}/vote/downvote">Downvote</a>
+                            <a href="{{ link.route }}/vote/downvote">Downvote</a>
                         </div>
                         <div class="author">
-                            {{ link.time_ago() }} by <a href="/u/{{ link.user.username }}">{{ link.user.name }}</a>
+                            {{ link.time_ago() }} by <a href="{{ link.user.route }}">{{ link.user.name }}</a>
                             {% if link.user.profile_pic %}
                                 <img src="{{ link.user.profile_pic }}" class="profile-pic-small">
                             {% endif %}
@@ -40,7 +40,7 @@
                 </div>
                 {% if current_user.is_authenticated %}
                     <div class="link-add-comment">
-                        <form method="post" action="/f/{{ link.feed.slug }}/{{ link.slug }}/comment">
+                        <form method="post" action="{{ link.feed.route }}/{{ link.slug }}/comment">
                             {{ comment_form.text(rows='6', cols='60') }}
                             {{ comment_form.parent_id }}
                             {{ comment_form.csrf_token }}
@@ -55,22 +55,22 @@
                             <div class="comment-voting">
                                 <div class="up">
                                     {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_upvote %}
-                                        <a href="/c/{{ comment.id }}/vote/unvote">
+                                        <a href="{{ comment.route }}/vote/unvote">
                                             <img src="/static/images/play-light-filled.svg">
                                         </a>
                                     {% else %}
-                                        <a href="/c/{{ comment.id }}/vote/upvote">
+                                        <a href="{{ comment.route }}/vote/upvote">
                                             <img src="/static/images/play-light.svg">
                                         </a>
                                     {% endif %}
                                 </div>
                                 <div class="down">
                                     {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_downvote %}
-                                        <a href="/c/{{ comment.id }}/vote/unvote">
+                                        <a href="{{ comment.route }}/vote/unvote">
                                             <img src="/static/images/play-light-filled.svg">
                                         </a>
                                     {% else %}
-                                        <a href="/c/{{ comment.id }}/vote/downvote">
+                                        <a href="{{ comment.route }}/vote/downvote">
                                             <img src="/static/images/play-light.svg">
                                         </a>
                                     {% endif %}
@@ -79,7 +79,7 @@
                             <div class="comment-body">
                                 <div class="comment-header">
                             <span>
-                                <a href="/u/{{ comment.user.username }}">{{ comment.user.name }}</a>
+                                <a href="{{ comment.user.route }}">{{ comment.user.name }}</a>
                             </span>
                                     <span>
                                 {{ comment.score }} points
@@ -94,14 +94,14 @@
                                 <div class="comment-comment"></div>
                                 <div class="comment-options">
                                     <a href="#" onclick="return commentComment('{{ comment.id }}')">reply</a>
-                                    <a href="/c/{{ comment.id }}/report"
+                                    <a href="{{ comment.route }}/report"
                                        onclick="return reportComment({{ comment.id }})">report</a>
                                     {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                                         <div class="admin-options">
                                             <span>
                                                 Admin:
                                             </span>
-                                            <a href="/c/{{ comment.id }}/delete">
+                                            <a href="{{ comment.route }}/delete">
                                                 delete
                                             </a>
                                             <a href="{{ link.feed.route }}/reports/">

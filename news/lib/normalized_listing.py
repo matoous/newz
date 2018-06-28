@@ -3,6 +3,7 @@ import itertools
 from datetime import datetime
 
 from news.lib.db.query import LinkQuery
+from news.lib.metrics import REQUEST_TIME
 from news.lib.utils.time_utils import epoch_seconds
 
 MAX_LINKS = 1000
@@ -12,7 +13,7 @@ def trending_tuples(fid):
     query = LinkQuery(fid, 'trending')
     return [(-hot_score, link) for link, hot_score in query.fetch()]
 
-
+@REQUEST_TIME.time()
 def trending_links(ids):
     links_by_fids = {}
 

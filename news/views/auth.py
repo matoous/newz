@@ -1,14 +1,11 @@
-from flask import Blueprint, render_template, redirect, abort, flash, request
+from flask import render_template, redirect, abort, flash
 from flask_login import login_required, current_user
 
 from news.lib.ratelimit import rate_limit
 from news.lib.verifications import EmailVerification
 from news.models.user import SignUpForm, LoginForm, User, ResetForm, PasswordReset, SetPasswordForm
 
-auth = Blueprint('auth', __name__, template_folder='/templates')
 
-
-@auth.route("/join")
 def signup():
     """
     Sign Up new user
@@ -19,8 +16,8 @@ def signup():
 
     return render_template("signup.html", form=SignUpForm(), show_logo=True, hide_menues=True)
 
-@auth.route("/join", methods=['POST'])
-@rate_limit("join", 100, 60*60, limit_user=False, limit_ip=True)
+
+@rate_limit('join', 100, 60 * 60, limit_user=False, limit_ip=True)
 def post_signup():
     """
     Sign Up new user
@@ -38,8 +35,6 @@ def post_signup():
     return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
 
 
-
-@auth.route("/login")
 def login():
     """
     Get login form
@@ -50,8 +45,8 @@ def login():
 
     return render_template("login.html", form=LoginForm(), show_logo=True, hide_menues=True)
 
-@auth.route("/login", methods=["POST"])
-@rate_limit("login", 10, 300, limit_user=False, limit_ip=True)
+
+@rate_limit('login', 10, 300, limit_user=False, limit_ip=True)
 def post_login():
     """
     Login existing user
@@ -69,7 +64,6 @@ def post_login():
     return render_template("login.html", form=form, show_logo=True, hide_menues=True)
 
 
-@auth.route("/logout")
 @login_required
 def logout():
     """
@@ -80,8 +74,7 @@ def logout():
     return redirect('/')
 
 
-@auth.route("/reset_password")
-def reset():
+def reset_password():
     """
     Request password reset
     :return:
@@ -100,9 +93,8 @@ def reset():
     return render_template('reset.html', form=form)
 
 
-@auth.route("/reset_password", methods=["POST"])
-@rate_limit("mailaction", 5, 60*60, limit_user=False, limit_ip=True)
-def post_reset():
+@rate_limit('mail-action', 5, 60 * 60, limit_user=False, limit_ip=True)
+def post_reset_password():
     """
     Request password reset
     :return:
@@ -121,8 +113,7 @@ def post_reset():
     return render_template('reset.html', form=form)
 
 
-@auth.route("/reset_password/<token>", methods=['GET', 'POST'])
-def get_set_password(token):
+def set_password(token):
     """
     Set password after receiving reset email
     :return:
@@ -142,17 +133,17 @@ def get_set_password(token):
                 abort(404)
             user.set_password(form.password.data)
             user.save()
+            pr.delete()
             return redirect("/login")
 
     return render_template('reset_password.html', form=form, token=token)
 
 
-@auth.route("/verify/resend", methods=["POST"])
-@rate_limit("mailaction", 5, 60*60, limit_user=False, limit_ip=True)
+@rate_limit('mail-action', 5, 60 * 60, limit_user=False, limit_ip=True)
 def resend_verify():
+    # TODO
     pass
 
-@auth.route("/verify/<token>")
 def verify(token):
     """
     Verify users email

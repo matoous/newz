@@ -26,6 +26,26 @@ class Solr:
 
         self.logger = app.logger
 
+    def search_links(self, q, options=None):
+        if options is None:
+            options = {
+                'hl.fl': '*',
+                'hl': 'on',
+                'hl.snippets': 1,
+                'hl.fragsize': 0,
+            }
+        return self.linksolr.search('text:{} title:{}'.format(q, q), options)
+
+    def search_feeds(self, q, options=None):
+        if options is None:
+            options = {
+                'hl.fl': '*',
+                'hl': 'on',
+                'hl.snippets': 1,
+                'hl.fragsize': 0,
+            }
+        return self.feedsolr.search('name:{} description:{}'.format(q, q), options)
+
 solr = Solr()
 
 @job('medium', connection=redis_conn)

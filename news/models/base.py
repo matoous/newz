@@ -9,6 +9,8 @@ from news.lib.cache import cache
 from news.lib.db.db import db
 import timeago
 
+from news.lib.metrics import CACHE_HITS, CACHE_MISSES
+
 CACHE_EXPIRE_TIME = 12 * 60 * 60
 
 class Base(Model):
@@ -160,10 +162,12 @@ class Base(Model):
         # try to load from cache
         item = cls.load_from_cache(id)
         if item is not None:
+            CACHE_HITS.inc(1)
             return item
 
+        CACHE_MISSES.inc(1)
         # check db on fail
-        item = cls.where('id', id).first()
+        item = cls.where('id', int(id)).first()
         if item is not None:
             item.write_to_cache()
 

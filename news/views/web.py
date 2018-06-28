@@ -1,6 +1,8 @@
 from feedgen.feed import FeedGenerator
 from flask import Blueprint, render_template, request
 from flask_login import current_user
+from prometheus_client import core
+from prometheus_client.exposition import generate_latest
 
 from news.lib.normalized_listing import trending_links, best_links, new_links
 from news.lib.pagination import paginate
@@ -8,13 +10,9 @@ from news.lib.rss import rss_entries
 from news.models.forms import ContactUsForm
 from news.models.link import Link
 
-web = Blueprint('web', __name__, template_folder='/templates')
-
 DEFAULT_FEEDS = [1,2,6,7]
 
-
-@web.route('/')
-def get_home():
+def index():
     if current_user.is_authenticated:
         links = trending_links(current_user.subscribed_feed_ids)
     else:
@@ -28,9 +26,7 @@ def get_home():
                            more_links=has_more,
                            title="Home")
 
-
-@web.route('/rss')
-def get_home_rss():
+def index_rss():
     if current_user.is_authenticated:
         links = trending_links(current_user.subscribed_feed_ids)
     else:
@@ -52,8 +48,7 @@ def get_home_rss():
     return fg.rss_str(pretty=True)
 
 
-@web.route('/new')
-def get_new_links():
+def new():
     links = new_links(DEFAULT_FEEDS)
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
@@ -65,8 +60,7 @@ def get_new_links():
                            title="New")
 
 
-@web.route('/best')
-def get_best_links():
+def best():
     time = request.args.get('time')
     links = best_links(DEFAULT_FEEDS, time_limit=time if time else 'all')
     paginated_ids, has_less, has_more = paginate(links, 20)
@@ -79,8 +73,7 @@ def get_best_links():
                            title="Best")
 
 
-@web.route('/trending')
-def get_trending_links():
+def trending():
     links = trending_links(DEFAULT_FEEDS)
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
@@ -92,45 +85,25 @@ def get_trending_links():
                            title="Trending")
 
 
-@web.route('/how-it-works')
-def get_how_it_works():
+def how_it_works():
     return render_template("how_it_works.html")
 
-
-@web.route('/contact')
-def get_contact():
-    form = ContactUsForm()
-    return render_template("contact.html", form=form)
-
-
-@web.route('/contact', methods=['POST'])
-def post_contact():
-    form = ContactUsForm()
-    if form.validate_on_submit():
-        pass
-    return render_template("contact.html", form=form)
-
-
-@web.route('/help')
 def get_help():
     return render_template("help.html")
 
-
-@web.route('/terms')
-def get_terms():
+def terms():
     return render_template("terms.html")
 
-
-@web.route('/privacy')
-def get_privacy():
+def privacy():
     return render_template("privacy.html")
 
-
-@web.route('/rules')
-def get_rules():
+def rules():
     return render_template("rules.html")
 
-
-@web.route('/jobs')
-def get_jobs():
+def jobs():
     return render_template("jobs.html")
+
+def metrics():
+    registry = core.REGISTRY
+    output = generate_latest(registry)
+    return(output)

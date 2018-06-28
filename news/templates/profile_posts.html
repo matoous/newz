@@ -9,15 +9,15 @@
         <div class="container">
             <div class="profile-menu">
                 <div class="menu">
-                    <a href="/u/{{ user.username }}">
-                        About
-                    </a>
-                    <a href="/u/{{ user.username }}/posts">
-                        Posts
-                    </a>
-                    <a href="/u/{{ user.username }}/comments">
-                        Comments
-                    </a>
+                <a href="{{user.route}}">
+                    About
+                </a>
+                <a href="{{user.route}}/posts">
+                    Posts
+                </a>
+                <a href="{{user.route}}/comments">
+                    Comments
+                </a>
                 </div>
             </div>
             <div class="profile">

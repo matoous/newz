@@ -12,14 +12,49 @@ class FeedConverter(BaseConverter):
         from news.models.feed import Feed
         if value == "":
             abort(404)
-        f = Feed.by_slug(value)
-        if f is None:
+        feed = Feed.by_slug(value)
+        if feed is None:
             abort(404)
-        return f
+        return feed
 
     def to_url(self, value):
         return value.slug
 
+class LinkConverter(BaseConverter):
+    """
+    Converter for link
+    If converting from URL then converter takes link slug as param and returns link if found and aborts with
+    status not found if link is not found
+    """
+    def to_python(self, value):
+        from news.models.link import Link
+        if value == "":
+            abort(404)
+        link = Link.by_slug(value)
+        if link is None:
+            abort(404)
+        return link
+
+    def to_url(self, value):
+        return value.slug
+
+class CommentConverter(BaseConverter):
+    """
+    Converter for comment
+    If converting from URL then converter takes link slug as param and returns link if found and aborts with
+    status not found if link is not found
+    """
+    def to_python(self, value):
+        from news.models.comment import Comment
+        if value == "":
+            abort(404)
+        comment = Comment.by_id(value)
+        if comment is None:
+            abort(404)
+        return comment
+
+    def to_url(self, value):
+        return value.id
 
 class FeedsConverter(BaseConverter):
     def to_python(self, value):
