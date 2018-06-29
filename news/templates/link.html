@@ -25,11 +25,13 @@
                         </div>
                     {% endif %}
                     <div class="link-info">
-                        <div class="rating">
-                            <a href="{{ link.route }}/vote/upvote">Upvote</a>
-                            {{ link.score }}
-                            <a href="{{ link.route }}/vote/downvote">Downvote</a>
-                        </div>
+                        {% if not link.archived %}
+                            <div class="rating">
+                                <a href="{{ link.route }}/vote/upvote">Upvote</a>
+                                {{ link.score }}
+                                <a href="{{ link.route }}/vote/downvote">Downvote</a>
+                            </div>
+                        {% endif %}
                         <div class="author">
                             {{ link.time_ago() }} by <a href="{{ link.user.route }}">{{ link.user.name }}</a>
                             {% if link.user.profile_pic %}
@@ -38,7 +40,7 @@
                         </div>
                     </div>
                 </div>
-                {% if current_user.is_authenticated %}
+                {% if current_user.is_authenticated and not link.archived %}
                     <div class="link-add-comment">
                         <form method="post" action="{{ link.feed.route }}/{{ link.slug }}/comment">
                             {{ comment_form.text(rows='6', cols='60') }}
@@ -52,30 +54,32 @@
                     {% for comment_id, subcomments in comments recursive %}
                         {% set comment = get_comment(comment_id) %}
                         <div class="comment" id="c{{ comment.id }}">
-                            <div class="comment-voting">
-                                <div class="up">
-                                    {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_upvote %}
-                                        <a href="{{ comment.route }}/vote/unvote">
-                                            <img src="/static/images/play-light-filled.svg">
-                                        </a>
-                                    {% else %}
-                                        <a href="{{ comment.route }}/vote/upvote">
-                                            <img src="/static/images/play-light.svg">
-                                        </a>
-                                    {% endif %}
+                            {% if not link.archived %}
+                                <div class="comment-voting">
+                                    <div class="up">
+                                        {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_upvote %}
+                                            <a href="{{ comment.route }}/vote/unvote">
+                                                <img src="/static/images/play-light-filled.svg">
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ comment.route }}/vote/upvote">
+                                                <img src="/static/images/play-light.svg">
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="down">
+                                        {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_downvote %}
+                                            <a href="{{ comment.route }}/vote/unvote">
+                                                <img src="/static/images/play-light-filled.svg">
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ comment.route }}/vote/downvote">
+                                                <img src="/static/images/play-light.svg">
+                                            </a>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                <div class="down">
-                                    {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_downvote %}
-                                        <a href="{{ comment.route }}/vote/unvote">
-                                            <img src="/static/images/play-light-filled.svg">
-                                        </a>
-                                    {% else %}
-                                        <a href="{{ comment.route }}/vote/downvote">
-                                            <img src="/static/images/play-light.svg">
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
+                            {% endif %}
                             <div class="comment-body">
                                 <div class="comment-header">
                             <span>
@@ -91,25 +95,29 @@
                                 <div class="comment-text md">
                                     {{ comment.text|safe }}
                                 </div>
-                                <div class="comment-comment"></div>
-                                <div class="comment-options">
-                                    <a href="#" onclick="return commentComment('{{ comment.id }}')">reply</a>
-                                    <a href="{{ comment.route }}/report"
-                                       onclick="return reportComment({{ comment.id }})">report</a>
-                                    {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
-                                        <div class="admin-options">
+
+                                {% if not link.archived %}
+                                    <div class="comment-comment"></div>
+                                    <div class="comment-options">
+                                        <a href="#" onclick="return commentComment('{{ comment.id }}')">reply</a>
+                                        <a href="{{ comment.route }}/report"
+                                           onclick="return reportComment({{ comment.id }})">report</a>
+                                        {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
+                                            <div class="admin-options">
                                             <span>
                                                 Admin:
                                             </span>
-                                            <a href="{{ comment.route }}/delete">
-                                                delete
-                                            </a>
-                                            <a href="{{ link.feed.route }}/reports/">
-                                                {{ comment.reported }} reports
-                                            </a>
-                                        </div>
-                                    {% endif %}
-                                </div>
+                                                <a href="{{ comment.route }}/delete">
+                                                    delete
+                                                </a>
+                                                <a href="{{ link.feed.route }}/reports/">
+                                                    {{ comment.reported }} reports
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+
                                 {% if subcomments|length > 0 %}
                                     <div class="subcomments">
                                         {{ loop(subcomments) }}

@@ -11,7 +11,7 @@ from news.lib.ratelimit import rate_limit
 from news.lib.rss import rss_page
 from news.lib.utils.redirect import redirect_back
 from news.models.ban import BanForm, Ban
-from news.models.feed import FeedForm
+from news.models.feed import FeedForm, EditFeedForm
 from news.models.feed_admin import FeedAdmin
 from news.models.link import LinkForm, Link
 from news.models.report import Report
@@ -126,10 +126,10 @@ def unsubscribe(feed):
 
 
 @feed_admin_required
-def do_add_admin(feed):
+def add_admin(feed):
     #get new admin username
     username = request.form.get('username')
-    if not username or username == "":
+    if not username or username == '':
         abort(404)
 
     # check privileges
@@ -139,13 +139,13 @@ def do_add_admin(feed):
             abort(404)
         feed_admin = FeedAdmin.create(user_id=user.id,
                                       feed_id=feed.id)
-        return redirect("/f/{}/admins".format(feed.slug))
+        return redirect("{}/admins".format(feed.route))
     else:
         abort(403)
 
 
 @feed_admin_required
-def get_feed_admins(feed):
+def feed_admins(feed):
     """
     Get all feed admins
     :param feed: feed
@@ -156,16 +156,16 @@ def get_feed_admins(feed):
 
 
 @feed_admin_required
-def get_feed_admin(feed):
+def feed_admin(feed):
     """
     Get administration page
     User can change rules/description here etc
     :param feed: feed
     :return:
     """
-    form = FeedForm()
+    form = EditFeedForm()
     form.fill(feed)
-    return render_template("feed_admin.html", feed=feed, form=form)
+    return render_template('feed_admin.html', feed=feed, form=form)
 
 
 @feed_admin_required
@@ -175,7 +175,7 @@ def post_feed_admin(feed):
     :param feed: feed
     :return:
     """
-    form = FeedForm()
+    form = EditFeedForm()
 
     if form.validate():
         needs_update = False
@@ -193,11 +193,11 @@ def post_feed_admin(feed):
 
         return redirect('/f/{}/admin'.format(feed.slug))
 
-    return render_template("feed_admin.html", feed=feed, form=form)
+    return render_template('feed_admin.html', feed=feed, form=form)
 
 
 @feed_admin_required
-def get_feed_bans(feed):
+def feed_bans(feed):
     """
     Get bans on given feed
     :param feed: feed
@@ -208,7 +208,7 @@ def get_feed_bans(feed):
     return render_template("feed_bans.html", feed=feed, bans=bans)
 
 @feed_admin_required
-def get_feed_reports(feed):
+def feed_reports(feed):
     reports = []
 
     q = request.args.get('q', None)
@@ -221,7 +221,7 @@ def get_feed_reports(feed):
     else:
         reports = Report.where('feed_id', feed.id).order_by('created_at', 'desc').get()
 
-    return render_template("feed_reports.html", feed=feed, reports=reports)
+    return render_template('feed_reports.html', feed=feed, reports=reports)
 
 
 @feed_admin_required
@@ -237,7 +237,7 @@ def ban_user(feed, username):
 
 
 @feed_admin_required
-def handle_ban_user(feed, username):
+def post_ban_user(feed, username):
     user = User.by_username(username)
     if user is None:
         abort(404)

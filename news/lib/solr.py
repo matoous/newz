@@ -15,14 +15,14 @@ class Solr:
             self.init_app(app)
 
     def init_app(self, app):
-        if 'REDIS' not in app.config:
-            raise RuntimeError('Missing "REDIS" configuration')
+        if 'SOLR' not in app.config:
+            raise RuntimeError('Missing "SOLR" configuration')
 
         self._config = app.config['SOLR']
-
         self.linksolr = pysolr.Solr(self._config['URL'] + '/links', timeout=10)
         self.usersolr = pysolr.Solr(self._config['URL'] + '/users', timeout=10)
         self.feedsolr = pysolr.Solr(self._config['URL'] + '/feeds', timeout=10)
+
 
         self.logger = app.logger
 
@@ -34,7 +34,7 @@ class Solr:
                 'hl.snippets': 1,
                 'hl.fragsize': 0,
             }
-        return self.linksolr.search('text:{} title:{}'.format(q, q), options)
+        return self.linksolr.search('text:{} title:{}'.format(q, q), **options)
 
     def search_feeds(self, q, options=None):
         if options is None:
@@ -44,7 +44,7 @@ class Solr:
                 'hl.snippets': 1,
                 'hl.fragsize': 0,
             }
-        return self.feedsolr.search('name:{} description:{}'.format(q, q), options)
+        return self.feedsolr.search('name:{} description:{}'.format(q, q), **options)
 
 solr = Solr()
 

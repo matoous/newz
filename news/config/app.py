@@ -1,4 +1,6 @@
-from flask import Flask
+import time
+
+from flask import Flask, g
 
 from news.config.config import load_config, register_functions
 from news.config.routes import register_routes
@@ -7,6 +9,7 @@ from news.lib.db.db import db
 from news.lib.csrf import csrf
 from news.lib.login import login_manager
 from news.lib.mail import mail
+from news.lib.metrics import REQUEST_TIME
 from news.lib.sentry import sentry
 from news.lib.solr import solr
 
@@ -46,5 +49,18 @@ def make_app():
 
     #for feed in Feed.get():
     #   feed.commit()
+
+    # with app.app_context():
+    #     from news.models.report import Report
+    #     Report.create_table()
+
+    @app.before_request
+    def before_request():
+        g.start = time.time()
+
+    @app.teardown_request
+    def teardown_request(exception=None):
+        diff = time.time() - g.start
+        REQUEST_TIME.observe(diff)
 
     return app

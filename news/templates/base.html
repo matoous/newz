@@ -5,33 +5,46 @@
     <link href="https://fonts.googleapis.com/css?family=Lora|Roboto+Condensed:400,700" rel="stylesheet">
     <link rel="stylesheet" href="/static/stylesheets/main.css">
     <script type="application/javascript" src="/static/scripts/menu.js"></script>
-{% if md_parser %}
-    <script type="application/javascript" src="/static/scripts/snuownd.js"></script>
-{% endif %}
+    {% if md_parser %}
+        <script type="application/javascript" src="/static/scripts/snuownd.js"></script>
+    {% endif %}
 </head>
 
 <body>
 
-    {% include 'menu.html' %}
+{% include 'menu.html' %}
 
-    {% block body %}
-    {% endblock %}
-
-    <footer>
-        <div class="wrapper">
-            <div class="options">
-                <a href="/terms">Terms</a>
-                -
-                <a href="/privacy">Privacy policy</a>
-                -
-                <a href="/ads">Ads</a>
-                -
-                <a href="/jobs">Jobs</a>
-            </div>
-            <div class="copyright">
-                © Copyright 2017 - 2018, Matouš Dzivjak.
-            </div>
+{% set alert_num = 1 %}
+{% for category, msg in get_flashed_messages(with_categories=true) %}
+    <div class="alert {{ category }}" id="alert{{ alert_num }}">
+        <a href="" class="close-alert" onclick="document.getElementById('alert{{ alert_num }}').outerHTML = ''; return false;">
+            <img src="/static/images/x.svg" alt="x">
+        </a>
+        <div class="alert-text">
+			{{ msg }}
         </div>
-    </footer>
+    </div>
+    {% set count = alert_num + 1 %}
+{% endfor %}
+
+{% block body %}
+{% endblock %}
+
+<footer>
+    <div class="wrapper">
+        <div class="options">
+            <a href="/terms">Terms</a>
+            -
+            <a href="/privacy">Privacy policy</a>
+            -
+            <a href="/ads">Ads</a>
+            -
+            <a href="/jobs">Jobs</a>
+        </div>
+        <div class="copyright">
+            © Copyright 2017 - 2018, Matouš Dzivjak.
+        </div>
+    </div>
+</footer>
 </body>
 </html>

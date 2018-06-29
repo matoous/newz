@@ -57,3 +57,7 @@ Instalation:
 ### More
 [Kube CSS](https://imperavi.com/kube/docs/messages/)  
 [Configuring PostgreSQL](http://thebuild.com/presentations/not-your-job.pdf)
+
+### TODO list
+* archive links after month
+* allow flashing messages

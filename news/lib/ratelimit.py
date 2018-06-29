@@ -5,6 +5,7 @@ from flask_login import current_user
 from werkzeug.exceptions import abort
 
 from news.lib.cache import cache
+from news.lib.metrics import RATELIMIT_HITS
 
 
 def rate_limit(prefix, limit, seconds, limit_user=True, limit_ip=True, key_func=None):
@@ -39,6 +40,7 @@ def rate_limit(prefix, limit, seconds, limit_user=True, limit_ip=True, key_func=
 
                 # limit surpassed
                 elif val > limit:
+                    RATELIMIT_HITS.inc(1)
                     abort(429)
 
             return f(*args, **kwargs)
@@ -65,6 +67,7 @@ def rate_limit_ok(prefix, limit, seconds, limit_user=True, limit_ip=True, key_fu
 
         # limit surpassed
         elif val > limit:
+            RATELIMIT_HITS.inc(1)
             abort(429)
 
     return True

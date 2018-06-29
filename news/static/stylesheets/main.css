@@ -1105,4 +1105,21 @@ section {
   padding: 0;
   margin-bottom: 12px;
 }
+.alert {
+  display: block;
+  padding: 6px;
+  margin: 6px;
+  border-radius: 3px;
+  border: 1px solid #b4b4b4;
+}
+.alert .close-alert {
+  float: right;
+}
+.alert .close-alert img {
+  width: 18px;
+  height: 18px;
+}
+.alert .alert-text {
+  padding-right: 24px;
+}
 /*# sourceMappingURL=main.css.map */

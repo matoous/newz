@@ -5,6 +5,7 @@ from rq.decorators import job
 
 from news.lib.cache import cache
 from news.lib.db.sorts import sorts
+from news.lib.metrics import CACHE_MISSES, CACHE_HITS
 from news.lib.task_queue import redis_conn
 from news.lib.sorts import sort_tuples
 from news.lib.utils.time_utils import epoch_seconds
@@ -146,7 +147,10 @@ class LinkQuery:
         self._data = cache.get(self._cache_key)
 
         if self._data is None:
+            CACHE_MISSES.inc(1)
             self._rebuild()
+        else:
+            CACHE_HITS.inc(1)
 
         self._fetched = True
 

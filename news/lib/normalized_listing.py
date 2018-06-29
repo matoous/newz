@@ -13,7 +13,6 @@ def trending_tuples(fid):
     query = LinkQuery(fid, 'trending')
     return [(-hot_score, link) for link, hot_score in query.fetch()]
 
-@REQUEST_TIME.time()
 def trending_links(ids):
     links_by_fids = {}
 

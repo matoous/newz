@@ -90,6 +90,14 @@ def register_routes(app):
     from news.views.comments import do_comment_vote
     from news.views.links import do_vote
     from news.views.settings import settings
+    from news.views.feed import add_admin
+    from news.views.feed import feed_admins
+    from news.views.feed import feed_admin
+    from news.views.feed import post_feed_admin
+    from news.views.feed import feed_bans
+    from news.views.feed import feed_reports
+    from news.views.feed import ban_user
+    from news.views.feed import post_ban_user
     routes = [
         # WEB
         Route('/', index),
@@ -127,6 +135,16 @@ def register_routes(app):
         Route('/f/<feed:feed>/subscribe', subscribe),
         Route('/f/<feed:feed>/unsubscribe', unsubscribe),
 
+        # FEED ADMIN
+        Route('/f/<feed:feed>/admin', feed_admin),
+        Route('/f/<feed:feed>/admin', post_feed_admin, methods=['POST']),
+        Route('/f/<feed:feed>/add_admin', add_admin, methods=['POST']),
+        Route('/f/<feed:feed>/admins', feed_admins),
+        Route('/f/<feed:feed>/bans', feed_bans),
+        Route('/f/<feed:feed>/ban/<username>', ban_user),
+        Route('/f/<feed:feed>/ban/<username>', post_ban_user, methods=['POST']),
+        Route('/f/<feed:feed>/reports', feed_reports),
+
         # LINKS
         Route('/l/<link:link>', get_link),
         Route('/l/<link:link>/report', link_report),
@@ -137,7 +155,7 @@ def register_routes(app):
 
         # COMMENTS
         Route('/c/<comment:comment>/report', comment_report),
-        Route('/c/<comment:comment>/report', post_comment_report),
+        Route('/c/<comment:comment>/report', post_comment_report, methods=['POST']),
         Route('/c/<comment:comment>/remove', remove_comment),
         Route('/c/<comment:comment>/vote/<vote_str>', do_comment_vote),
 

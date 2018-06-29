@@ -35,7 +35,7 @@ def post_comment_report(comment):
         comment.reports().save(report)
         comment.incr('reported', 1)
 
-        flash("Thanks for your feedback!")
+        flash('Thanks for your feedback!')
         return redirect(comment.link.route)
 
     return render_template('report.html', thing=comment, feed=comment.link.feed, report_form=report_form)

@@ -86,8 +86,8 @@ def post_link_report(link):
         link.reports().save(report)
         link.incr('reported', 1)
 
-        flash("Thanks for your feedback!")
-        return redirect(redirect_back(link.route))
+        flash('Thanks for your feedback!')
+        return redirect(link.route) # todo safe users origin through the form to redirect him back
 
     return render_template('report.html', thing=link, feed=link.feed, report_form=report_form)
 

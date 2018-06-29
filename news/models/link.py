@@ -152,6 +152,13 @@ class Link(Base):
     def route(self):
         return "/l/{}".format(self.slug)
 
+    def archive(self):
+        with self.get_read_modify_write_lock():
+            self.archived = True
+            self.save()
+            self.write_to_cache()
+
+
 
 
 class LinkForm(Form):

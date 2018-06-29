@@ -165,6 +165,26 @@ class FeedForm(Form):
         self.description.data = feed.description
         self.rules.data = feed.rules
 
+class EditFeedForm(Form):
+    description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
+    rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
+
+
+    def __init__(self, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        self.feed = None
+
+    def validate(self):
+        rv = Form.validate(self)
+        if not rv:
+            return False
+        self.feed = Feed(name=self.name.data, description=self.description.data, slug=slugify(self.name.data))
+        return True
+
+    def fill(self, feed):
+        self.description.data = feed.description
+        self.rules.data = feed.rules
+
 @job('medium', connection=redis_conn)
 def handle_new_feed(feed):
     add_feed_to_search(feed)

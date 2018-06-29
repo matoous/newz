@@ -11,6 +11,7 @@ from wtforms.validators import DataRequired, Optional
 from news.lib.cache import cache, cache
 from news.lib.comments import add_new_comment
 from news.lib.db.db import db
+from news.lib.metrics import CACHE_MISSES, CACHE_HITS
 from news.lib.task_queue import q
 from news.lib.utils.confidence import confidence
 from news.models.base import Base
@@ -233,7 +234,10 @@ class CommentTree:
         """
         tree = CommentTreeCache.load_tree(link)
         if tree is None:
+            CACHE_MISSES.inc(1)
             tree = cls._rebuild(link)
+        else:
+            CACHE_HITS.inc(1)
         return cls(link, tree)
 
     @classmethod
@@ -310,9 +314,12 @@ class SortedComments:
 
         # cache miss, update
         if children_tuples is None:
+            CACHE_MISSES.inc(1)
             children = Comment.where('parent_id', comment_id).where('link_id', self.link.id).get()
             children_tuples = [(x.id, confidence(x.ups, x.downs)) for x in children]
             cache.set(self._cache_key(self.link, comment_id), children_tuples)
+        else:
+            CACHE_HITS.inc(1)
 
         return comment_id, [self.build_tree(children_id) for children_id, _ in children_tuples]
 

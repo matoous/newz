@@ -4,6 +4,7 @@ from rq.decorators import job
 
 from news.lib.task_queue import redis_conn
 
+# TODO create own Mail class, this source has last update 6 years ago
 mail = Mail()
 
 
