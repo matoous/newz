@@ -27,9 +27,9 @@ def load_config(app):
     app.config['MAIL_SERVER'] = get_string('MAIL_SERVER', 'smtp.gmail.com')
     app.config['MAIL_PORT'] = get_int('MAIL_PORT', 465)
     app.config['MAIL_USE_SSL'] = get_bool('MAIL_USE_SSL', True)
-    app.config['MAIL_USERNAME'] = get_string('matoousmaster@gmail.com')
-    app.config['MAIL_PASSWORD'] = get_string('wfrylwazkglasodn')
-    app.config['MAIL_DEFAULT_SENDER'] = get_string('matoousmaster@gmail.com')
+    app.config['MAIL_USERNAME'] = get_string('MAIL_USERNAME', 'matoousmaster@gmail.com')
+    app.config['MAIL_PASSWORD'] = get_string('MAIL_PASSWORD', 'wfrylwazkglasodn')
+    app.config['MAIL_DEFAULT_SENDER'] = get_string('MAIL_DEFAULT_SENDER', 'matoousmaster@gmail.com')
     app.config['MAIL_URL'] = get_string('MAIL_URL', app.config['URL'])
     app.config['CONTACT_EMAIL'] = "{}@{}".format(get_string('CONTACT_EMAIL', 'contact'), app.config['MAIL_URL'])
 

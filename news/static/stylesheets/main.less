@@ -8,18 +8,12 @@
 @import "search";
 @import "modal";
 
-@font-face {
-    font-family: 'DualisLite';
-    src:url('/static/fnt/DualisLite.ttf.woff') format('woff'),
-        url('/static/fnt/DualisLite.ttf.svg#DualisLite') format('svg'),
-        url('/static/fnt/DualisLite.ttf.eot'),
-        url('/static/fnt/DualisLite.ttf.eot?#iefix') format('embedded-opentype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 @blue: #0074D9;
 @yellow: #FFDC00;
+
+@custom-sans: 'Roboto', sans-serif;
+@custom-serif: Georgia, serif;
+@custom-small: 'Roboto Condensed', sans-serif;
 
 * {
   box-sizing: border-box;
@@ -35,15 +29,18 @@ html, body {
 }
 
 body {
-  font-family: 'Lora', serif;
+  font-family: @custom-serif;
   margin: 0;
 }
 
 h1 {
-  font-family: 'DualisLite', sans-serif;
-  font-weight: 300;
-  text-transform: uppercase;
+  font-family: @custom-small;
+  font-weight: 400;
   font-size: 52px;
+}
+
+h2, h3 {
+  font-family: @custom-small;
 }
 
 a {
@@ -114,6 +111,7 @@ section {
       font-size: 42px;
       font-weight: bold;
       transition: font-size .6s;
+      font-family: @custom-sans;
 
       a {
         color: black;
@@ -130,7 +128,7 @@ section {
     padding: 4px 20px;
     overflow: hidden;
     border-bottom: 1px solid #e5e5e5;
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: @custom-small;
     font-size: .8em;
     display: flex;
     width: 100%;
@@ -205,7 +203,7 @@ section {
   transition: all .3s ease-in-out 0s;
   border-left: 1px solid rgba(0,0,0,0.15);
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16);
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: @custom-small;
   font-weight: bold;
 
   &#feeds-nav {
@@ -342,7 +340,7 @@ section {
     flex-direction: row;
     margin-bottom: 32px;
     font-size: 1rem;
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: @custom-small;
     align-content: space-between;
     padding: 0 20px;
     .subscribe {
@@ -427,7 +425,7 @@ section {
   .link {
     margin-bottom: 16px;
     .link-feed {
-      font-family: 'Roboto Condensed', sans-serif;
+      font-family: @custom-small;
       font-size: .8em;
       margin-bottom: -2px;
     }
@@ -444,7 +442,7 @@ section {
       width: 42px;
       padding-left: 12px;
       font-size: .9rem;
-      font-family: 'Roboto Condensed', sans-serif;
+      font-family: @custom-small;
       text-align: center;
 
       .up {
@@ -472,13 +470,13 @@ section {
       }
     }
     .link-summ{
-      font-size: 0.875rem;
       margin-bottom: 6px;
+      color: #333;
     }
 
     .bottom-line {
       font-size: .8em;
-      font-family: 'Roboto Condensed', sans-serif;
+      font-family: @custom-small;
       color: #777;
 
       div {
@@ -487,13 +485,6 @@ section {
 
       a {
         color: #777;
-      }
-
-      .comments {
-        font-weight: bold;
-        a {
-          color: #999;
-        }
       }
 
       .date {
@@ -513,7 +504,7 @@ section {
     margin: 0 0 2px 0;
     a {
       color: #000;
-      font-family: 'DualisLite', sans-serif;
+      font-family: @custom-sans;
       font-weight: 300;
       letter-spacing: -1px;
     }
@@ -540,12 +531,13 @@ section {
     margin-bottom: 12px;
     h1{
       margin: 16px 0;
+      text-transform: none;
     }
     a {
       color: black;
       text-decoration: none;
       font-weight: bold;
-      font-family: 'Lora', serif;
+      font-family: @custom-sans;
     }
   }
   .link-summary {
@@ -554,7 +546,7 @@ section {
   }
   .link-info {
     margin: 12px 0;
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: @custom-small;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap-reverse;
@@ -590,6 +582,10 @@ section {
   margin-top: 12px;
   display: flex;
   flex-direction: row;
+
+  &-text {
+    margin-top: 6px;
+  }
 
   .comment-voting {
     padding: 4px 8px 4px 0;
@@ -652,7 +648,7 @@ section {
 
   a {
     color: black;
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: @custom-small;
   }
 }
 
@@ -732,8 +728,6 @@ section {
   display: block;
   padding: 6px;
   margin: 6px;
-  border-radius: 3px;
-  border: 1px solid rgb(180,180,180);
 
   .close-alert {
     float: right;
@@ -745,5 +739,13 @@ section {
 
   .alert-text {
     padding-right: 24px;
+  }
+
+  &.message, &.info {
+    background-color: #eee;
+  }
+
+  &.error {
+    background-color: #ff6347;
   }
 }

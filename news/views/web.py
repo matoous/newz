@@ -1,5 +1,6 @@
 from feedgen.feed import FeedGenerator
-from flask import Blueprint, render_template, request
+from flask import render_template, request, flash
+from flask.views import View
 from flask_login import current_user
 from prometheus_client import core
 from prometheus_client.exposition import generate_latest
@@ -7,10 +8,21 @@ from prometheus_client.exposition import generate_latest
 from news.lib.normalized_listing import trending_links, best_links, new_links
 from news.lib.pagination import paginate
 from news.lib.rss import rss_entries
-from news.models.forms import ContactUsForm
 from news.models.link import Link
 
 DEFAULT_FEEDS = [1,2,6,7]
+
+class LinksListing(View):
+    def feed_ids(self):
+        return current_user.subscribed_feed_ids if current_user.is_authenticated else DEFAULT_FEEDS
+
+    def get(self):
+        pass
+
+class CommonListing(LinksListing):
+    def feed_ids(self):
+        return DEFAULT_FEEDS
+
 
 def index():
     if current_user.is_authenticated:

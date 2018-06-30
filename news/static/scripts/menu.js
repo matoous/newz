@@ -39,6 +39,11 @@ handleUrlChange = function(){
     }
 };
 
+deleteById = function(id) {
+    document.getElementById(id).outerHTML = '';
+    return false;
+};
+
 generatePreview = function(){
     const md = document.querySelector('#text').value;
     document.querySelector('#preview').innerHTML = SnuOwnd.getParser().render(md);

@@ -54,8 +54,6 @@ class EmailVerification:
         Creates email verification which expires after given time
         and sends email to user to verify his email
         """
-        if current_app.config.TESTING:
-            return
 
         # create token
         self.token = token_urlsafe(16)

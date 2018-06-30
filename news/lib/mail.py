@@ -40,5 +40,5 @@ def reset_email(user, url):
     msg = Message("You can reset your password on following link",
                   sender=current_app.config['MAIL_DEFAULT_SENDER'],
                   recipients=[user.email])
-    msg.body = render_template("mails/reset.txt", user=user, url=url, new_reset=app.config['ME'] + "/reset_password")
+    msg.body = render_template("mails/reset.txt", user=user, url=url, new_reset=current_app.config['ME'] + "/reset_password")
     return msg

@@ -1,4 +1,4 @@
-You lost your Onefeed password? Sorry about that!
+You lost your {{ config['ME'] }} password? Sorry about that!
 
 You can use the following link to reset your password:
 
