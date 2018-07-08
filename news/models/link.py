@@ -32,7 +32,7 @@ class Link(Base):
         with schema.create('links') as table:
             table.big_increments('id').unsigned()
             table.string('title', 128)
-            table.string('slug', 150).unique()
+            table.string('slug', 150)
             table.text('text').nullable()
             table.text('image').nullable()
             table.text('url')
@@ -149,8 +149,12 @@ class Link(Base):
         q.enqueue(new_link_queue, self, result_ttl=0)
 
     @property
+    def full_route(self):
+        return "/l/{}/{}".format(self.id, self.slug)
+
+    @property
     def route(self):
-        return "/l/{}".format(self.slug)
+        return "/l/{}".format(self.id)
 
     def archive(self):
         with self.get_read_modify_write_lock():
@@ -190,6 +194,7 @@ class SavedLink(Model):
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('saved_links')
         with schema.create('saved_links') as table:
             table.big_integer('link_id').unsigned()

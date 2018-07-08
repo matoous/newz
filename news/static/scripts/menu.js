@@ -67,10 +67,10 @@ cancelComment = function(id) {
   ele.outerHTML = "";
 };
 
-commentComment = function(id) {
+commentComment = function(id, route) {
     const nowId = '#c' + id + 'c';
     const commentDiv = document.querySelector("#c" + id + " .comment-comment");
-    const submitUrl = window.location.pathname + "/comment";
+    const submitUrl = route + "/comment";
     commentDiv.style.display = "block";
     commentDiv.innerHTML = `
 <form method="post" action="${submitUrl}" id="${nowId}">

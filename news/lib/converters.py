@@ -30,13 +30,13 @@ class LinkConverter(BaseConverter):
         from news.models.link import Link
         if value == "":
             abort(404)
-        link = Link.by_slug(value)
+        link = Link.by_id(value)
         if link is None:
             abort(404)
         return link
 
     def to_url(self, value):
-        return value.slug
+        return value.id
 
 class CommentConverter(BaseConverter):
     """

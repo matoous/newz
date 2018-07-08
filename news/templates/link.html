@@ -42,7 +42,7 @@
                 </div>
                 {% if current_user.is_authenticated and not link.archived %}
                     <div class="link-add-comment">
-                        <form method="post" action="{{ link.feed.route }}/{{ link.slug }}/comment">
+                        <form method="post" action="{{ link.route }}/comment">
                             {{ comment_form.text(rows='6', cols='60') }}
                             {{ comment_form.parent_id }}
                             {{ comment_form.csrf_token }}
@@ -99,7 +99,7 @@
                                 {% if not link.archived %}
                                     <div class="comment-comment"></div>
                                     <div class="comment-options">
-                                        <a href="#" onclick="return commentComment('{{ comment.id }}')">reply</a>
+                                        <a href="#" onclick="return commentComment('{{ comment.id }}', '{{ link.route }}')">reply</a>
                                         <a href="{{ comment.route }}/report"
                                            onclick="return reportComment({{ comment.id }})">report</a>
                                         {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}

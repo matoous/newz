@@ -5,6 +5,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed:400" rel="stylesheet">
     <link rel="stylesheet" href="/static/stylesheets/main.css">
     <script type="application/javascript" src="/static/scripts/menu.js"></script>
+
     {% if md_parser %}
         <script type="application/javascript" src="/static/scripts/snuownd.js"></script>
     {% endif %}
@@ -19,21 +20,7 @@
 {% block body %}
 {% endblock %}
 
-<footer>
-    <div class="wrapper">
-        <div class="options">
-            <a href="/terms">Terms</a>
-            -
-            <a href="/privacy">Privacy policy</a>
-            -
-            <a href="/ads">Ads</a>
-            -
-            <a href="/jobs">Jobs</a>
-        </div>
-        <div class="copyright">
-            © Copyright 2017 - 2018, Matouš Dzivjak.
-        </div>
-    </div>
-</footer>
+{% include 'footer.html' %}
+
 </body>
 </html>

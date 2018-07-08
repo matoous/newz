@@ -60,4 +60,9 @@ Instalation:
 
 ### TODO list
 * archive links after month
-* allow flashing messages
+* update scores in solr
+* fix feed description and look
+* implement 'delete account'
+* user preferences
+* feed images
+* reports - remove, act etc.

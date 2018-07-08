@@ -74,30 +74,17 @@ class Route:
 def register_routes(app):
     from news.views.web import index, index_rss, new, best, trending, how_it_works, get_help, terms, privacy, rules, jobs, metrics
     from news.views.user import users_profile, users_posts, users_comments, saved_links
-    from news.views.settings import profile_settings, account_settings, post_new_password, preferences_setting
+    from news.views.settings import profile_settings, account_settings, post_new_password, preferences_setting, settings
     from news.views.search import search
-    from news.views.feed import new_feed, get_feed, get_feed_rss, add_link, remove_link, subscribe, unsubscribe
-    from news.views.auth import signup, post_signup, post_login, login, logout, reset_password, post_reset_password, set_password, verify
-
+    from news.views.feeds import new_feed, get_feed, get_feed_rss, add_link, remove_link, subscribe, unsubscribe
+    from news.views.auth import signup, post_signup, post_login, login, logout, reset_password, post_reset_password, set_password, verify, resend_verify
     from news.views.links import get_link
     from news.views.links import link_report
     from news.views.links import post_link_report
     from news.views.links import comment_link
-    from news.views.links import save_link
-    from news.views.comments import comment_report
-    from news.views.comments import post_comment_report
-    from news.views.comments import remove_comment
-    from news.views.comments import do_comment_vote
-    from news.views.links import do_vote
-    from news.views.settings import settings
-    from news.views.feed import add_admin
-    from news.views.feed import feed_admins
-    from news.views.feed import feed_admin
-    from news.views.feed import post_feed_admin
-    from news.views.feed import feed_bans
-    from news.views.feed import feed_reports
-    from news.views.feed import ban_user
-    from news.views.feed import post_ban_user
+    from news.views.links import save_link, do_vote
+    from news.views.comments import comment_report, post_comment_report, remove_comment, do_comment_vote
+    from news.views.feeds import add_admin, feed_admins, feed_admin, post_feed_admin, feed_bans, feed_reports, ban_user, post_ban_user
     routes = [
         # WEB
         Route('/', index),
@@ -123,6 +110,7 @@ def register_routes(app):
         Route('/reset_password', reset_password),
         Route('/reset_password', post_reset_password, methods=['POST']),
         Route('/reset_password/<token>', set_password, methods=['POST', 'GET']),
+        Route('/send_verify', resend_verify),
         Route('/verify/<token>', verify),
 
         # FEED
@@ -131,7 +119,7 @@ def register_routes(app):
         Route('/f/<feed:feed>/<any(trending, new, best):sort>', get_feed),
         Route('/f/<feed:feed>/rss', get_feed_rss),
         Route('/f/<feed:feed>/add', add_link, methods=['GET', 'POST']),
-        Route('/f/<feed:feed>/<link_slug>/remove', remove_link, methods=['GET', 'POST']),
+        Route('/f/<feed:feed>/<link_id>/remove', remove_link, methods=['GET', 'POST']),
         Route('/f/<feed:feed>/subscribe', subscribe),
         Route('/f/<feed:feed>/unsubscribe', unsubscribe),
 
@@ -147,11 +135,12 @@ def register_routes(app):
 
         # LINKS
         Route('/l/<link:link>', get_link),
+        Route('/l/<link:link>/<link_slug>', get_link),
         Route('/l/<link:link>/report', link_report),
         Route('/l/<link:link>/report', post_link_report, methods=['POST']),
-        Route('/l/<link:link>/comment', comment_link),
+        Route('/l/<link:link>/comment', comment_link, methods=['POST']),
         Route('/l/<link:link>/save', save_link),
-        Route('/l/<link>/vote/<vote_str>', do_vote),
+        Route('/l/<link:link>/vote/<vote_str>', do_vote),
 
         # COMMENTS
         Route('/c/<comment:comment>/report', comment_report),
@@ -175,7 +164,7 @@ def register_routes(app):
 
         # SETTINGS
         Route('/settings', settings),
-        Route('/settings/profile', profile_settings),
+        Route('/settings/profile', profile_settings, methods=['GET', 'POST']),
         Route('/settings/account', account_settings),
         Route('/settings/preferences', preferences_setting),
         Route('/settings/password', post_new_password, methods=['POST']),

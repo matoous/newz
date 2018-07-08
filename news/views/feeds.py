@@ -84,7 +84,7 @@ def add_link(feed):
 
 
 @feed_admin_required
-def remove_link(feed, link_slug):
+def remove_link(feed, link_id):
     """
     Removes link from given feed
     This is a hard delete, so be careful
@@ -92,7 +92,7 @@ def remove_link(feed, link_slug):
     :param link_slug: link slug
     :return:
     """
-    link = Link.by_slug(link_slug)
+    link = Link.by_id(link_id)
     if link is None:
         abort(404)
     link.delete()

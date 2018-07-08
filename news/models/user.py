@@ -11,18 +11,19 @@ from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
 from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField, BooleanField
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.validators import DataRequired, URL, Length, ValidationError
+from wtforms.validators import DataRequired, URL, Length, ValidationError, EqualTo
 
 from news.lib.cache import cache
 from news.lib.db.db import db
 from news.lib.login import login_manager
 from news.lib.mail import reset_email, send_mail
-from news.lib.task_queue import redis_conn, q
+from news.lib.task_queue import q
 from news.lib.validators import UniqueUsername, UniqueEmail
 from news.lib.verifications import EmailVerification
 from news.models.ban import Ban
 from news.models.base import Base
 from news.models.feed_admin import FeedAdmin
+from news.models.ip import Ip
 from news.models.token import DisposableToken
 
 MAX_SUBSCRIPTIONS_FREE = 50
@@ -110,6 +111,8 @@ class User(Base):
         session_key = 'us:{}'.format(self.session_token)
         cache.set(session_key, self.id, ttl=0 if remember_me else 60 * 60 * 2, raw=True)
         login_user(self, remember=remember_me)
+
+        Ip.from_request()
 
     def logout(self):
         cache.delete('us:{}'.format(self.session_token))
@@ -434,7 +437,16 @@ class EmailForm(Form):
 
 
 class DeactivateForm(Form):
-    pass
+    username = StringField('Your username', [], render_kw={'autocomplete': 'off', 'placeholder': 'Your username'})
+    password = PasswordField('Your password', [], render_kw={'placeholder': 'Your password'})
+
+    def validate(self):
+        user = current_user.load_from_db()
+        if user.username != self.username.data:
+            return False
+        if not user.check_password(self.password.data):
+            return False
+        return True
 
 
 class ProfileForm(Form):

@@ -1,17 +1,26 @@
 import datetime
 
-from news.lib.db.db import schema
+from flask import request
+from orator import Schema
+
+from news.lib.db.db import db
 from news.models.base import Base
 
 TTL = datetime.timedelta(days=100).total_seconds()
 
 
-class Ips(Base):
+class Ip(Base):
     __table__ = 'ips'
-    __fillable__ = ['ip', 'user_id']
+    __fillable__ = ['ip', 'user_id', 'agent']
+
+    @classmethod
+    def from_request(cls):
+        print(request.headers)
+        return cls(ip=request.remote_addr, agent=request.headers.get('User-Agent'))
 
     @classmethod
     def create_table(cls):
+        schema = Schema(db)
         schema.drop_if_exists('ips')
         with schema.create('ips') as table:
             table.raw('inet')

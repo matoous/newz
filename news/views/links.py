@@ -12,7 +12,7 @@ from news.models.report import ReportForm, Report
 from news.models.vote import vote_type_from_string, LinkVote
 
 
-def get_link(link):
+def get_link(link, link_slug=''):
     """
     Default view page for link
     :param link_slug: link slug

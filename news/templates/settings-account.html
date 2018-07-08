@@ -36,7 +36,7 @@
                 {% if email_form.user.email_verified %}
                     Your email is verified.
                 {% else %}
-                    You have not verified your email yet. <a href="/send-verify">Send verification link</a>
+                    You have not verified your email yet. <a href="/send_verify">Send verification link</a>
                 {% endif %}
             </div>
             {{ email_form.csrf_token }}

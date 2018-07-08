@@ -1,5 +1,5 @@
 from feedgen.feed import FeedGenerator
-from flask import render_template, request, flash
+from flask import render_template, request
 from flask.views import View
 from flask_login import current_user
 from prometheus_client import core
@@ -25,13 +25,14 @@ class CommonListing(LinksListing):
 
 
 def index():
+    # TODO allow different sorts
     if current_user.is_authenticated:
         links = trending_links(current_user.subscribed_feed_ids)
     else:
         links = trending_links(DEFAULT_FEEDS)
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
-    return render_template("index.html",
+    return render_template('index.html',
                            links=links,
                            show_logo=True,
                            less_links=has_less,

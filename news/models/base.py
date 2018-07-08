@@ -202,3 +202,7 @@ class Base(Model):
         """
         super().update(_attributes, **attributes)
         self.write_to_cache()
+
+    def load_from_db(self):
+        assert self.__incrementing__
+        return self.__class__.where('id', self.id)

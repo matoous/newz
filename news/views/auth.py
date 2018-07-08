@@ -2,6 +2,7 @@ from flask import render_template, redirect, abort, flash
 from flask_login import login_required, current_user
 
 from news.lib.ratelimit import rate_limit
+from news.lib.utils.redirect import redirect_back
 from news.lib.verifications import EmailVerification
 from news.models.user import SignUpForm, LoginForm, User, ResetForm, PasswordReset, SetPasswordForm
 
@@ -30,6 +31,7 @@ def post_signup():
     if form.validate():
         user = form.user()
         user.register()
+        user.login(remember_me=True)
         return redirect('/')
 
     return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
@@ -139,10 +141,15 @@ def set_password(token):
     return render_template('reset_password.html', form=form, token=token)
 
 
-@rate_limit('mail-action', 5, 60 * 60, limit_user=False, limit_ip=True)
+@rate_limit('mail-action', 5, 60 * 60, limit_user=True, limit_ip=True)
 def resend_verify():
-    # TODO
-    pass
+    # create and send verification
+    verification = EmailVerification(current_user)
+    verification.create()
+
+    flash('We have send you email with verification link.', 'info')
+
+    return redirect(redirect_back('/settings/account'))
 
 def verify(token):
     """
@@ -162,7 +169,8 @@ def verify(token):
         user.email_verified = True
         user.update_with_cache()
 
-        flash('Email successfully verified!', 'success')
+        flash('Email successfully verified!', 'info')
+
         return redirect('/')
 
     abort(404)
