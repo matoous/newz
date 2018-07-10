@@ -25,8 +25,8 @@ class Feed(Base):
     @classmethod
     def create_table(cls):
         schema = Schema(db)
-        schema.drop_if_exists('feeds')
-        with schema.create('feeds') as table:
+        schema.drop_if_exists(cls.__table__)
+        with schema.create(cls.__table__) as table:
             table.increments('id').unsigned()
             table.string('name', 64)
             table.string('slug', 80).unique()

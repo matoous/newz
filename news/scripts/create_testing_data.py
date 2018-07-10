@@ -151,3 +151,22 @@ def loadVotes():
         pipe.set(cache_key, dumps(v))
     pipe.execute()
     print('Done')
+
+def create_stories():
+    for feed in Feed.get():
+        feed.name = feed.name.strip()
+        feed.save()
+    with open('news/scripts/stories.csv', 'r') as f:
+        for line in f.readlines():
+            url, title, text, feed = line.split(';')
+            f = Feed.by_slug(slugify(feed))
+            if f is None:
+                f = Feed(name=feed, slug=slugify(feed))
+                f.save()
+            u = User.by_username('matoous')
+            l = Link(title=title, slug=slugify(title), url=url, text=text, user_id=u.id, feed_id=f.id)
+            if Link.by_slug(slugify(title)) is None:
+                try:
+                    l.save()
+                except Exception as e:
+                    print(e)

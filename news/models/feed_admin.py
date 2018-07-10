@@ -16,11 +16,13 @@ class FeedAdmin(Base):
     @classmethod
     def create_table(cls):
         schema = Schema(db)
-        schema.drop_if_exists('feed_admins')
-        with schema.create('feed_admins') as table:
+        schema.drop_if_exists(cls.__table__)
+        with schema.create(cls.__table__) as table:
             table.boolean('god').default(False)
             table.integer('user_id').unsigned()
+            table.foreign('user_id').references('id').on('users').on_delete('cascade')
             table.integer('feed_id').unsigned()
+            table.foreign('feed_id').references('id').on('feeds').on_delete('cascade')
             table.datetime('created_at')
             table.datetime('updated_at')
             table.primary(['user_id', 'feed_id'])

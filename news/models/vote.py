@@ -79,7 +79,7 @@ class LinkVote(Vote):
             table.integer('user_id').unsigned()
             table.foreign('user_id').references('id').on('users').on_delete('cascade')
             table.big_integer('link_id').unsigned()
-            table.foreign('link_id').references('id').on('links')
+            table.foreign('link_id').references('id').on('links').on_delete('cascade')
             table.integer('vote_type')
             table.primary(['user_id', 'link_id'])
 
@@ -160,7 +160,7 @@ class CommentVote(Vote):
             table.integer('user_id').unsigned()
             table.foreign('user_id').references('id').on('users').on_delete('cascade')
             table.big_integer('comment_id').unsigned()
-            table.foreign('comment_id').references('id').on('comments')
+            table.foreign('comment_id').references('id').on('comments').on_delete('cascade')
             table.integer('vote_type')
             table.primary(['user_id', 'comment_id'])
 

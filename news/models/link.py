@@ -41,7 +41,7 @@ class Link(Base):
             table.datetime('updated_at')
             table.foreign('user_id').references('id').on('users')
             table.integer('feed_id').unsigned()
-            table.foreign('feed_id').references('id').on('feeds')
+            table.foreign('feed_id').references('id').on('feeds').ondelete('cascade')
             table.integer('ups').default(0)
             table.integer('downs').default(0)
             table.integer('comments_count').default(0)
@@ -78,12 +78,12 @@ class Link(Base):
     def by_slug(cls, slug):
         # TODO should be by slug and feed id so the slugs dont have to be unique
         cache_key = "lslug:{}".format(slug)
-        id = cache.get(cache_key, raw=True)
+        id = cache.get(cache_key)
 
         if id is None:
             link = Link.where('slug', slug).first()
             id = link.id if link is not None else ""
-            cache.set(cache_key, id, raw=True)
+            cache.set(cache_key, id)
 
         if id == "":
             return None

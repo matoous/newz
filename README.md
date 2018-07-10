@@ -52,6 +52,7 @@ Instalation:
             [Python Client](http://statsd.readthedocs.io/en/v3.2.2/index.html)
 * Graphite - [Info here](https://graphite.readthedocs.io/en/latest/index.html)
 * Sentry - [Info here](https://sentry.io/)
+* Administration - https://cockpit-project.org/
 
 
 ### More

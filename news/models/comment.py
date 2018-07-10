@@ -32,9 +32,12 @@ class Comment(Base):
         with schema.create('comments') as table:
             table.big_increments('id').unsigned()
             table.big_integer('parent_id').unsigned().nullable()
+            table.foreign('parent_id').references('id').on('comments').on_delete('cascade')
             table.text('text')
             table.integer('user_id').unsigned()
+            table.foreign('user_id').references('id').on('users')
             table.integer('link_id').unsigned()
+            table.foreign('link_id').references('id').on('links').on_delete('cascade')
             table.integer('reported').default(0)
             table.boolean('spam').default(False)
             table.integer('ups').default(0)

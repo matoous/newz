@@ -21,10 +21,11 @@ class Ip(Base):
     @classmethod
     def create_table(cls):
         schema = Schema(db)
-        schema.drop_if_exists('ips')
-        with schema.create('ips') as table:
+        schema.drop_if_exists(cls.__table__)
+        with schema.create(cls.__table__) as table:
             table.raw('inet')
             table.integer('user_id').unsigned()
+            table.foreign('user_id').references('id').on('users').on_delete('cascade')
             table.datetime('created_at')
 
     @classmethod

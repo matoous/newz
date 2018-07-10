@@ -46,6 +46,8 @@ def make_app():
 
     #sentry.init_app(app)
     #importHN()
+    #from news.scripts.create_testing_data import create_stories
+    #create_stories()
 
     #for feed in Feed.get():
     #   feed.commit()

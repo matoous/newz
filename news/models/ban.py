@@ -26,7 +26,9 @@ class Ban(Base):
         with schema.create('bans') as table:
             table.string('reason')
             table.integer('user_id').unsigned()
+            table.foreign('user_id').references('id').on('users').on_delete('cascade')
             table.integer('feed_id').unsigned()
+            table.foreign('feed_id').references('id').on('feeds').on_delete('cascade')
             table.datetime('created_at')
             table.datetime('updated_at')
             table.datetime('until')
