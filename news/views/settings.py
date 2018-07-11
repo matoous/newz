@@ -45,6 +45,7 @@ def post_deactivate():
     if deactivate_form.validate(current_user):
         User.destroy(current_user.id)
         current_user.logout()
+        redirect('/')
         # maybe some cleanup after user?
 
     return render_template('settings-account.html', pw_form=pw_form, email_form=email_form, deactivate_form=deactivate_form)
