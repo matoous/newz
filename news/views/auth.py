@@ -1,6 +1,7 @@
-from flask import render_template, redirect, abort, flash
-from flask_login import login_required, current_user
+from flask import render_template, redirect, abort, flash, request
+from flask_login import login_required, current_user, LoginManager
 
+from news.lib.login import login_manager
 from news.lib.ratelimit import rate_limit
 from news.lib.utils.redirect import redirect_back
 from news.lib.verifications import EmailVerification
@@ -36,7 +37,6 @@ def post_signup():
 
     return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
 
-
 def login():
     """
     Get login form
@@ -45,7 +45,7 @@ def login():
     if current_user.is_authenticated:
         return redirect("/")
 
-    return render_template("login.html", form=LoginForm(), show_logo=True, hide_menues=True)
+    return render_template("login.html", form=LoginForm(), show_logo=True, hide_menues=True, next=request.args.get('next'))
 
 
 @rate_limit('login', 10, 300, limit_user=False, limit_ip=True)
@@ -61,7 +61,7 @@ def post_login():
     if form.validate():
         user = form.user()
         user.login(form.remember_me.data)
-        return redirect('/')
+        return redirect(redirect_back('/'))
 
     return render_template("login.html", form=form, show_logo=True, hide_menues=True)
 

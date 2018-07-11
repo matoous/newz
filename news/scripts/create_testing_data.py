@@ -162,11 +162,11 @@ def create_stories():
             f = Feed.by_slug(slugify(feed))
             if f is None:
                 f = Feed(name=feed, slug=slugify(feed))
-                f.save()
+                f.commit()
             u = User.by_username('matoous')
             l = Link(title=title, slug=slugify(title), url=url, text=text, user_id=u.id, feed_id=f.id)
             if Link.by_slug(slugify(title)) is None:
                 try:
-                    l.save()
+                    l.commit()
                 except Exception as e:
                     print(e)

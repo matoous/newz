@@ -43,10 +43,22 @@
             <input type="submit" value="Change">
         </fieldset>
     </form>
-    <form>
-        <h3>Delete Account</h3>
+    <form method="POST" action="/settings/deactivate">
+        <h3 style="color: red;">Delete Account</h3>
         <fieldset>
-            <input type="submit" value="Delete account">
+            <div>
+                If you delete your account there's no going back. Be careful!
+            </div>
+            <div class="f-row">
+                {{ deactivate_form.username.label }}
+                {{ deactivate_form.username }}
+            </div>
+            <div class="f-row">
+                {{ deactivate_form.password.label }}
+                {{ deactivate_form.password }}
+            </div>
+            {{ deactivate_form.csrf_token }}
+            <input type="submit" value="Delete account" onclick="return confirm('Are you sure you want to delete your account?');">
         </fieldset>
     </form>
 {% endblock %}

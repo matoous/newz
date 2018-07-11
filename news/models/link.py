@@ -223,7 +223,7 @@ class SavedLink(Model):
 
     @classmethod
     def by_user(cls, user):
-        return cls.where('user_id', user.id).get()
+        return cls.where('user_id', user.id).order_by('created_at', 'desc').get()
 
     def commit(self):
         try:

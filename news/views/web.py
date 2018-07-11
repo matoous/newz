@@ -25,7 +25,6 @@ class CommonListing(LinksListing):
 
 
 def index():
-    # TODO allow different sorts
     if current_user.is_authenticated:
         links = trending_links(current_user.subscribed_feed_ids)
     else:
@@ -115,6 +114,9 @@ def rules():
 
 def jobs():
     return render_template("jobs.html")
+
+def suggest_feed():
+    return render_template("suggest_feed.html")
 
 def metrics():
     registry = core.REGISTRY

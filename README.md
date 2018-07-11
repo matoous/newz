@@ -67,3 +67,4 @@ Instalation:
 * user preferences
 * feed images
 * reports - remove, act etc.
+* new feeds suggestion

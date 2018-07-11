@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block body %}
+<section>
+    <div class="container">
+        <div class="jobs pb">
+            <h1>Suggest feed</h1>
+            <p>
+                If you have cool idea about new feed and would like to be the admin of this feed don't hesitate and contact us by email.
+                <b>{{ config['CONTACT_EMAIL'] }}</b>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

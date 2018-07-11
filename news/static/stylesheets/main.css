@@ -18,16 +18,16 @@ form {
 form .form-error {
   color: red;
   padding-bottom: 6px;
-  font-size: .8em;
+  font-size: .8rem;
 }
 form > p {
-  font-size: .8em;
+  font-size: .8rem;
 }
 form a {
   color: black;
 }
 form .additional-info {
-  font-size: .8em;
+  font-size: .8rem;
   border-top: 1px solid #e5e5e5;
   padding-top: 12px;
   margin-top: 12px;
@@ -41,7 +41,7 @@ form input[type=url] {
   border-radius: 0;
   box-shadow: none;
   border: 1px solid #e5e5e5;
-  padding: 1em 1.6em;
+  padding: 1rem 1.6rem;
   font-size: 16px;
 }
 form textarea {
@@ -257,19 +257,6 @@ input[type=submit].small {
   width: 100%;
   text-align: center;
 }
-.profile .profile-avatar {
-  border-radius: 50%;
-  max-width: 260px;
-  background-color: #f5f5f5;
-  display: inline-block;
-  margin: 0 auto;
-  overflow: hidden;
-}
-.profile .profile-avatar img {
-  display: block;
-  max-width: 100%;
-  width: 100%;
-}
 .profile .profile-name h1 {
   margin: 18px 0 6px 0;
 }
@@ -288,8 +275,7 @@ input[type=submit].small {
 }
 .profile .profile-about {
   margin-top: 32px;
-  font-size: 20px;
-  line-height: 28px;
+  font-size: 1.1rem;
   word-wrap: break-word;
 }
 .profile-section {
@@ -311,6 +297,9 @@ input[type=submit].small {
 .settings .menu a {
   color: black;
   margin-right: 12px;
+}
+.settings .settings-tab form {
+  margin-bottom: 32px;
 }
 footer {
   font-family: 'Roboto Condensed', sans-serif;
@@ -522,8 +511,9 @@ body {
   width: 100%;
 }
 body {
-  font-family: Georgia, serif;
+  font-family: 'Open Sans', sans-serif;
   margin: 0;
+  font-size: 14px;
 }
 h1 {
   font-family: 'Roboto Condensed', sans-serif;
@@ -550,7 +540,7 @@ section {
   color: black;
 }
 .small {
-  font-size: .8em;
+  font-size: .8rem;
 }
 .page-container {
   max-width: 100%;
@@ -603,7 +593,7 @@ section {
   overflow: hidden;
   border-bottom: 1px solid #e5e5e5;
   font-family: 'Roboto Condensed', sans-serif;
-  font-size: .8em;
+  font-size: .8rem;
   display: flex;
   width: 100%;
   flex-direction: row;
@@ -691,7 +681,7 @@ section {
   margin: 20px 0 32px 0;
 }
 .t-nav .menu-section .header {
-  font-size: .8em;
+  font-size: .8rem;
   color: #999;
   text-transform: uppercase;
   margin-bottom: 8px;
@@ -751,7 +741,7 @@ section {
   display: none;
 }
 .feed .feed-logo {
-  margin-bottom: .6em;
+  margin-bottom: .6rem;
 }
 .feed .feed-logo img {
   display: block;
@@ -760,7 +750,7 @@ section {
   margin: 0 auto;
 }
 .feed .feed-info {
-  margin-top: .3em;
+  margin-top: .3rem;
 }
 .feed h1 {
   text-align: center;
@@ -856,7 +846,7 @@ section {
 }
 .links .link .link-feed {
   font-family: 'Roboto Condensed', sans-serif;
-  font-size: .8em;
+  font-size: .8rem;
   margin-bottom: -2px;
 }
 .links .link .link-text {
@@ -896,7 +886,7 @@ section {
   color: #333;
 }
 .links .link .bottom-line {
-  font-size: .8em;
+  font-size: .8rem;
   font-family: 'Roboto Condensed', sans-serif;
   color: #777;
 }

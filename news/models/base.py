@@ -174,6 +174,10 @@ class Base(Model):
         return item
 
     @classmethod
+    def by_id_slow(cls, id:str) -> object:
+        return cls.where('id', id).first()
+
+    @classmethod
     def by_ids(cls, ids: List[str]) -> List[object]:
         """
         Get items by ids
@@ -202,7 +206,3 @@ class Base(Model):
         """
         super().update(_attributes, **attributes)
         self.write_to_cache()
-
-    def load_from_db(self):
-        assert self.__incrementing__
-        return self.__class__.where('id', self.id)

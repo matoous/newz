@@ -112,7 +112,7 @@ class User(Base):
         cache.set(session_key, self.id, ttl=0 if remember_me else 60 * 60 * 2, raw=True)
         login_user(self, remember=remember_me)
 
-        Ip.from_request()
+        #Ip.from_request()
 
     def logout(self):
         cache.delete('us:{}'.format(self.session_token))
@@ -440,8 +440,8 @@ class DeactivateForm(Form):
     username = StringField('Your username', [], render_kw={'autocomplete': 'off', 'placeholder': 'Your username'})
     password = PasswordField('Your password', [], render_kw={'placeholder': 'Your password'})
 
-    def validate(self):
-        user = current_user.load_from_db()
+    def validate(self, u):
+        user = User.by_id_slow(current_user.id)
         if user.username != self.username.data:
             return False
         if not user.check_password(self.password.data):
