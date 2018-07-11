@@ -63,8 +63,8 @@ Instalation:
 * archive links after month
 * update scores in solr
 * fix feed description and look
-* implement 'delete account'
 * user preferences
 * feed images
 * reports - remove, act etc.
-* new feeds suggestion
+* add site-local articles instead of long texts
+* SEO, head optimization

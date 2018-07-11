@@ -140,8 +140,7 @@ class User(Base):
             self.email_verified = False
 
             # update
-            self.save()
-            self.write_to_cache()
+            self.update_with_cache()
 
         # send verification
         verification = EmailVerification(self)
@@ -404,12 +403,12 @@ class PasswordForm(Form):
                              render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
     old_password = PasswordField('Old password', render_kw={'autocomplete': 'off'})
 
-    def __init__(self, user, *args, **kwargs):
-        Form.__init__(self, *args, **kwargs)
-        self._user = user
-
     def validate(self):
-        if not self._user.check_password(self.old_password.data):
+        if not current_user.is_authenticated:
+            return False
+
+        user = User.by_id_slow(current_user.id)
+        if not user.check_password(self.old_password.data):
             self.errors['password'] = 'Invalid password'
             return False
 
@@ -421,19 +420,12 @@ class PasswordForm(Form):
 
 
 class EmailForm(Form):
-    email = EmailField('Email')
+    email = EmailField('Email', [DataRequired(), UniqueEmail()])
     public = BooleanField('Email public')
 
-    def __init__(self, user, *args, **kwargs):
-        Form.__init__(self, *args, **kwargs)
-        self.user = user
+    def fill(self, user):
         self.email.data = user.email
         self.public.data = user.email_public
-
-    def validate(self):
-        if self.email.data == self.user.email:
-            return False
-        return True
 
 
 class DeactivateForm(Form):

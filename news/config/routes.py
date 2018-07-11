@@ -1,3 +1,13 @@
+from news.views.web import *
+from news.views.auth import *
+from news.views.search import *
+from news.views.settings import *
+from news.views.user import *
+from news.views.comments import *
+from news.views.feeds import *
+from news.views.links import *
+
+
 class Route:
     """ A basic Flask router, used for the most basic form of flask routes,
     namely functionally based views which would normally use the ``@route``
@@ -72,24 +82,6 @@ class Route:
 
 
 def register_routes(app):
-    from news.views.web import index, index_rss, new, best, trending, how_it_works, get_help, terms, privacy, rules, \
-        jobs, metrics
-    from news.views.user import users_profile, users_posts, users_comments, saved_links
-    from news.views.settings import profile_settings, account_settings, post_new_password, preferences_setting, settings
-    from news.views.search import search
-    from news.views.feeds import new_feed, get_feed, get_feed_rss, add_link, remove_link, subscribe, unsubscribe
-    from news.views.auth import signup, post_signup, post_login, login, logout, reset_password, post_reset_password, \
-        set_password, verify, resend_verify
-    from news.views.links import get_link
-    from news.views.links import link_report
-    from news.views.links import post_link_report
-    from news.views.links import comment_link
-    from news.views.links import save_link, do_vote
-    from news.views.comments import comment_report, post_comment_report, remove_comment, do_comment_vote
-    from news.views.feeds import add_admin, feed_admins, feed_admin, post_feed_admin, feed_bans, feed_reports, ban_user, \
-        post_ban_user
-    from news.views.web import suggest_feed
-    from news.views.settings import post_deactivate
     routes = [
         # WEB
         Route('/', index),
@@ -174,7 +166,8 @@ def register_routes(app):
         Route('/settings/account', account_settings),
         Route('/settings/preferences', preferences_setting),
         Route('/settings/password', post_new_password, methods=['POST']),
-        Route('/settings/deactivate', post_deactivate, methods=['POST'])
+        Route('/settings/deactivate', post_deactivate, methods=['POST']),
+        Route('/settings/email', post_change_email, methods=['POST'])
     ]
 
     for route in routes:

@@ -5,10 +5,20 @@
     <form action="/settings/password" method="POST">
         <h3>Change Password</h3>
         <fieldset>
+            {% if pw_form.errors['password'] %}
+                <div class="form-error">
+                    {{ pw_form.errors['password'] }}
+                </div>
+            {% endif %}
             <div class="f-row">
                 {{ pw_form.old_password.label }}
                 {{ pw_form.old_password }}
             </div>
+            {% if pw_form.errors['passwords'] %}
+                <div class="form-error">
+                    {{ pw_form.errors['passwords'] }}
+                </div>
+            {% endif %}
             <div class="f-row">
                 {{ pw_form.new_password.label }}
                 {{ pw_form.new_password }}
@@ -24,6 +34,13 @@
     <form action="/settings/email" method="POST">
         <h3>Email Settings</h3>
         <fieldset>
+                        {% if email_form.email.errors %}
+                    {% for error in email_form.email.errors %}
+                    <div class="form-error">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
             <div class="f-row">
                 {{ email_form.email.label }}
                 {{ email_form.email }}
@@ -33,7 +50,7 @@
                 {{ email_form.public }}
             </div>
             <div class="additional-info">
-                {% if email_form.user.email_verified %}
+                {% if current_user.email_verified %}
                     Your email is verified.
                 {% else %}
                     You have not verified your email yet. <a href="/send_verify">Send verification link</a>
@@ -58,7 +75,8 @@
                 {{ deactivate_form.password }}
             </div>
             {{ deactivate_form.csrf_token }}
-            <input type="submit" value="Delete account" onclick="return confirm('Are you sure you want to delete your account?');">
+            <input type="submit" value="Delete account"
+                   onclick="return confirm('Are you sure you want to delete your account?');">
         </fieldset>
     </form>
 {% endblock %}
