@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from flask import redirect, render_template, request, abort
+from flask import redirect, render_template, request, abort, flash
 from flask_login import login_required, current_user
 
 from news.lib.access import feed_admin_required, not_banned
@@ -79,7 +79,8 @@ def add_link(feed):
     if request.method == 'POST' and form.validate(feed, current_user):
         link = form.link
         link.commit()
-        return redirect('/f/{feed}'.format(feed=feed.slug))
+        flash('Link successfully posted', 'success')
+        return redirect(feed.route)
     return render_template("new_link.html", form=form, feed=feed, md_parser=True)
 
 

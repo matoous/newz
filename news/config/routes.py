@@ -112,7 +112,7 @@ def register_routes(app):
         Route('/verify/<token>', verify),
 
         # FEED
-        Route('/new_feed', new_feed),
+        Route('/new_feed', new_feed, methods=['GET', 'POST']),
         Route('/f/<feed:feed>', get_feed),
         Route('/f/<feed:feed>/<any(trending, new, best):sort>', get_feed),
         Route('/f/<feed:feed>/rss', get_feed_rss),

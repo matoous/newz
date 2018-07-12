@@ -34,13 +34,13 @@
     <form action="/settings/email" method="POST">
         <h3>Email Settings</h3>
         <fieldset>
-                        {% if email_form.email.errors %}
-                    {% for error in email_form.email.errors %}
+            {% if email_form.email.errors %}
+                {% for error in email_form.email.errors %}
                     <div class="form-error">
                         {{ error }}
                     </div>
-                    {% endfor %}
-                {% endif %}
+                {% endfor %}
+            {% endif %}
             <div class="f-row">
                 {{ email_form.email.label }}
                 {{ email_form.email }}

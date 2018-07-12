@@ -1108,9 +1108,12 @@ section {
 }
 .alert.message,
 .alert.info {
-  background-color: #eee;
+  background-color: #DDDDDD;
+}
+.alert.success {
+  background-color: #2ECC40;
 }
 .alert.error {
-  background-color: #ff6347;
+  background-color: #FF4136;
 }
 /*# sourceMappingURL=main.css.map */
