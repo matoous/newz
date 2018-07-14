@@ -62,9 +62,9 @@ Instalation:
 ### TODO list
 * archive links after month
 * update scores in solr
-* fix feed description and look
 * user preferences
 * feed images
 * reports - remove, act etc.
 * add site-local articles instead of long texts
 * SEO, head optimization
+* add subscribers count to feed desription

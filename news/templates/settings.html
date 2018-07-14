@@ -5,10 +5,10 @@
 {% endblock %}
 
 {% block body %}
-        <div class="settings">
-            <div class="sub-menu">
+    <div class="settings">
+        <div class="sub-menu">
             <div class="container">
-                                <a href="/settings/profile" {% if active_tab == 'profile' %}class="active"{% endif %}>
+                <a href="/settings/profile" {% if active_tab == 'profile' %}class="active"{% endif %}>
                     Profile
                 </a>
                 <a href="/settings/account" {% if active_tab == 'account' %}class="active"{% endif %}>
@@ -18,11 +18,11 @@
                     Preferences
                 </a>
             </div>
-            </div>
-            <div class="settings-tab container">
+        </div>
+        <div class="settings-tab container">
 
-                {% block settings_content %}
-                {% endblock %}
-            </div>
+            {% block settings_content %}
+            {% endblock %}
+        </div>
     </div>
 {% endblock %}

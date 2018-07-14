@@ -8,7 +8,6 @@ class FeedAdmin(Base):
     """
     FeedAdmin model
     """
-
     __table__ = 'feed_admins'
     __fillable__ = ['id', 'god', 'user_id', 'feed_id']
     __incrementing__ = False
@@ -30,12 +29,16 @@ class FeedAdmin(Base):
     @accessor
     def user(self):
         from news.models.user import User
-        return User.by_id(self.user_id)
+        if not 'user' in self._attributes:
+            self.set_raw_attribute('user', User.by_id(self.user_id))
+        return self.get_raw_attribute('user')
 
     @accessor
     def feed(self):
         from news.models.feed import Feed
-        return Feed.by_id(self.feed_id)
+        if not 'feed' in self._attributes:
+            self.set_raw_attribute('feed', Feed.by_id(self.feed_id))
+        return self.get_raw_attribute('feed')
 
     @classmethod
     def by_feed_id(cls, feed_id):

@@ -13,7 +13,7 @@ from news.models.vote import CommentVote, vote_type_from_string
 def comment_report(comment):
     """
     Report comment
-    :param id: comment id
+    :param comment: comment to report
     :return:
     """
     return render_template('report.html', thing=comment, feed=comment.link.feed, report_form=ReportForm())

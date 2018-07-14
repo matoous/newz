@@ -1,17 +1,16 @@
 from datetime import datetime
-from pickle import dumps, loads
 from typing import List
 
 from orator import Model
 from redis_lock import Lock
 
 from news.lib.cache import cache
-from news.lib.db.db import db
 import timeago
 
 from news.lib.metrics import CACHE_HITS, CACHE_MISSES
 
 CACHE_EXPIRE_TIME = 12 * 60 * 60
+
 
 class Base(Model):
     """
@@ -21,6 +20,7 @@ class Base(Model):
     If model-specific methods for cache access are needed be really careful
     when implementing them and try to use as much code from this class as possible
     """
+
 
     @classmethod
     def _cache_prefix(cls) -> str:
@@ -76,6 +76,10 @@ class Base(Model):
         if cached is not None:
             self.set_raw_attributes(cached)
 
+    def update_with_cache(self):
+        self.save()
+        self.write_to_cache()
+
     def write_to_cache(self):
         """
         Write self to cache
@@ -84,7 +88,6 @@ class Base(Model):
         """
         # save token to redis for limited time
         cache.set(self._cache_key, self.serialize())
-
 
     @classmethod
     def load_from_cache(cls, id: str) -> object:
@@ -129,6 +132,18 @@ class Base(Model):
             self.__class__.where('id', self.id).decrement(attr, amp)
             self.write_to_cache()
 
+    def set(self, attr: str, val: object):
+        """
+        Decrement given attribute
+        Decrements model in both database and redis
+        :param attr: attribute
+        :param amp: amplitude
+        """
+        with self.get_read_modify_write_lock():
+            self.set_raw_attribute(attr, val)
+            self.save()
+            self.write_to_cache()
+
     def to_solr(self) -> dict:
         """
         Convert object to it's solr representation
@@ -136,7 +151,7 @@ class Base(Model):
         :return:
         """
         assert self.__class__.__searchable__
-        return {x : self.get_attribute(x) for x in self.__class__.__searchable__}
+        return {x: self.get_attribute(x) for x in self.__class__.__searchable__}
 
     def time_ago(self):
         return timeago.format(self.created_at, datetime.utcnow())
@@ -172,7 +187,7 @@ class Base(Model):
         return item
 
     @classmethod
-    def by_id_slow(cls, id:str) -> object:
+    def by_id_slow(cls, id: str) -> object:
         return cls.where('id', id).first()
 
     @classmethod

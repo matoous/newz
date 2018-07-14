@@ -72,7 +72,9 @@ class Link(Base):
     @accessor
     def feed(self):
         from news.models.feed import Feed
-        return Feed.by_id(self.feed_id)
+        if not 'feed' in self._attributes:
+            self.set_raw_attribute('feed', Feed.by_id(self.feed_id))
+        return self.get_raw_attribute('feed')
 
     @classmethod
     def by_slug(cls, slug):
@@ -90,11 +92,12 @@ class Link(Base):
 
         return Link.by_id(id)
 
-
     @accessor
     def user(self):
         from news.models.user import User
-        return User.by_id(self.user_id)
+        if not 'user' in self._attributes:
+            self.set_raw_attribute('user', User.by_id(self.user_id))
+        return self.get_raw_attribute('user')
 
     @property
     def trimmed_summary(self):
@@ -165,8 +168,6 @@ class Link(Base):
             self.archived = True
             self.save()
             self.write_to_cache()
-
-
 
 
 class LinkForm(Form):

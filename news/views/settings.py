@@ -45,9 +45,9 @@ def post_deactivate():
     deactivate_form = DeactivateForm()
 
     if deactivate_form.validate(current_user):
+        for feed in current_user.subscribed_feeds():
+            current_user.unsubscribe(feed)
         User.destroy(current_user.id)
-        # maybe some cleanup after user?
-        # TODO unsubscribe to keep the numbers true
         current_user.logout()
         flash('You account was successfully deactivated', 'success')
         redirect('/')
@@ -65,9 +65,8 @@ def post_change_email():
         if email_form.email.data != current_user.email:
             current_user.change_email(email_form.email.data)
             flash('Email successfully changed', 'success')
-        if email_form.public.data != current_user.email_public:
-            # TODO change email privacy under lock
-            pass
+    if email_form.public.data != current_user.email_public:
+        current_user.set('email_public', email_form.public.data)
 
 
     return render_template('settings-account.html', pw_form=pw_form, email_form=email_form, deactivate_form=deactivate_form)

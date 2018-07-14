@@ -22,6 +22,7 @@ class Cache:
         data = self.conn.get(key)
         if raw:
             return data
+        print(loads(data) if data else key + ' not found')
         return loads(data) if data else None
 
     def set(self, key, val, ttl=DEFAULT_CACHE_TTL, raw=False):

@@ -1,5 +1,4 @@
 from datetime import datetime
-from pickle import dumps, loads
 from secrets import token_urlsafe
 from typing import Optional, List
 
@@ -11,7 +10,7 @@ from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
 from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField, BooleanField
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.validators import DataRequired, URL, Length, ValidationError, EqualTo
+from wtforms.validators import DataRequired, URL, Length
 
 from news.lib.cache import cache
 from news.lib.db.db import db
@@ -32,9 +31,8 @@ MAX_SUBSCRIPTIONS_FREE = 50
 class User(Base):
     __table__ = 'users'
     __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sort', 'bio', 'url',
-                    'profile_pic', 'email_public', 'feed_subs',
-                    'p_show_images', 'p_min_link_score']
-    __hidden__ = ['password']
+                    'profile_pic', 'email_public', 'feed_subs', 'p_show_images', 'p_min_link_score']
+    __hidden__ = ['password', 'feeds']
     __append__ = ['session_token']
     __searchable__ = ['id', 'username', 'full_name']
 
@@ -61,9 +59,11 @@ class User(Base):
             table.text('url').nullable()
             table.text('profile_pic').nullable()
             table.integer('feed_subs').default(0)
+
             # preferences
             table.string('p_show_images', 1).default('y')
             table.integer('p_min_link_score').default(-3)
+
             # indexes
             table.index('username')
             table.index('email')
@@ -90,7 +90,7 @@ class User(Base):
 
     @property
     def name(self) -> str:
-        return self.full_name if self.full_name is not None else self.username
+        return self.full_name or self.username
 
     def set_password(self, password: str):
         self.set_attribute('password', bcrypt.hash(password))
@@ -115,10 +115,16 @@ class User(Base):
         #Ip.from_request()
 
     def logout(self):
+        """
+        Logout the user
+        """
         cache.delete('us:{}'.format(self.session_token))
         logout_user()
 
     def register(self):
+        """
+        Register new user and send email verification email
+        """
         # save self
         self.save()
 
@@ -170,10 +176,6 @@ class User(Base):
         if u is not None:
             u.write_to_cache()
         return u
-
-    def update_with_cache(self):
-        self.save()
-        self.write_to_cache()
 
     @classmethod
     def _cache_prefix(cls):
@@ -227,7 +229,6 @@ class User(Base):
     def subscribe(self, feed):
         """
         Subscribe user to given feed
-        TODO allow users to by 'pro' and have more than max subscriptions
         :param feed: feed to subscribe
         :return:
         """

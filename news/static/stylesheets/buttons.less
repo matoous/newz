@@ -1,8 +1,6 @@
 .btn, button, input[type=submit] {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
-  -o-border-radius: 3px;
-  -ms-border-radius: 3px;
   border-radius: 3px;
   background-color: #087cc3;
   font-family: 'Roboto Condensed', sans-serif;
@@ -27,5 +25,25 @@
     line-height: 1.5;
     height: 32px;
     padding: 0 16px;
+  }
+
+  &.grey {
+    background-color: #bbb;
+  }
+}
+
+a.btn {
+    font-family: 'Roboto', sans-serif;
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 32px;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  text-decoration: none!important;
+
+  &:hover {
+    opacity: 0.8;
   }
 }

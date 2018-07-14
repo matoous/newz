@@ -13,6 +13,9 @@ from news.models.link import Link
 DEFAULT_FEEDS = [3, 4, 5, 7, 78, 79, 80, 81, 2, 82, 6, 83, 1, 84, 85, 86, 87, 88, 89, 90]
 
 class LinksListing(View):
+    def dispatch_request(self):
+        pass
+
     def feed_ids(self):
         return current_user.subscribed_feed_ids if current_user.is_authenticated else DEFAULT_FEEDS
 

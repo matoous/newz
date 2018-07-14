@@ -68,7 +68,9 @@ class Comment(Base):
         :return: Parent Link of Comment
         """
         from news.models.link import Link
-        return Link.by_id(self.link_id)
+        if not 'link' in self._attributes:
+            self.set_raw_attribute('link', Link.by_id(self.link_id))
+        return self.get_raw_attribute('link')
 
     @accessor
     def user(self):
@@ -77,7 +79,9 @@ class Comment(Base):
         :return: Creator of Comment
         """
         from news.models.user import User
-        return User.by_id(self.user_id)
+        if not 'user' in self._attributes:
+            self.set_raw_attribute('user', User.by_id(self.user_id))
+        return self.get_raw_attribute('user')
 
     @has_many
     def votes(self):
