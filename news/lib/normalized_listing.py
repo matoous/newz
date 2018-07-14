@@ -3,7 +3,6 @@ import itertools
 from datetime import datetime
 
 from news.lib.db.query import LinkQuery
-from news.lib.metrics import REQUEST_TIME
 from news.lib.utils.time_utils import epoch_seconds
 
 MAX_LINKS = 1000

@@ -1,12 +1,16 @@
-<div class="container">
-    {% for category, msg in get_flashed_messages(with_categories=true) %}
-        <div class="alert {{ category }}" id="alert{{ loop.index }}">
-            <a href="" class="close-alert" onclick="return deleteById('alert{{ loop.index }}')">
-                <img src="/static/images/x.svg" alt="x">
-            </a>
-            <div class="alert-text">
-                {{ msg }}
-            </div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="container">
+            {% for category, msg in messages %}
+                <div class="alert {{ category }}" id="alert{{ loop.index }}">
+                    <a href="" class="close-alert" onclick="return deleteById('alert{{ loop.index }}')">
+                        <img src="/static/images/x.svg" alt="x">
+                    </a>
+                    <div class="alert-text">
+                        {{ msg }}
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
-</div>
+    {% endif %}
+{% endwith %}

@@ -1,64 +1,43 @@
-{% extends "base.html" %}
+{% extends "profile_base.html" %}
 
-{% block title %}
-    {{ user.name }}
-{% endblock %}
-
-{% block body %}
-<section>
-    <div class="container">
-            <div class="profile-menu">
-            <div class="menu">
-                <a href="{{user.route}}">
-                    About
-                </a>
-                <a href="{{user.route}}/posts">
-                    Posts
-                </a>
-                <a href="{{user.route}}/comments">
-                    Comments
-                </a>
+{% block content %}
+    <div class="profile">
+        <div class="profile-head">
+            <div class="profile-avatar">
+                <img src="/static/images/testingprof.png">
             </div>
-        </div>
-        <div class="profile">
-            <div class="profile-head">
-                <div class="profile-avatar">
-                    <img src="/static/images/testingprof.png">
-                </div>
-                <div class="profile-name">
-                    {% if user.full_name %}
+            <div class="profile-name">
+                {% if user.full_name %}
                     <h1 class="full-name">{{ user.full_name }}</h1>
                     <div class="under-name">{{ user.username }}</div>
-                    {% else %}
+                {% else %}
                     <h1 class="username">{{ user.username }}</h1>
-                    {% endif %}
-                    {% if user.url %}
+                {% endif %}
+                {% if user.url %}
                     <div class="profile-url">
                         <a href="{{ user.url }}">{{ user.url }}</a>
                     </div>
-                    {% endif %}
-                </div>
+                {% endif %}
             </div>
         </div>
-        <div class="comments">
-            {% for comment in user.comments %}
-                {% with comment=comment %}
-                    {% include 'comment_listing.html' %}
-                {% endwith %}
-            {% endfor %}
-            </div>
-                <div class="page-navigation">
-                {% if less_comments !=  None %}
-                    <a href="?count={{ less_comments }}">
-                        Previous
-                    </a>
-                {% endif %}
-                {% if more_comments != None %}
-                    <a href="?count={{ more_comments }}">
-                        Next
-                    </a>
-                {% endif %}
-            </div>
     </div>
-</section>
+    <div class="comments container">
+        {% for comment in user.comments %}
+            {% with comment=comment %}
+                {% include 'comment_listing.html' %}
+            {% endwith %}
+        {% endfor %}
+        <div class="page-navigation">
+            {% if less_comments !=  None %}
+                <a href="?count={{ less_comments }}">
+                    Previous
+                </a>
+            {% endif %}
+            {% if more_comments != None %}
+                <a href="?count={{ more_comments }}">
+                    Next
+                </a>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

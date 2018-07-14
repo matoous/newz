@@ -6,8 +6,7 @@
 
 {% block body %}
 <section>
-    <div class="container">
-        <div class="links">
+        <div class="links container">
             {% for link in links %}
                 {% with link=link %}
                     {% include 'link_listing.html' %}
@@ -26,6 +25,5 @@
                 {% endif %}
             </div>
             </div>
-    </div>
 </section>
 {% endblock %}

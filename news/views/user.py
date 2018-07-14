@@ -15,13 +15,14 @@ def users_profile(username):
     links = Link.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(11).get()
     comments = Comment.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(11).get()
     administrations = FeedAdmin.by_user_id(user.id)
-    return render_template("profile.html",
+    return render_template('profile.html',
                            user=user,
                            links=links[:min(len(links), 10)],
                            has_more_links=len(links) > 10,
                            comments=comments[:min(len(comments), 10)],
                            has_more_comments=len(comments) > 10,
-                           administrations=administrations)
+                           administrations=administrations,
+                           active_section='about')
 
 
 def users_comments(username):
@@ -29,7 +30,12 @@ def users_comments(username):
     if user is None:
         abort(404)
     comments, less, more = paginate(user.comments, 20)
-    return render_template("profile_comments.html", user=user, comments=comments, less_comments=less, more_comments=more)
+    return render_template('profile_comments.html',
+                           user=user,
+                           comments=comments,
+                           less_comments=less,
+                           more_comments=more,
+                           active_section='comments')
 
 
 def users_posts(username):
@@ -37,7 +43,12 @@ def users_posts(username):
     if user is None:
         abort(404)
     links, less, more = paginate(user.links, 20)
-    return render_template("profile_posts.html", user=user, links=links, less_links=less, more_links=more)
+    return render_template("profile_posts.html",
+                           user=user,
+                           links=links,
+                           less_links=less,
+                           more_links=more,
+                           active_section='posts')
 
 
 @login_required

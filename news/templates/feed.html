@@ -5,8 +5,7 @@
 {% endblock %}
 
 {% block body %}
-    <section>
-        <div class="container">
+    <section class="container">
             {% set subscribed = current_user.is_authenticated and current_user.subscribed_to(feed) %}
             <div class="feed {% if subscribed %}hidden{% endif %}">
                 <div class="feed-head">
@@ -88,6 +87,5 @@
                     {% endif %}
                 </div>
             </div>
-        </div>
     </section>
 {% endblock %}

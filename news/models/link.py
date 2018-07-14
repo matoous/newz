@@ -111,6 +111,10 @@ class Link(Base):
             return None
         return LinkVote.by_link_and_user(self.id, user.id)
 
+    def report(self, report):
+        self.reports().save(report)
+        self.incr('reported', 1)
+
     @property
     def num_votes(self):
         return self.ups + self.downs

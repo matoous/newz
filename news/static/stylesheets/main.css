@@ -250,7 +250,6 @@ input[type=submit].small {
 }
 .profile {
   margin-bottom: 42px;
-  padding: 0 20px;
 }
 .profile .profile-head {
   position: relative;
@@ -281,13 +280,6 @@ input[type=submit].small {
 .profile-section {
   margin-bottom: 32px;
 }
-.profile-menu {
-  padding: 0 20px;
-}
-.profile-menu a {
-  color: black;
-  margin-right: 12px;
-}
 .settings {
   font-family: 'Roboto Condensed', sans-serif;
 }
@@ -297,6 +289,9 @@ input[type=submit].small {
 .settings .menu a {
   color: black;
   margin-right: 12px;
+}
+.settings .settings-tab {
+  padding: 0 20px;
 }
 .settings .settings-tab form {
   margin-bottom: 32px;
@@ -576,7 +571,7 @@ section {
   margin: 0 auto;
   position: relative;
   display: inline-block;
-  font-size: 42px;
+  font-size: 2rem;
   font-weight: bold;
   transition: font-size 0.6s;
   font-family: 'Roboto', sans-serif;
@@ -727,6 +722,7 @@ section {
 .container {
   max-width: 1024px;
   margin: 0 auto;
+  padding: 0 20px;
   box-sizing: border-box;
 }
 .feed {
@@ -755,16 +751,6 @@ section {
 .feed h1 {
   text-align: center;
   margin: 0;
-}
-@media screen and (max-width: 1024px) {
-  .links {
-    /* Desktop */
-  }
-  .links .link {
-    padding-bottom: 24px;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 24px!important;
-  }
 }
 .links .menu {
   display: flex;
@@ -853,7 +839,6 @@ section {
   flex-grow: 1;
 }
 .links .link .link-body {
-  padding: 0 20px;
   display: flex;
   flex-direction: row;
 }
@@ -1039,7 +1024,6 @@ section {
 .single-comment {
   background-color: rgba(100, 120, 140, 0.1);
   padding: 6px;
-  margin: 0 20px;
   border-radius: 4px;
   margin-bottom: 22px;
 }
@@ -1115,5 +1099,23 @@ section {
 }
 .alert.error {
   background-color: #FF4136;
+}
+.sub-menu {
+  padding: 32px 0 0;
+  background-color: black;
+}
+.sub-menu a {
+  display: inline-block;
+  color: white;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-right: 12px;
+  padding: 0 0 4px;
+  border-bottom: 4px solid black;
+  text-decoration: none!important;
+}
+.sub-menu a:hover,
+.sub-menu a.active {
+  border-bottom: 4px solid white;
 }
 /*# sourceMappingURL=main.css.map */

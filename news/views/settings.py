@@ -10,7 +10,7 @@ def settings():
     form = PreferencesForm()
     if request.method == 'POST' and form.validate():
         return redirect('/settings')
-    return render_template("settings.html", form=form)
+    return render_template('settings.html', form=form)
 
 @login_required
 def profile_settings():
@@ -26,7 +26,7 @@ def profile_settings():
         form.full_name.data = current_user.full_name
         form.bio.data = current_user.bio
         form.url.data = current_user.url
-    return render_template('settings-profile.html', form=form)
+    return render_template('settings-profile.html', form=form, active_tab='profile')
 
 
 @login_required
@@ -35,7 +35,7 @@ def account_settings():
     email_form = EmailForm()
     email_form.fill(current_user)
     deactivate_form = DeactivateForm()
-    return render_template('settings-account.html', pw_form=pw_form, email_form=email_form, deactivate_form=deactivate_form)
+    return render_template('settings-account.html', pw_form=pw_form, email_form=email_form, deactivate_form=deactivate_form, active_tab='account')
 
 @login_required
 def post_deactivate():
@@ -92,5 +92,5 @@ def post_new_password():
 @login_required
 def preferences_setting():
     form = PreferencesForm()
-    return render_template("settings-preferences.html", form=form)
+    return render_template("settings-preferences.html", form=form, active_tab='preferences')
 

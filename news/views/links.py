@@ -2,7 +2,6 @@ from flask import render_template, flash, abort
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
 
-from news.lib.access import not_banned
 from news.lib.ratelimit import rate_limit
 from news.lib.utils.redirect import redirect_back
 from news.models.ban import Ban
@@ -41,6 +40,9 @@ def do_vote(link, vote_str=None):
     if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
         abort(403)
 
+    if link.archived:
+        abort(405)
+
     vote = vote_type_from_string(vote_str)
     vote = LinkVote(user_id=current_user.id, link_id=link.id, vote_type=vote)
     vote.apply()
@@ -51,13 +53,16 @@ def do_vote(link, vote_str=None):
 @login_required
 def link_report(link):
     """
-    Report given link for breaking the rules or being a dick
+    Report given link for breaking the rules
     :param feed: feed
     :param link_slug: link slug
     :return:
     """
     if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
         abort(403)
+
+    if link.archived:
+        abort(405)
 
     return render_template('report.html', thing=link, feed=link.feed, report_form=ReportForm())
 
@@ -76,15 +81,16 @@ def post_link_report(link):
     if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
         abort(403)
 
+    if link.archived:
+        abort(405)
+
     report_form = ReportForm()
 
     if report_form.validate():
         report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id,
                         feed_id=link.feed.id)
 
-        # TODO do it all in one function in report
-        link.reports().save(report)
-        link.incr('reported', 1)
+        link.report(report)
 
         flash('Thanks for your feedback!')
         return redirect(link.route) # todo safe users origin through the form to redirect him back
@@ -103,6 +109,9 @@ def comment_link(link):
     """
     if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
         abort(403)
+
+    if link.archived:
+        abort(405)
 
     comment_form = CommentForm()
     if comment_form.validate(current_user, link):

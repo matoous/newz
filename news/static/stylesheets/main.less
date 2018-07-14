@@ -109,7 +109,7 @@ section {
       margin: 0 auto;
       position: relative;
       display: inline-block;
-      font-size: 42px;
+      font-size: 2rem;
       font-weight: bold;
       transition: font-size .6s;
       font-family: @custom-sans;
@@ -287,6 +287,7 @@ section {
 .container {
   max-width: 1024px;
   margin: 0 auto;
+  padding: 0 20px;
   box-sizing: border-box;
 }
 
@@ -329,13 +330,6 @@ section {
 }
 
 .links {
-  @media screen and (max-width: 1024px) /* Desktop */ {
-    .link {
-      padding-bottom: 24px;
-      border-bottom: 1px solid #ccc;
-      margin-bottom: 24px!important;
-    }
-  }
   .menu {
     display: flex;
     flex-direction: row;
@@ -435,7 +429,6 @@ section {
     }
 
     .link-body {
-      padding: 0 20px;
       display: flex;
       flex-direction: row;
     }
@@ -656,7 +649,6 @@ section {
 .single-comment {
   background-color: rgba(100, 120, 140, 0.1);
   padding: 6px;
-  margin: 0 20px;
   border-radius: 4px;
   margin-bottom: 22px;
 }
@@ -752,5 +744,25 @@ section {
 
   &.error {
     background-color: #FF4136;
+  }
+}
+
+.sub-menu {
+  padding: 32px 0 0;
+  background-color: black;
+
+  a {
+    display: inline-block;
+    color: white;
+    font-weight: bold;
+    font-family: @custom-sans;
+    margin-right: 12px;
+    padding: 0 0 4px;
+    border-bottom: 4px solid black;
+    text-decoration: none!important;
+
+    &:hover, &.active {
+      border-bottom: 4px solid white;
+    }
   }
 }

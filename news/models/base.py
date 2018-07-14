@@ -112,9 +112,8 @@ class Base(Model):
             self.update_from_cache()
             new_val = getattr(self, attr) + amp
             self.set_attribute(attr, new_val)
-            with db.transaction():
-                self.__class__.where('id', self.id).increment(attr, amp)
-                self.write_to_cache()
+            self.__class__.where('id', self.id).increment(attr, amp)
+            self.write_to_cache()
 
     def decr(self, attr: str, amp: int = 1):
         """
@@ -127,9 +126,8 @@ class Base(Model):
             self.update_from_cache()
             new_val = getattr(self, attr) - amp
             self.set_attribute(attr, new_val)
-            with db.transaction():
-                self.__class__.where('id', self.id).decrement(attr, amp)
-                self.write_to_cache()
+            self.__class__.where('id', self.id).decrement(attr, amp)
+            self.write_to_cache()
 
     def to_solr(self) -> dict:
         """

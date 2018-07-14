@@ -1,110 +1,91 @@
-{% extends "base.html" %}
+{% extends "profile_base.html" %}
 
-{% block title %}
-    {{ user.name }}
-{% endblock %}
-
-{% block body %}
-<section>
-    <div class="container">
-        <div class="profile-menu">
-            <div class="menu">
-                <a href="{{user.route}}">
-                    About
-                </a>
-                <a href="{{user.route}}/posts">
-                    Posts
-                </a>
-                <a href="{{user.route}}/comments">
-                    Comments
-                </a>
-            </div>
-        </div>
-        <div class="profile">
-            <div class="profile-head">
-                <!--<div class="profile-avatar">
-                    <img src="/static/images/testingprof.png">
-                </div>-->
-                <div class="profile-name">
-                    {% if user.full_name %}
+{% block content %}
+    <div class="profile container">
+        <div class="profile-head">
+            <div class="profile-name">
+                {% if user.full_name %}
                     <h1 class="full-name">{{ user.full_name }}</h1>
                     <div class="under-name">{{ user.username }}</div>
-                    {% else %}
+                {% else %}
                     <h1 class="username">{{ user.username }}</h1>
-                    {% endif %}
-                    {% if user.url %}
+                {% endif %}
+                {% if user.url %}
                     <div class="profile-url">
                         <a href="{{ user.url }}">{{ user.url }}</a>
                     </div>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="profile-body">
-                {% if user.bio %}
-                <div class="profile-about">
-                    {{ user.bio }}
-                </div>
                 {% endif %}
             </div>
         </div>
-        {% if administrations|length > 0 %}
-                    <div class="profile-section">
-            <h2 class="pb">Admin of</h2>
+        <div class="profile-body">
+            {% if user.bio %}
+                <div class="profile-about">
+                    {{ user.bio }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% if administrations|length > 0 %}
+        <div class="profile-section">
+        <div class="container">
+                        <h2>Admin of</h2>
             <div class="administrations">
                 {% for administration in administrations %}
-                    <div class="s-feed pb">
-                                <h2>
-                                    <a href="{{ administration.feed.route }}">
-                                            {{ administration.feed.name }}
-                                    </a>
-                                </h2>
-                                    <div>
-                                        {{ administration.feed.description }}
-                                    </div>
-                                <div class="bottom-line">
-                                    <div class="subcribers">
-                                        {{ administration.feed.subscribers_count }} subscribers
-                                    </div>
-                                    <div class="date">
-                                        {{ administration.feed.time_ago() }}
-                                    </div>
-                                </div>
+                    <div class="s-feed">
+                        <h2>
+                            <a href="{{ administration.feed.route }}">
+                                {{ administration.feed.name }}
+                            </a>
+                        </h2>
+                        <div>
+                            {{ administration.feed.description }}
                         </div>
+                        <div class="bottom-line">
+                            <div class="subcribers">
+                                {{ administration.feed.subscribers_count }} subscribers
+                            </div>
+                            <div class="date">
+                                {{ administration.feed.time_ago() }}
+                            </div>
+                        </div>
+                    </div>
                 {% endfor %}
-
             </div>
+        </div>
         </div>
     {% endif %}
-        <div class="profile-section">
-            <h2 class="pb">Best Links</h2>
-            <div class="links">
-                {% for link in links %}
-                    {% with link=link %}
-                        {% include 'link_listing.html' %}
-                    {% endwith %}
-                {% endfor %}
-            </div>
+    <div class="profile-section">
+    <div class="container">
+                <h2>Best Links</h2>
+        <div class="links">
+            {% for link in links %}
+                {% with link=link %}
+                    {% include 'link_listing.html' %}
+                {% endwith %}
+            {% endfor %}
+        </div>
         {% if has_more_links %}
             <div class="page-navigation">
-        <a href="{{ user.route }}/posts?s=new">More</a>
+                <a href="{{ user.route }}/posts?s=new">More</a>
             </div>
         {% endif %}
-        </div>
-        <div class="profile-section">
-            <h2 class="pb">Best Comments</h2>
+    </div>
+    </div>
+    <div class="profile-section">
+    <div class="container">
+                <h2>Best Comments</h2>
         <div class="comments">
-                        {% for comment in comments %}
+            {% for comment in comments %}
                 {% with comment=comment %}
                     {% include 'comment_listing.html' %}
                 {% endwith %}
             {% endfor %}
         </div>
-                {% if has_more_comments %}
-                    <div class="page-navigation">
-        <a href="{{ user.route }}/comments?s=new">More</a>
-                    </div>
+        {% if has_more_comments %}
+            <div class="page-navigation">
+                <a href="{{ user.route }}/comments?s=new">More</a>
+            </div>
         {% endif %}
-        </div>
     </div>
-</section>
+    </div>
 {% endblock %}

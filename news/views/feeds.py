@@ -63,7 +63,6 @@ def get_feed(feed, sort=None):
 def get_feed_rss(feed):
     """
     Returns the feed in rss form
-    TODO add support for different sort
     :param feed: feed
     :return:
     """
@@ -153,7 +152,7 @@ def feed_admins(feed):
     :return:
     """
     admins = FeedAdmin.by_feed_id(feed.id)
-    return render_template("feed_admins.html", admins=admins, feed=feed)
+    return render_template("feed_admins.html", admins=admins, feed=feed, active_tab='admins')
 
 
 @feed_admin_required
@@ -166,7 +165,7 @@ def feed_admin(feed):
     """
     form = EditFeedForm()
     form.fill(feed)
-    return render_template('feed_admin.html', feed=feed, form=form)
+    return render_template('feed_admin.html', feed=feed, form=form, active_tab='admin')
 
 
 @feed_admin_required
@@ -194,7 +193,7 @@ def post_feed_admin(feed):
 
         return redirect('/f/{}/admin'.format(feed.slug))
 
-    return render_template('feed_admin.html', feed=feed, form=form)
+    return render_template('feed_admin.html', feed=feed, form=form, active_tab='admin')
 
 
 @feed_admin_required
@@ -206,7 +205,7 @@ def feed_bans(feed):
     """
     bans = Ban.where('feed_id', feed.id).get()
 
-    return render_template("feed_bans.html", feed=feed, bans=bans)
+    return render_template("feed_bans.html", feed=feed, bans=bans, active_tab='bans')
 
 @feed_admin_required
 def feed_reports(feed):
@@ -222,7 +221,7 @@ def feed_reports(feed):
     else:
         reports = Report.where('feed_id', feed.id).order_by('created_at', 'desc').get()
 
-    return render_template('feed_reports.html', feed=feed, reports=reports)
+    return render_template('feed_reports.html', feed=feed, reports=reports, active_tab='reports')
 
 
 @feed_admin_required

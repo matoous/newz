@@ -26,6 +26,9 @@ def post_comment_report(comment):
     :param id: comment id
     :return:
     """
+    if comment.link.archived:
+        abort(405)
+
     report_form = ReportForm()
     if report_form.validate():
         report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id,
@@ -48,6 +51,8 @@ def remove_comment(comment):
     :param id: comment id
     :return:
     """
+    if comment.link.archived:
+        abort(405)
 
     # save the path where to go
     redirect_to = redirect_back(comment.route)
@@ -64,6 +69,8 @@ def do_comment_vote(comment, vote_str=None):
     :param vote_str: vote type
     :return:
     """
+    if comment.link.archived:
+        abort(405)
 
     vote = vote_type_from_string(vote_str)
     if comment is None or vote is None:
