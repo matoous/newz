@@ -8,6 +8,7 @@ class FeedAdmin(Base):
     """
     FeedAdmin model
     """
+
     __table__ = 'feed_admins'
     __fillable__ = ['id', 'god', 'user_id', 'feed_id']
     __incrementing__ = False

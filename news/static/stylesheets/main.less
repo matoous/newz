@@ -37,6 +37,9 @@ h1 {
   font-family: @custom-small;
   font-weight: 400;
   font-size: 52px;
+  @media screen and (max-width: 995px) , screen and (max-height: 700px) {
+    font-size: 36px;
+  }
 }
 
 h2, h3 {
@@ -713,6 +716,13 @@ section {
 .sub-menu {
   padding: 48px 0 0;
   background-color: black;
+
+  .container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow: auto;
+  }
 
   a {
     display: inline-block;

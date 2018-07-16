@@ -5,7 +5,7 @@ from orator import mutator, Schema
 from orator.orm import belongs_to_many
 from rq.decorators import job
 from slugify import slugify
-from wtforms import StringField, TextAreaField
+from wtforms import StringField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Length
 from markdown2 import markdown
 
@@ -168,7 +168,7 @@ class FeedForm(Form):
 class EditFeedForm(Form):
     description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
     rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
-
+    img = FileField('Logo')
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)

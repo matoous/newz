@@ -68,3 +68,6 @@ Instalation:
 * add site-local articles instead of long texts
 * SEO, head optimization
 * add subscribers count to feed desription
+* cache all simple relationships
+* check that we save to redis only the things we need to save
+* scrollable side-panels on small displays

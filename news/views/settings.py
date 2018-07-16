@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, flash
+from flask import render_template, redirect, request, flash, url_for
 from flask_login import current_user, login_required
 
 from news.lib.ratelimit import rate_limit
@@ -7,10 +7,7 @@ from news.models.user import PreferencesForm, ProfileForm, PasswordForm, EmailFo
 
 @login_required
 def settings():
-    form = PreferencesForm()
-    if request.method == 'POST' and form.validate():
-        return redirect('/settings')
-    return render_template('settings.html', form=form)
+    return redirect(url_for('profile_settings'))
 
 @login_required
 def profile_settings():

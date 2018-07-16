@@ -7,17 +7,23 @@
 {% block body %}
     <div class="sub-menu">
         <div class="container">
-            <a href="{{ user.route }}" {% if active_section == 'about' %}class="active"{% endif %}>
-                About
-            </a>
-            <a href="{{ user.route }}/posts" {% if active_section == 'posts' %}class="active"{% endif %}>
-                Posts
-            </a>
-            <a href="{{ user.route }}/comments" {% if active_section == 'comments' %}class="active"{% endif %}>
-                Comments
-            </a>
+            <div>
+                <a href="{{ user.route }}" {% if active_section == 'about' %}class="active"{% endif %}>
+                    About
+                </a>
+            </div>
+            <div>
+                <a href="{{ user.route }}/posts" {% if active_section == 'posts' %}class="active"{% endif %}>
+                    Posts
+                </a>
+            </div>
+            <div>
+                <a href="{{ user.route }}/comments" {% if active_section == 'comments' %}class="active"{% endif %}>
+                    Comments
+                </a>
+            </div>
         </div>
     </div>
-        {% block content %}
-        {% endblock %}
+    {% block content %}
+    {% endblock %}
 {% endblock %}

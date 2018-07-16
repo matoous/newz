@@ -78,7 +78,6 @@ class Link(Base):
 
     @classmethod
     def by_slug(cls, slug):
-        # TODO should be by slug and feed id so the slugs dont have to be unique
         cache_key = "lslug:{}".format(slug)
         id = cache.get(cache_key)
 
@@ -101,7 +100,7 @@ class Link(Base):
 
     @property
     def trimmed_summary(self):
-        return self.text[:max(300, len(self.text))] if self.text else ""
+        return self.text[:max(300, len(self.text))] if self.text else ''
 
     @accessor
     def votes(self):

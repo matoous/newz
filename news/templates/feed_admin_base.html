@@ -8,21 +8,31 @@
     <div class="feed-admin">
         <div class="sub-menu">
             <div class="container">
-                <a href="/f/{{ feed.slug }}/admin" {% if active_tab == 'admin' %}class="active"{% endif %}>
-                    General
-                </a>
-                <a href="/f/{{ feed.slug }}/admins" {% if active_tab == 'admins' %}class="active"{% endif %}>
-                    Admins
-                </a>
-                <a href="/f/{{ feed.slug }}/reports" {% if active_tab == 'reports' %}class="active"{% endif %}>
-                    Reports
-                </a>
-                <a href="/f/{{ feed.slug }}/bans" {% if active_tab == 'bans' %}class="active"{% endif %}>
-                    Bans
-                </a>
-                <a href="/f/{{ feed.slug }}">
-                    Feed
-                </a>
+                <div>
+                    <a href="/f/{{ feed.slug }}/admin" {% if active_tab == 'admin' %}class="active"{% endif %}>
+                        General
+                    </a>
+                </div>
+                <div>
+                    <a href="/f/{{ feed.slug }}/admins" {% if active_tab == 'admins' %}class="active"{% endif %}>
+                        Admins
+                    </a>
+                </div>
+                <div>
+                    <a href="/f/{{ feed.slug }}/reports" {% if active_tab == 'reports' %}class="active"{% endif %}>
+                        Reports
+                    </a>
+                </div>
+                <div>
+                    <a href="/f/{{ feed.slug }}/bans" {% if active_tab == 'bans' %}class="active"{% endif %}>
+                        Bans
+                    </a>
+                </div>
+                <div>
+                    <a href="/f/{{ feed.slug }}">
+                        Feed
+                    </a>
+                </div>
             </div>
         </div>
         <div class="container">

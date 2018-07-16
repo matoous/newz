@@ -16,6 +16,10 @@
                     <div class="md">
                         {{ feed.rules_html|safe }}
                     </div>
+                    <div class="f-row">
+                        {{ form.img.label }}
+                        {{ form.img }}
+                    </div>
                     {{ form.csrf_token }}
                     <input type="submit" value="Change">
                 </fieldset>
