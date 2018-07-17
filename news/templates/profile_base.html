@@ -7,6 +7,9 @@
 {% block body %}
     <div class="sub-menu">
         <div class="container">
+            <h1>{{ user.name }}</h1>
+        </div>
+        <div class="container items">
             <div>
                 <a href="{{ user.route }}" {% if active_section == 'about' %}class="active"{% endif %}>
                     About

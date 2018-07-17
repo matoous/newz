@@ -1,24 +1,7 @@
 {% extends "profile_base.html" %}
 
 {% block content %}
-    <div class="profile">
-        <div class="profile-head">
-            <div class="profile-name">
-                {% if user.full_name %}
-                    <h1 class="full-name">{{ user.full_name }}</h1>
-                    <div class="under-name">{{ user.username }}</div>
-                {% else %}
-                    <h1 class="username">{{ user.username }}</h1>
-                {% endif %}
-                {% if user.url %}
-                    <div class="profile-url">
-                        <a href="{{ user.url }}">{{ user.url }}</a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    <div class="links container">
+    <div class="links container profile-tab">
         {% for link in links %}
             {% with link=link %}
                 {% include 'link_listing.html' %}

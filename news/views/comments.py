@@ -1,7 +1,7 @@
 from flask import render_template, flash
 from flask_login import login_required, current_user
 from werkzeug.exceptions import abort
-from werkzeug.utils import redirect
+from werkzeug.utils import redirect, escape
 
 from news.lib.access import feed_admin_required
 from news.lib.utils.redirect import redirect_back
@@ -44,21 +44,24 @@ def post_comment_report(comment):
     return render_template('report.html', thing=comment, feed=comment.link.feed, report_form=report_form)
 
 
-@feed_admin_required
 def remove_comment(comment):
     """
     Remove comment
     :param id: comment id
     :return:
     """
+    if not current_user.is_feed_admin(comment.link.feed) and not current_user.is_god():
+        abort(405)
+
     if comment.link.archived:
         abort(405)
 
     # save the path where to go
-    redirect_to = redirect_back(comment.route)
-    comment.delete()
+    # TODO inform user
+    comment.text = escape('<removed>')
+    comment.update_with_cache()
 
-    return redirect(redirect_to)
+    return redirect(redirect_back(comment.route))
 
 
 @login_required

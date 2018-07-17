@@ -172,13 +172,11 @@ class EditFeedForm(Form):
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
-        self.feed = None
 
     def validate(self):
         rv = Form.validate(self)
         if not rv:
             return False
-        self.feed = Feed(name=self.name.data, description=self.description.data, slug=slugify(self.name.data))
         return True
 
     def fill(self, feed):

@@ -37,7 +37,7 @@ class Base(Model):
         Cache key for model
         :return: cache key for object
         """
-        prefix = self._cache_prefix()
+        prefix = self.__class__._cache_prefix()
         return "{prefix}{id}".format(prefix=prefix, id=self.id)
 
     @property

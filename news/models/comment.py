@@ -21,6 +21,7 @@ from news.models.report import Report
 class Comment(Base):
     __table__ = 'comments'
     __fillable__ = ['id', 'reported', 'spam', 'ups', 'downs', 'link_id', 'parent_id', 'text', 'user_id']
+    __hidden__ = ['link', 'feed', 'user']
 
     @classmethod
     def create_table(cls):
@@ -68,9 +69,9 @@ class Comment(Base):
         :return: Parent Link of Comment
         """
         from news.models.link import Link
-        if not 'link' in self._attributes:
-            self.set_raw_attribute('link', Link.by_id(self.link_id))
-        return self.get_raw_attribute('link')
+        if not 'link' in self._relations:
+            self._relations['link'] = Link.by_id(self.link_id)
+        return self._relations['link']
 
     @accessor
     def user(self):
@@ -79,9 +80,9 @@ class Comment(Base):
         :return: Creator of Comment
         """
         from news.models.user import User
-        if not 'user' in self._attributes:
-            self.set_raw_attribute('user', User.by_id(self.user_id))
-        return self.get_raw_attribute('user')
+        if not 'user' in self._relations:
+            self._relations['user'] = User.by_id(self.user_id)
+        return self._relations['user']
 
     @has_many
     def votes(self):

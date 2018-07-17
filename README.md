@@ -62,7 +62,6 @@ Instalation:
 ### TODO list
 * archive links after month
 * update scores in solr
-* user preferences
 * feed images
 * reports - remove, act etc.
 * add site-local articles instead of long texts

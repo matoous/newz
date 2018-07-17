@@ -996,6 +996,9 @@ section {
   color: #666666;
   margin-right: 6px;
 }
+.admin-tab {
+  padding-bottom: 32px;
+}
 .comment-comment {
   display: none;
   margin: 12px 0 6px 0;
@@ -1054,7 +1057,11 @@ section {
   padding: 48px 0 0;
   background-color: black;
 }
-.sub-menu .container {
+.sub-menu h1 {
+  color: white;
+  margin: 0 0 16px;
+}
+.sub-menu .items {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -1073,5 +1080,8 @@ section {
 .sub-menu a:hover,
 .sub-menu a.active {
   border-bottom: 4px solid white;
+}
+.profile-tab {
+  margin-top: 32px;
 }
 /*# sourceMappingURL=main.css.map */
