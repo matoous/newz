@@ -79,6 +79,7 @@ class Comment(Base):
         Get user who created this link
         :return: Creator of Comment
         """
+        # TODO use this method in all models
         from news.models.user import User
         if not 'user' in self._relations:
             self._relations['user'] = User.by_id(self.user_id)
