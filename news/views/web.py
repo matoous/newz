@@ -103,6 +103,9 @@ def trending():
 def how_it_works():
     return render_template("how_it_works.html")
 
+def contact():
+    return render_template("contact.html")
+
 def get_help():
     return render_template("help.html")
 

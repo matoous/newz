@@ -8,7 +8,7 @@
     <section>
         <div class="container">
             <div class="search-page">
-                <div class="search pb">
+                <div class="search">
                     <form method="get" action="/search">
                         <input name="q" type="text" autocomplete="off" placeholder="Search" required value="{{ q }}">
                         <button type="submit">
@@ -16,80 +16,87 @@
                         </button>
                     </form>
                 </div>
-                                <div class="search-info pb">
-                        {{ search_info.hits }} results in {{ search_info.elapsed }} s
-                    </div>
+                <div class="search-info">
+                    {{ search_info.hits }} results in {{ search_info.elapsed }} s
+                </div>
+                {% if not feeds and not links %}
+                    <h3>Sorry, nothing found.</h3>
+                {% endif %}
+                {% if feeds %}
                 <div class="feeds search-results">
-                    <h2 class="pb">Feeds</h2>
+                    <h2>Feeds</h2>
                     {% for feed in feeds %}
-                        <div class="s-feed pb">
-                                <h2>
-                                    <a href="{{ feed.feed.route }}">
-                                        {% if feed.name %}
-                                            {{ feed.name|safe }}
-                                        {% else %}
-                                            {{ feed.feed.name }}
-                                        {% endif %}
-                                    </a>
-                                </h2>
-                                {% if feed.description %}
-                                    <div>
-                                        {{ feed.description|safe }}
-                                    </div>
-                                {% endif %}
-                                <div class="bottom-line">
-                                    <div class="subcribers">
-                                        {{ feed.feed.subscribers_count }} subscribers
-                                    </div>
-                                    <div class="date">
-                                        {{ feed.feed.time_ago() }}
-                                    </div>
+                        <div class="s-feed">
+                            <h2>
+                                <a href="{{ feed.feed.route }}">
+                                    {% if feed.name %}
+                                        {{ feed.name|safe }}
+                                    {% else %}
+                                        {{ feed.feed.name }}
+                                    {% endif %}
+                                </a>
+                            </h2>
+                            {% if feed.description %}
+                                <div>
+                                    {{ feed.description|safe }}
                                 </div>
+                            {% endif %}
+                            <div class="bottom-line">
+                                <div class="subcribers">
+                                    {{ feed.feed.subscribers_count }} subscribers
+                                </div>
+                                <div class="date">
+                                    {{ feed.feed.time_ago() }}
+                                </div>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
+            {% endif %}
+            {% if links %}
                 <div class="links search-results">
-                    <h2 class="pb">Links</h2>
+                    <h2>Links</h2>
                     {% for link in links %}
                         <div class="link">
                             <div class="link-body">
-                            <div class="link-text">
-                                                                <div class="link-feed">
-                                    <a href="{{ link.link.feed.route }}">
-                                        {{ link.link.feed.name }}
-                                    </a>
-                                </div>
-                                <h2>
-                                    <a href="{{ link.url }}">
-                                        {% if link.title %}
-                                            {{ link.title|safe }}
-                                        {% else %}
-                                            {{ link.link.title }}
-                                        {% endif %}
-                                    </a>
-                                </h2>
-                                {% if link.text %}
-                                    <div>
-                                        {{ link.text|safe }}
+                                <div class="link-text">
+                                    <div class="link-feed">
+                                        <a href="{{ link.link.feed.route }}">
+                                            {{ link.link.feed.name }}
+                                        </a>
                                     </div>
-                                {% endif %}
-                                <div class="bottom-line">
-                                    <div class="comments">
-                                        <a href="{{ link.link.full_route }}">{{ link.link.comments_count }}
-                                            comments</a>
+                                    <h2>
+                                        <a href="{{ link.link.url }}">
+                                            {% if link.title %}
+                                                {{ link.title|safe }}
+                                            {% else %}
+                                                {{ link.link.title }}
+                                            {% endif %}
+                                        </a>
+                                    </h2>
+                                    {% if link.text %}
+                                        <div>
+                                            {{ link.text|safe }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="bottom-line">
+                                        <div class="comments">
+                                            <a href="{{ link.link.full_route }}">{{ link.link.comments_count }}
+                                                comments</a>
+                                        </div>
+                                        <div class="date">
+                                            {{ link.link.time_ago() }}
+                                        </div>
+                                        <div class="author">
+                                            by <a href="{{ link.link.user.route }}">{{ link.link.user.name }}</a>
+                                        </div>
                                     </div>
-                                    <div class="date">
-                                        {{ link.link.time_ago() }}
-                                    </div>
-                                    <div class="author">
-                                        by <a href="{{ link.link.user.route }}">{{ link.link.user.name }}</a>
-                                    </div>
-                            </div>
                                 </div>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
+            {% endif %}
             </div>
         </div>
     </section>

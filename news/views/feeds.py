@@ -189,7 +189,7 @@ def post_feed_admin(feed):
             needs_update = True
 
         if needs_update:
-            feed.update()
+            feed.update_with_cache()
 
         return redirect('/f/{}/admin'.format(feed.slug))
 
@@ -217,7 +217,7 @@ def feed_reports(feed):
         if len(q_data) != 2:
             abort(404)
         t, d = q_data
-        reports = Report.where('feed_id', feed.id).where('reportable_type', "comments" if t == "c" else "links").where('reportable_id', d).order_by('created_at', 'desc').get()
+        reports = Report.where('feed_id', feed.id).where('reportable_type', 'comments' if t == 'c' else 'links').where('reportable_id', d).order_by('created_at', 'desc').get()
     else:
         reports = Report.where('feed_id', feed.id).order_by('created_at', 'desc').get()
 
@@ -229,6 +229,10 @@ def ban_user(feed, username):
     user = User.by_username(username)
     if user is None:
         abort(404)
+
+    if Ban.by_user_and_feed(user, feed) is not None:
+        flash('This user is already baned', 'info')
+        return redirect(redirect_back(feed.route + '/admin/reports'))
 
     ban_form = BanForm()
     ban_form.fill(user)

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block body %}
+<section>
+    <div class="container">
+        <div>
+            <a href="mailto:{{ config['CONTACT_EMAIL'] }}">{{ config['CONTACT_EMAIL'] }}</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

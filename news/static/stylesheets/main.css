@@ -282,13 +282,6 @@ a.btn:hover {
 .profile .profile-name h1.full-name {
   text-transform: capitalize;
 }
-.profile .profile-url {
-  font-family: 'Roboto Condensed', sans-serif;
-}
-.profile .profile-url a {
-  font-weight: bold;
-  color: #666;
-}
 .profile .profile-about {
   margin-top: 32px;
   font-size: 1.1rem;
@@ -418,6 +411,9 @@ table.unstyled th {
 }
 .search-page .search-results em {
   background-color: yellow;
+}
+.search-info {
+  margin-bottom: 32px;
 }
 .search form {
   position: relative;
@@ -1080,6 +1076,15 @@ section {
 .sub-menu a:hover,
 .sub-menu a.active {
   border-bottom: 4px solid white;
+}
+.sub-menu .profile-url {
+  font-family: 'Roboto Condensed', sans-serif;
+  margin-bottom: 12px;
+}
+.sub-menu .profile-url a {
+  font-weight: bold;
+  color: white;
+  border-bottom: none !important;
 }
 .profile-tab {
   margin-top: 32px;

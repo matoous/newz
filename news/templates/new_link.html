@@ -24,15 +24,17 @@
                 {{ form.text }}
             </div>
             <div class="additional-info">
-                Be sure to follow the <a href="/rules">general rules</a> and feed specific rules which you can find below.
+                Be sure to follow the <a href="/rules">general rules</a>{% if feed.rules %} and feed specific rules which you can find below.{% else %}.{% endif %}
             </div>
             <input type="submit" value="Submit">
+            {% if feed.rules %}
             <div class="f-row">
                 <h2>Feed rules</h2>
                 <div class="md">
                     {{ feed.rules_html|safe }}
                 </div>
             </div>
+            {% endif %}
         </fieldset>
     </form>
     </div>

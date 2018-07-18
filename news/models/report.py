@@ -37,25 +37,28 @@ class Report(Model):
     @accessor
     def user(self):
         from news.models.user import User
-        return User.by_id(self.user_id)
+        if not 'user' in self._relations:
+            self._relations['user'] = User.by_id(self.user_id)
+        return self._relations['user']
 
     @property
     def reported_thing(self):
-        if self.reportable_type == "comments":
-            return "comment"
-        if self.reportable_type == "links":
-            return "link"
+        if self.reportable_type == 'comments':
+            return 'comment'
+        if self.reportable_type == 'links':
+            return 'link'
         return None
 
     @accessor
     def thing(self):
-        if self.reportable_type == "comments":
-            from news.models.comment import Comment
-            return Comment.by_id(self.reportable_id)
-        if self.reportable_type == "links":
-            from news.models.link import Link
-            return Link.by_id(self.reportable_id)
-        return None
+        if not 'thing' in self._relations:
+            if self.reportable_type == 'comments':
+                from news.models.comment import Comment
+                self._relations['thing'] = Comment.by_id(self.reportable_id)
+            if self.reportable_type == 'links':
+                from news.models.link import Link
+                self._relations['thing'] = Link.by_id(self.reportable_id)
+        return self._relations['thing']
 
 
 

@@ -1,6 +1,11 @@
+from typing import Optional
+
 from werkzeug.exceptions import abort
 from werkzeug.routing import BaseConverter
 
+from news.models.comment import Comment
+from news.models.link import Link
+from news.models.feed import Feed
 
 class FeedConverter(BaseConverter):
     """
@@ -8,8 +13,7 @@ class FeedConverter(BaseConverter):
     If converting from URL then converter takes feed slug as param and returns feed if found and aborts with
     status not found if feed is not found
     """
-    def to_python(self, value):
-        from news.models.feed import Feed
+    def to_python(self, value: str) -> Optional[Feed]:
         if value == "":
             abort(404)
         feed = Feed.by_slug(value)
@@ -26,8 +30,7 @@ class LinkConverter(BaseConverter):
     If converting from URL then converter takes link slug as param and returns link if found and aborts with
     status not found if link is not found
     """
-    def to_python(self, value):
-        from news.models.link import Link
+    def to_python(self, value: str) -> Optional[Link]:
         if value == "":
             abort(404)
         link = Link.by_id(value)
@@ -44,8 +47,7 @@ class CommentConverter(BaseConverter):
     If converting from URL then converter takes link slug as param and returns link if found and aborts with
     status not found if link is not found
     """
-    def to_python(self, value):
-        from news.models.comment import Comment
+    def to_python(self, value: str) -> Optional[Comment]:
         if value == "":
             abort(404)
         comment = Comment.by_id(value)

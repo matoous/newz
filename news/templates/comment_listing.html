@@ -47,8 +47,8 @@
                                 {{ comment.time_ago() }}
                             </span>
             </div>
-            <div class="comment-text">
-                {{ comment.text }}
+            <div class="comment-text md">
+                {{ comment.text|safe }}
             </div>
             <div class="comment-options">
                 <a href="#" onclick="return setReplyTo('{{ comment.id }}')">reply</a>

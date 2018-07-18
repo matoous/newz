@@ -167,17 +167,8 @@ class FeedForm(Form):
 
 class EditFeedForm(Form):
     description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
-    rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
+    rules = TextAreaField('Rules', [Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
     img = FileField('Logo')
-
-    def __init__(self, *args, **kwargs):
-        Form.__init__(self, *args, **kwargs)
-
-    def validate(self):
-        rv = Form.validate(self)
-        if not rv:
-            return False
-        return True
 
     def fill(self, feed):
         self.description.data = feed.description

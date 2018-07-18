@@ -2,21 +2,6 @@
 
 {% block content %}
     <div class="profile container">
-        <div class="profile-head">
-            <div class="profile-name">
-                {% if user.full_name %}
-                    <h1 class="full-name">{{ user.full_name }}</h1>
-                    <div class="under-name">{{ user.username }}</div>
-                {% else %}
-                    <h1 class="username">{{ user.username }}</h1>
-                {% endif %}
-                {% if user.url %}
-                    <div class="profile-url">
-                        <a href="{{ user.url }}">{{ user.url }}</a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
         <div class="profile-body">
             {% if user.bio %}
                 <div class="profile-about">

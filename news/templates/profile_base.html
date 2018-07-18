@@ -8,6 +8,11 @@
     <div class="sub-menu">
         <div class="container">
             <h1>{{ user.name }}</h1>
+            {% if user.url %}
+                <div class="profile-url">
+                    <a href="{{ user.url }}">{{ user.url }}</a>
+                </div>
+            {% endif %}
         </div>
         <div class="container items">
             <div>

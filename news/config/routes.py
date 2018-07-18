@@ -91,6 +91,7 @@ def register_routes(app):
         Route('/trending', trending),
         Route('/how-it-works', how_it_works),
         Route('/help', get_help),
+        Route('/contact', contact),
         Route('/terms', terms),
         Route('/conditions', terms),
         Route('/privacy', privacy),

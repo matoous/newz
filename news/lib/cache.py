@@ -18,13 +18,13 @@ class Cache:
         self._config = app.config['REDIS']
         self.conn = StrictRedis.from_url(self._config['URL'])
 
-    def get(self, key, raw=False):
+    def get(self, key: str, raw: bool = False) -> object:
         data = self.conn.get(key)
         if raw:
             return data
         return loads(data) if data else None
 
-    def set(self, key, val, ttl=DEFAULT_CACHE_TTL, raw=False):
+    def set(self, key: str, val: object, ttl: int = DEFAULT_CACHE_TTL, raw: bool = False):
         if ttl == 0:
             return self.conn.set(key, val if raw else dumps(val))
         else:

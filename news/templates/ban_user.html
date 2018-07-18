@@ -13,7 +13,6 @@
                     <div class="f-row">
                         User: <b>{{ user.name }}</b>
                     </div>
-                    {{ form.errors }}
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     {{ form.user_id }}
                     <div class="f-row">

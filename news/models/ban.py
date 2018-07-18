@@ -45,7 +45,16 @@ class Ban(Base):
     @accessor
     def user(self):
         from news.models.user import User
-        return User.by_id(self.user_id)
+        if not 'user' in self._relations:
+            self._relations['user'] = User.by_id(self.user_id)
+        return self._relations['user']
+
+    @accessor
+    def feed(self):
+        from news.models.feed import Feed
+        if not 'feed' in self._relations:
+            self._relations['feed'] = Feed.by_id(self.feed_id)
+        return self._relations['feed']
 
     @classmethod
     def cache_key(cls, user_id, feed_id):
