@@ -18,6 +18,7 @@ def profile_settings():
             current_user.bio = form.bio.data
             current_user.url = form.url.data
             current_user.update_with_cache()
+            flash('Profile successfully updated', 'info')
             return redirect('/settings/profile')
     else:
         form.full_name.data = current_user.full_name

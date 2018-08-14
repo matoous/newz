@@ -1,6 +1,7 @@
 import time
 
 from flask import Flask, g
+from orator import Schema
 
 from news.config.config import load_config, register_functions
 from news.config.routes import register_routes
@@ -57,13 +58,15 @@ def make_app():
     #     from news.models.report import Report
     #     Report.create_table()
 
+
     @app.before_request
     def before_request():
         g.start = time.time()
 
     @app.teardown_request
     def teardown_request(exception=None):
-        diff = time.time() - g.start
-        REQUEST_TIME.observe(diff)
+        if g.start:
+            diff = time.time() - g.start
+            REQUEST_TIME.observe(diff)
 
     return app

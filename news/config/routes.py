@@ -134,12 +134,13 @@ def register_routes(app):
 
         # LINKS
         Route('/l/<link:link>', get_link),
-        Route('/l/<link:link>/<link_slug>', get_link),
+        Route('/l/<link:link>/remove', remove_link),
         Route('/l/<link:link>/report', link_report),
         Route('/l/<link:link>/report', post_link_report, methods=['POST']),
         Route('/l/<link:link>/comment', comment_link, methods=['POST']),
         Route('/l/<link:link>/save', save_link),
         Route('/l/<link:link>/vote/<vote_str>', do_vote),
+        Route('/l/<link:link>/<link_slug>', get_link),
 
         # COMMENTS
         Route('/c/<comment:comment>/report', comment_report),

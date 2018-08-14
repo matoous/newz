@@ -107,7 +107,7 @@ def comment_link(link):
     :param link_slug:
     :return:
     """
-    if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
+    if Ban.by_user_and_feed(current_user, link.feed) is not None:
         abort(403)
 
     if link.archived:
@@ -129,7 +129,7 @@ def save_link(link):
     :param link_slug: link slug
     :return:
     """
-    if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
+    if Ban.by_user_and_feed(current_user, link.feed) is not None:
         abort(403)
 
     # save the link
@@ -137,3 +137,11 @@ def save_link(link):
     saved_link.commit()
 
     return redirect(redirect_back(link.route))
+
+@login_required
+def remove_link(link):
+    if current_user.is_feed_admin(link.feed) or current_user.is_god():
+        link.delete()
+        return redirect(redirect_back(link.feed.route))
+    else:
+        abort(403)

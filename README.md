@@ -63,7 +63,6 @@ Instalation:
 * archive links after month
 * update scores in solr
 * feed images
-* reports - remove, act etc.
 * add site-local articles instead of long texts
 * SEO, head optimization
 * add subscribers count to feed desription

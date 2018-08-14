@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask_wtf import Form
+from flask_wtf import Form, FlaskForm
 from orator import mutator, Schema
 from orator.orm import belongs_to_many
 from rq.decorators import job
@@ -19,7 +19,7 @@ from news.models.link import Link
 
 class Feed(Base):
     __table__ = 'feeds'
-    __fillable__ = ['id', 'name', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo', 'reported', 'subscribers_count']
+    __fillable__ = ['id', 'name', 'img', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo', 'reported', 'subscribers_count']
     __searchable__ = ['id', 'name', 'description', 'lang', 'over_18', 'created_at']
 
     @classmethod
@@ -32,6 +32,7 @@ class Feed(Base):
             table.string('slug', 80).unique()
             table.text('description').nullable()
             table.text('rules').nullable()
+            table.text('img').nullable()
             table.integer('subscribers_count').default(0)
             table.string('default_sort', 12).default('trending')
             table.datetime('created_at')
@@ -165,7 +166,7 @@ class FeedForm(Form):
         self.description.data = feed.description
         self.rules.data = feed.rules
 
-class EditFeedForm(Form):
+class EditFeedForm(FlaskForm):
     description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
     rules = TextAreaField('Rules', [Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
     img = FileField('Logo')

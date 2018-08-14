@@ -10,7 +10,7 @@
         <div class="feed">
             <div class="feed-head">
                 <div class="feed-logo">
-                    <img src="/static/images/testimg.png">
+                    <img src="{% if feed.img %}https://s3.eu-central-1.amazonaws.com/newspublic/{{ feed.img }}{% else %}/static/images/testimg.png{% endif %}">
                 </div>
                 <h1>{{ feed.name }}</h1>
                 <div class="feed-description">

@@ -219,3 +219,7 @@ class Base(Model):
         """
         super().update(_attributes, **attributes)
         self.write_to_cache()
+
+    def delete(self):
+        cache.__delitem__(self._cache_key)
+        super().delete()

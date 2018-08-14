@@ -2,7 +2,7 @@
 
 {% block admin_content %}
             <h1>Feed Administration</h1>
-            <form action="/f/{{ feed.slug }}/admin" method="POST">
+            <form action="/f/{{ feed.slug }}/admin" method="POST" enctype="multipart/form-data">
                 <h3>Edit feed {{ feed.name }}</h3>
                 <fieldset>
                     <div class="f-row">

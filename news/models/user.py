@@ -4,7 +4,7 @@ from typing import Optional, List
 
 from flask import current_app
 from flask_login import current_user, login_user, logout_user
-from flask_wtf import Form
+from flask_wtf import Form, FlaskForm
 from orator import accessor, Schema
 from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
@@ -420,7 +420,7 @@ class PasswordForm(Form):
         return True
 
 
-class EmailForm(Form):
+class EmailForm(FlaskForm):
     email = EmailField('Email', [DataRequired(), UniqueEmail()])
     public = BooleanField('Email public')
 
@@ -429,7 +429,7 @@ class EmailForm(Form):
         self.public.data = user.email_public
 
 
-class DeactivateForm(Form):
+class DeactivateForm(FlaskForm):
     username = StringField('Your username', [], render_kw={'autocomplete': 'off', 'placeholder': 'Your username'})
     password = PasswordField('Your password', [], render_kw={'placeholder': 'Your password'})
 
@@ -442,7 +442,7 @@ class DeactivateForm(Form):
         return True
 
 
-class ProfileForm(Form):
+class ProfileForm(FlaskForm):
     full_name = StringField('Full name', )
     bio = TextAreaField('Bio', [Length(max=8192)], render_kw={'rows': 6, 'autocomplete': 'off'})
     url = URLField(validators=[URL()])
@@ -450,13 +450,13 @@ class ProfileForm(Form):
     def validate(self):
         return True
 
-class ResetForm(Form):
+class ResetForm(FlaskForm):
     email = EmailField('Email', [DataRequired()], render_kw={'placeholder': 'Email'})
 
     def validate(self):
         return True
 
-class SetPasswordForm(Form):
+class SetPasswordForm(FlaskForm):
     password = PasswordField('Password', [DataRequired(), Length(min=6)], render_kw={'placeholder': 'New password'})
     password_again = PasswordField('Password again', [DataRequired()], render_kw={'placeholder': 'New password again'})
     user_id = HiddenField('username')

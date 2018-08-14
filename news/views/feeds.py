@@ -1,15 +1,22 @@
+import io
+import os
 from datetime import datetime, timedelta
 
+from PIL import Image
 from flask import redirect, render_template, request, abort, flash
 from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename
 
 from news.lib.access import feed_admin_required, not_banned
+from news.lib.amazons3 import upload_to_s3
 from news.lib.db.query import LinkQuery
 from news.lib.filters import min_score_filter
 from news.lib.pagination import paginate
 from news.lib.ratelimit import rate_limit
 from news.lib.rss import rss_page
+from news.lib.utils.file_type import imagefile
 from news.lib.utils.redirect import redirect_back
+from news.lib.utils.resize import create_feed_logo
 from news.models.ban import BanForm, Ban
 from news.models.feed import FeedForm, EditFeedForm
 from news.models.feed_admin import FeedAdmin
@@ -187,6 +194,15 @@ def post_feed_admin(feed):
         if feed.rules != form.rules.data:
             feed.rules = form.rules.data
             needs_update = True
+
+        if form.img.data:
+            filename = secure_filename(form.img.data.filename)
+            if imagefile(filename):
+                img = create_feed_logo(form.img.data)
+                filename = feed.slug + ".png"
+                upload_to_s3(img, filename)
+                feed.img = filename
+                needs_update = True
 
         if needs_update:
             feed.update_with_cache()
