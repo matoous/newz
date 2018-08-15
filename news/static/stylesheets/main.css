@@ -453,27 +453,21 @@ table.unstyled th {
 * {
   box-sizing: border-box;
 }
-a,
-div,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-span {
-  text-rendering: geometricPrecision;
-}
 html,
 body {
   height: 100%;
   width: 100%;
+  text-rendering: geometricPrecision;
 }
 body {
   font-family: Georgia, serif;
   margin: 0;
   font-size: 15px;
+}
+h1,
+h2,
+h3 {
+  font-family: 'Roboto Condensed', sans-serif;
 }
 h1 {
   font-family: 'Roboto Condensed', sans-serif;
@@ -484,10 +478,6 @@ h1 {
   h1 {
     font-size: 36px;
   }
-}
-h2,
-h3 {
-  font-family: 'Roboto Condensed', sans-serif;
 }
 a {
   text-decoration: none;
@@ -544,7 +534,7 @@ section {
   font-size: 2rem;
   font-weight: bold;
   transition: font-size 0.6s;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
 }
 .main-nav .nav-logo .logo a {
   color: black;
@@ -693,7 +683,6 @@ section {
   max-width: 1024px;
   margin: 0 auto;
   padding: 0 20px;
-  box-sizing: border-box;
 }
 .feed {
   border-bottom: 1px solid #aaa;
@@ -706,20 +695,20 @@ section {
   font-style: italic;
   margin-top: .3rem;
 }
-.feed.hidden .feed-description {
-  display: none;
-}
-.feed.hidden .feed-logo {
-  display: none;
-}
 .feed .feed-logo {
   margin-bottom: .6rem;
 }
 .feed .feed-logo img {
   display: block;
-  max-height: 124px;
-  max-width: 156px;
+  max-height: 160px;
+  max-width: 200px;
   margin: 0 auto;
+}
+.feed.hidden .feed-description {
+  display: none;
+}
+.feed.hidden .feed-logo {
+  display: none;
 }
 .feed h1 {
   text-align: center;
@@ -732,36 +721,7 @@ section {
   display: flex;
   flex-direction: row;
   margin-bottom: 32px;
-  font-size: 1rem;
   font-family: 'Roboto Condensed', sans-serif;
-  align-content: space-between;
-}
-.links .menu .subscribe {
-  margin-left: 6px;
-  text-align: center;
-  padding: 6px 12px;
-  overflow: visible;
-  position: relative;
-  box-sizing: border-box;
-  min-width: 120px;
-  float: right;
-  background-color: #ff0000;
-}
-.links .menu .subscribe a {
-  color: white;
-}
-.links .menu .submit {
-  margin-left: 6px;
-  border: 1px solid black;
-  text-align: center;
-  padding: 6px 12px;
-  overflow: visible;
-  position: relative;
-  box-sizing: border-box;
-  min-width: 120px;
-}
-.links .menu .submit a {
-  color: black;
 }
 .links .menu .sorting {
   border: 1px solid black;
@@ -769,7 +729,6 @@ section {
   padding: 6px 12px;
   overflow: visible;
   position: relative;
-  box-sizing: border-box;
   min-width: 120px;
 }
 .links .menu .sorting .selected-sort {
@@ -791,7 +750,6 @@ section {
   border-top: 1px solid black;
 }
 .links .menu .sorting ul li {
-  box-sizing: border-box;
   padding: 8px 12px;
   min-width: 120px;
 }
@@ -807,7 +765,7 @@ section {
 }
 .links h2 a {
   color: #000;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
   font-weight: 300;
   letter-spacing: -1px;
 }
@@ -880,7 +838,6 @@ section {
   color: #555555;
 }
 .link-card .link-title {
-  font-size: 2rem;
   margin-bottom: 12px;
 }
 .link-card .link-title h1 {
@@ -891,7 +848,7 @@ section {
   color: black;
   text-decoration: none;
   font-weight: bold;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
 }
 .link-card .link-summary {
   font-size: 1.1rem;
@@ -924,48 +881,43 @@ section {
 .comment-text {
   margin-top: 6px;
 }
-.comment .comment-voting {
+.comment-header {
+  font-size: 13px;
+  color: #666;
+}
+.comment-header span {
+  margin-right: 6px;
+}
+.comment-voting {
   padding: 4px 8px 4px 0;
 }
-.comment .comment-voting .up {
+.comment-voting .up {
   margin-bottom: -6px;
 }
-.comment .comment-voting .up img {
+.comment-voting .up img {
   color: #999;
   height: 16px;
   width: 16px;
   transform: rotate(270deg);
 }
-.comment .comment-voting .down img {
+.comment-voting .down img {
   color: #999;
   height: 16px;
   width: 16px;
   transform: rotate(90deg);
 }
-.comment .comment-header {
-  font-size: 13px;
-  color: #666;
-}
-.comment .comment-header span {
-  margin-right: 6px;
-}
-.comment .subcomments {
-  border-left: 1px solid #999;
-  margin: 8px 0 0 12px;
-  padding-left: 12px;
-}
-.comment .comment-options {
+.comment-options {
   font-size: 13px;
   margin-top: 6px;
 }
-.comment .comment-options a {
+.comment-options a {
   color: #666;
   margin-right: 6px;
 }
-.preview {
-  margin: 32px 0;
-  padding: 16px;
-  background-color: rgba(0, 0, 0, 0.04);
+.subcomments {
+  border-left: 1px solid #999;
+  margin: 8px 0 0 12px;
+  padding-left: 12px;
 }
 .subscribed-feeds {
   margin-top: 32px !important;
@@ -1067,7 +1019,7 @@ section {
   display: inline-block;
   color: white;
   font-weight: bold;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
   margin-right: 12px;
   padding: 0 0 4px;
   border-bottom: 4px solid black;

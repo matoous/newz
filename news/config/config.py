@@ -33,6 +33,8 @@ def load_config(app):
     app.config['MAIL_URL'] = get_string('MAIL_URL', app.config['URL'])
     app.config['CONTACT_EMAIL'] = "{}@{}".format(get_string('CONTACT_EMAIL', 'contact'), app.config['MAIL_URL'])
 
+    app.config['FEED_LOGO_SIZE'] = 200, 160
+
 
     # SENTRY CONFIG
     app.config['DSN'] = get_string('SENTRY_URL', 'https://12a16a3e55454d369b85ae76b8d70db2:32c22327ed7a407baa89f5e212f86cd0@sentry.io/1186847')

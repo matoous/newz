@@ -53,6 +53,7 @@ Instalation:
 * Graphite - [Info here](https://graphite.readthedocs.io/en/latest/index.html)
 * Sentry - [Info here](https://sentry.io/)
 * Administration - https://cockpit-project.org/
+* AWS s3 - Needs to be configured before start. for feed logos
 
 
 ### More
@@ -62,7 +63,6 @@ Instalation:
 ### TODO list
 * archive links after month
 * update scores in solr
-* feed images
 * add site-local articles instead of long texts
 * SEO, head optimization
 * add subscribers count to feed desription

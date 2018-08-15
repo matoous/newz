@@ -1,8 +1,5 @@
-import io
-import os
 from datetime import datetime, timedelta
 
-from PIL import Image
 from flask import redirect, render_template, request, abort, flash
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename

@@ -10,7 +10,7 @@
 @blue: #0074D9;
 @yellow: #FFDC00;
 
-@custom-sans: 'Roboto', sans-serif;
+@custom-sans: 'Roboto', Arial, Helvetica, sans-serif;
 @custom-serif: Georgia, serif;
 @custom-small: 'Roboto Condensed', sans-serif;
 
@@ -18,19 +18,20 @@
   box-sizing: border-box;
 }
 
-a, div, h1, h2, h3, h4, h5, h6, p, span {
-  text-rendering: geometricPrecision;
-}
-
 html, body {
   height: 100%;
   width: 100%;
+  text-rendering: geometricPrecision;
 }
 
 body {
   font-family: @custom-serif;
   margin: 0;
   font-size: 15px;
+}
+
+h1, h2, h3 {
+  font-family: @custom-small;
 }
 
 h1 {
@@ -42,14 +43,9 @@ h1 {
   }
 }
 
-h2, h3 {
-  font-family: @custom-small;
-}
-
 a {
   text-decoration: none;
   color: #0074D9;
-
   &:hover {
     text-decoration: underline;
   }
@@ -290,7 +286,6 @@ section {
   max-width: 1024px;
   margin: 0 auto;
   padding: 0 20px;
-  box-sizing: border-box;
 }
 
 .feed {
@@ -305,22 +300,22 @@ section {
     margin-top: .3rem;
   }
 
+  .feed-logo {
+    margin-bottom: .6rem;
+    img {
+      display: block;
+      max-height: 160px;
+      max-width: 200px;
+      margin: 0 auto;
+    }
+  }
+
   &.hidden {
     .feed-description {
       display: none;
     }
     .feed-logo {
       display: none;
-    }
-  }
-
-  .feed-logo {
-    margin-bottom: .6rem;
-    img {
-      display: block;
-      max-height: 124px;
-      max-width: 156px;
-      margin: 0 auto;
     }
   }
 
@@ -339,37 +334,7 @@ section {
     display: flex;
     flex-direction: row;
     margin-bottom: 32px;
-    font-size: 1rem;
     font-family: @custom-small;
-    align-content: space-between;
-    .subscribe {
-      margin-left: 6px;
-      text-align: center;
-      padding: 6px 12px;
-      overflow: visible;
-      position: relative;
-      box-sizing: border-box;
-      min-width: 120px;
-      float: right;
-      background-color: #ff0000;
-      a {
-        color: white;
-      }
-    }
-
-    .submit {
-      margin-left: 6px;
-      border: 1px solid black;
-      text-align: center;
-      padding: 6px 12px;
-      overflow: visible;
-      position: relative;
-      box-sizing: border-box;
-      min-width: 120px;
-      a {
-        color: black;
-      }
-    }
 
     .sorting {
       border: 1px solid black;
@@ -377,7 +342,6 @@ section {
       padding: 6px 12px;
       overflow: visible;
       position: relative;
-      box-sizing: border-box;
       min-width: 120px;
 
       .selected-sort {
@@ -403,7 +367,6 @@ section {
         border-top: 1px solid black;
 
         li {
-          box-sizing: border-box;
           padding: 8px 12px;
           min-width: 120px;
 
@@ -463,11 +426,11 @@ section {
     }
 
     .up img {
-        transform: rotate(270deg);
+      transform: rotate(270deg);
     }
 
     .down img {
-        transform: rotate(90deg);
+      transform: rotate(90deg);
     }
   }
   .link-text {
@@ -516,7 +479,6 @@ section {
     }
   }
   .link-title {
-    font-size: 2rem;
     margin-bottom: 12px;
     h1 {
       margin: 16px 0;
@@ -565,56 +527,50 @@ section {
   &-text {
     margin-top: 6px;
   }
+}
 
-  .comment-voting {
-    padding: 4px 8px 4px 0;
-    .up {
-      margin-bottom: -6px;
-      img {
-        color: #999;
-        height: 16px;
-        width: 16px;
-        transform: rotate(270deg);
-      }
-    }
-    .down {
-      img {
-        color: #999;
-        height: 16px;
-        width: 16px;
-        transform: rotate(90deg);
-      }
-    }
+.comment-header {
+  font-size: 13px;
+  color: #666;
+  span {
+    margin-right: 6px;
   }
+}
 
-  .comment-header {
-    font-size: 13px;
-    color: #666;
-    span {
-      margin-right: 6px;
+.comment-voting {
+  padding: 4px 8px 4px 0;
+  .up {
+    margin-bottom: -6px;
+    img {
+      color: #999;
+      height: 16px;
+      width: 16px;
+      transform: rotate(270deg);
     }
   }
-
-  .subcomments {
-    border-left: 1px solid #999;
-    margin: 8px 0 0 12px;
-    padding-left: 12px;
-  }
-
-  .comment-options {
-    font-size: 13px;
-    margin-top: 6px;
-    a {
-      color: #666;
-      margin-right: 6px;
+  .down {
+    img {
+      color: #999;
+      height: 16px;
+      width: 16px;
+      transform: rotate(90deg);
     }
   }
 }
 
-.preview {
-  margin: 32px 0;
-  padding: 16px;
-  background-color: rgba(0, 0, 0, 0.04);
+.comment-options {
+  font-size: 13px;
+  margin-top: 6px;
+  a {
+    color: #666;
+    margin-right: 6px;
+  }
+}
+
+.subcomments {
+  border-left: 1px solid #999;
+  margin: 8px 0 0 12px;
+  padding-left: 12px;
 }
 
 .subscribed-feeds {
@@ -747,15 +703,15 @@ section {
       border-bottom: 4px solid white;
     }
   }
-    .profile-url {
-      font-family: 'Roboto Condensed', sans-serif;
-      margin-bottom: 12px;
-      a {
-        font-weight: bold;
-        color: white;
-        border-bottom: none !important;
-      }
+  .profile-url {
+    font-family: 'Roboto Condensed', sans-serif;
+    margin-bottom: 12px;
+    a {
+      font-weight: bold;
+      color: white;
+      border-bottom: none !important;
     }
+  }
 }
 
 .profile-tab {

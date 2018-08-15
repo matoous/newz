@@ -52,8 +52,8 @@
                     reported {{ report.thing.reported }} times
                 </td>
                 <td>
-                    <a href="/c/remove/{{ report.thing.id }}"
-                       onclick="return confirm('Are you sure you want to delete this comment?')">remove</a>
+                    <a href="{{ report.thing.route }}/remove"
+                       onclick="return confirm('Are you sure you want to delete this {{ report.reported_thing }}?')">remove</a>
                     <br>
                     <a href="/f/{{ feed.slug }}/ban/{{ report.thing.user.username }}"
                        onclick="return confirm('Are you sure you want to ban this user?')">ban user</a>
