@@ -163,10 +163,14 @@ class Link(Base):
         return "/l/{}".format(self.id)
 
     def archive(self):
+        from news.models.vote import LinkVote
+        # TODO delete them from cache too?
+        LinkVote.where('link_id', self.id).delete()
+        # TODO delete them from cache too?
+        db.statement('DELETE FROM comment_votes USING comments WHERE comment_votes.comment_id = comments.id AND comments.link_id = {}'.format(self.id))
         with self.get_read_modify_write_lock():
             self.archived = True
-            self.save()
-            self.write_to_cache()
+            self.update_with_cache()
 
 
 class LinkForm(Form):

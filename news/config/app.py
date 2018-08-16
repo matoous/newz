@@ -14,6 +14,7 @@ from news.lib.mail import mail
 from news.lib.metrics import REQUEST_TIME
 from news.lib.sentry import sentry
 from news.lib.solr import solr
+from news.scripts.archive_links import archive_links
 from news.scripts.create_testing_data import loadVotes
 
 
@@ -43,6 +44,8 @@ def make_app():
 
     register_routes(app)
 
+
+    #archive_links()
     #loadVotes()
     #create_tables(app)
 
