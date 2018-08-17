@@ -1,4 +1,5 @@
 import binascii
+import json
 import os
 
 from babel import dates
@@ -61,6 +62,7 @@ def load_config(app):
     app.config['SOLR'] = {
         'URL': 'http://localhost:8983/solr',
     }
+    app.config['DEFAULT_FEEDS'] = json.loads(os.getenv('DEFAULT_FEEDS') if os.getenv('DEFAULT_FEEDS') else '[]')
 
 def register_functions(app):
     def format_datetime(value, format='medium'):

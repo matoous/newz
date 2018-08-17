@@ -46,6 +46,11 @@ class Solr:
             }
         return self.feedsolr.search('name:{} description:{}'.format(q, q), **options)
 
+    def update_link_score(self, link):
+        doc = {'id': link.id, 'ups': link.ups, 'downs': link.downs}
+        self.linksolr.add([doc], fieldUpdates={'ups': 'set', 'downs': 'set'})
+
+
 solr = Solr()
 
 @job('medium', connection=redis_conn)

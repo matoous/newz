@@ -48,6 +48,7 @@
                 {% endif %}
             </div>
         </div>
+    {% if not link.archived %}
         <div class="link-rating">
             <div class="up">
                 {% if link.vote_by(current_user) and link.vote_by(current_user).is_upvote %}
@@ -75,6 +76,7 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 {% endif %}

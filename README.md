@@ -61,11 +61,12 @@ Instalation:
 [Configuring PostgreSQL](http://thebuild.com/presentations/not-your-job.pdf)
 
 ### TODO list
-* archive links after month
-* update scores in solr
-* add site-local articles instead of long texts
 * SEO, head optimization
-* add subscribers count to feed desription
 * cache all simple relationships
 * check that we save to redis only the things we need to save
 * scrollable side-panels on small displays
+* fix sidepanals opening/closing
+
+### Cool TODOSs
+* add site-local articles instead of long texts
+* add feed sources -> post articles from other rss feeds automatically on this feed

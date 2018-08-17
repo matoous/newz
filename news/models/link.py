@@ -23,7 +23,7 @@ class Link(Base):
     __table__ = 'links'
     __fillable__ = ['title', 'slug', 'text', 'user_id', 'url', 'feed_id', 'id', 'image',
                     'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
-    __searchable__ = ['id', 'title', 'text', 'url', 'user_id', 'feed_id', 'created_at']
+    __searchable__ = ['id', 'title', 'text', 'url', 'user_id', 'feed_id', 'created_at', 'ups', 'downs']
 
     @classmethod
     def create_table(cls):

@@ -26,10 +26,32 @@
                     {% endif %}
                     <div class="link-info">
                         {% if not link.archived %}
-                            <div class="rating">
-                                <a href="{{ link.route }}/vote/upvote">Upvote</a>
-                                {{ link.score }}
-                                <a href="{{ link.route }}/vote/downvote">Downvote</a>
+                            <div class="link-rating wide">
+                                <div class="up">
+                                    {% if link.vote_by(current_user) and link.vote_by(current_user).is_upvote %}
+                                        <a href="{{ link.route }}/vote/unvote">
+                                            <img class="voted" src="/static/images/play-clicked.svg">
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ link.route }}/vote/upvote">
+                                            <img src="/static/images/play.svg">
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                <div class="score">
+                                    {{ link.score }}
+                                </div>
+                                <div class="down">
+                                    {% if link.vote_by(current_user) and link.vote_by(current_user).is_downvote %}
+                                        <a href="{{ link.route }}/vote/unvote">
+                                            <img class="voted" src="/static/images/play-clicked.svg">
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ link.route }}/vote/downvote">
+                                            <img src="/static/images/play.svg">
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
                         {% endif %}
                         <div class="author">
@@ -99,7 +121,8 @@
                                 {% if not link.archived %}
                                     <div class="comment-comment"></div>
                                     <div class="comment-options">
-                                        <a href="#" onclick="return commentComment('{{ comment.id }}', '{{ link.route }}')">reply</a>
+                                        <a href="#"
+                                           onclick="return commentComment('{{ comment.id }}', '{{ link.route }}')">reply</a>
                                         <a href="{{ comment.route }}/report"
                                            onclick="return reportComment({{ comment.id }})">report</a>
                                         {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
@@ -107,7 +130,8 @@
                                             <span>
                                                 Admin:
                                             </span>
-                                                <a href="{{ comment.route }}/remove" onclick="return confirm('Are you sure you want to delete this comment?');">
+                                                <a href="{{ comment.route }}/remove"
+                                                   onclick="return confirm('Are you sure you want to delete this comment?');">
                                                     delete
                                                 </a>
                                                 <a href="{{ link.feed.route }}/reports?q=c:{{ comment.id }}">

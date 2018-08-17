@@ -13,9 +13,14 @@
                     <img src="{% if feed.img %}https://s3.eu-central-1.amazonaws.com/newspublic/{{ feed.img }}{% else %}/static/images/testimg.png{% endif %}">
                 </div>
                 <h1>{{ feed.name }}</h1>
+            {% if feed.description %}
                 <div class="feed-description">
                     {{ feed.description }}
                 </div>
+            {% endif %}
+            <div class="feed-subs">
+                {{ feed.subscribers_count + 1 }} subscribers
+            </div>
             </div>
             <div class="feed-options">
                 {% if current_user.is_authenticated %}

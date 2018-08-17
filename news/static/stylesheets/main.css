@@ -784,23 +784,6 @@ section {
 .link .link-text {
   flex-grow: 1;
 }
-.link .link-rating {
-  width: 42px;
-  padding-left: 12px;
-  font-size: .9rem;
-  font-family: 'Roboto Condensed', sans-serif;
-  text-align: center;
-}
-.link .link-rating img {
-  height: 18px;
-  width: 18px;
-}
-.link .link-rating .up img {
-  transform: rotate(270deg);
-}
-.link .link-rating .down img {
-  transform: rotate(90deg);
-}
 .link .link-text {
   margin-bottom: 6px;
   color: #333;
@@ -824,6 +807,32 @@ section {
 }
 .link .bottom-line .options a {
   margin-right: 6px;
+}
+.link-rating {
+  width: 42px;
+  padding-left: 12px;
+  font-size: .9rem;
+  font-family: 'Roboto Condensed', sans-serif;
+  text-align: center;
+}
+.link-rating.wide {
+  width: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+}
+.link-rating.wide .score {
+  padding: 0 6px;
+}
+.link-rating img {
+  height: 18px;
+  width: 18px;
+}
+.link-rating .up img {
+  transform: rotate(270deg);
+}
+.link-rating .down img {
+  transform: rotate(90deg);
 }
 .link-card .link-head {
   margin-bottom: 32px;
@@ -963,6 +972,10 @@ section {
 }
 .feed-options > div {
   margin-right: 12px;
+}
+.feed-subs {
+  margin-top: 10px;
+  text-align: center;
 }
 .err404 {
   padding: 0 32px;
