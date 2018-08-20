@@ -1,4 +1,4 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from orator import Model, accessor, Schema
 from orator.exceptions.query import QueryException
 from orator.orm import morph_many
@@ -173,17 +173,17 @@ class Link(Base):
             self.update_with_cache()
 
 
-class LinkForm(Form):
+class LinkForm(FlaskForm):
     title = StringField('Title', [DataRequired(), Length(max=128, min=6)], render_kw={'placeholder': 'Title', 'autocomplete': 'off'})
     url = StringField('Url', [DataRequired(), URL(), Length(max=256)], render_kw={'placeholder': 'URL', 'oninput': 'handleUrlChange()', 'autocomplete': 'off'})
     text = TextAreaField('Summary', [Length(max=8192)], render_kw={'placeholder': 'Summary or text', 'rows': 6, 'autocomplete': 'off'})
 
     def __init__(self, *args, **kwargs):
-        Form.__init__(self, *args, **kwargs)
+        FlaskForm.__init__(self, *args, **kwargs)
         self.link = None
 
     def validate(self, feed, user):
-        rv = Form.validate(self)
+        rv = FlaskForm.validate(self)
         if not rv:
             return False
         self.link = Link(title=self.title.data,

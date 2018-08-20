@@ -1,5 +1,4 @@
 import pysolr as pysolr
-from flask import current_app
 from rq.decorators import job
 
 from news.lib.task_queue import redis_conn
@@ -58,22 +57,19 @@ solr = Solr()
 
 @job('medium', connection=redis_conn)
 def new_link_queue(link):
-    if not current_app.config['SOLR_DISABLED']:
-        solr.logger.info('Adding new link to solr: {}'.format(link.title))
-        solr.linksolr.add([link.to_solr()])
+    #solr.logger.info('Adding new link to solr: {}'.format(link.title))
+    #solr.linksolr.add([link.to_solr()])
     return None
 
 
 @job('medium', connection=redis_conn)
 def new_user_queue(user):
-    if not current_app.config['SOLR_DISABLED']:
-        solr.logger.info('Adding new user to solr: {}'.format(user.username))
-        solr.usersolr.add([user.to_solr()])
+    #solr.logger.info('Adding new user to solr: {}'.format(user.username))
+    #solr.usersolr.add([user.to_solr()])
     return None
 
 
 def add_feed_to_search(feed):
-    if not current_app.config['SOLR_DISABLED']:
-        solr.logger.info('Adding new feed to solr: {}'.format(feed.name))
-        solr.feedsolr.add([feed.to_solr()])
+    #solr.logger.info('Adding new feed to solr: {}'.format(feed.name))
+    #solr.feedsolr.add([feed.to_solr()])
     return None

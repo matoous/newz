@@ -1,4 +1,4 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from orator import Model, accessor, Schema
 from orator.orm import morph_to
 from wtforms import TextAreaField, RadioField, IntegerField
@@ -61,8 +61,7 @@ class Report(Model):
         return self._relations['thing']
 
 
-
-class ReportForm(Form):
+class ReportForm(FlaskForm):
     comment = TextAreaField("Comment", [Length(max=2048)], render_kw={"placeholder": "Comment", "autocomplete": "off"})
     reason = RadioField("Reason", choices=[('breaks_rules',''),('spam',''), ('offensive', ''), ('other', '')])
     think_id = IntegerField("think_id")

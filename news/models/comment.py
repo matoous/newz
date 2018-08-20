@@ -1,6 +1,6 @@
 from pickle import dumps, loads
 
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from markdown2 import markdown
 from orator import accessor, Schema
 from orator.orm import has_many, morph_many
@@ -341,12 +341,12 @@ class SortedComments:
         return tree[1]
 
 
-class CommentForm(Form):
+class CommentForm(FlaskForm):
     text = TextAreaField('comment', [DataRequired()])
     parent_id = HiddenField('parent_id', [Optional()], render_kw={'class': 'parent_comment_id'})
 
     def __init__(self, *args, **kwargs):
-        Form.__init__(self, *args, **kwargs)
+        FlaskForm.__init__(self, *args, **kwargs)
         self.comment = None
 
     def validate(self, user, link):

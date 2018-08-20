@@ -1,4 +1,4 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from orator import accessor, Schema
 from wtforms import SelectField, HiddenField, TextAreaField
 from wtforms.validators import DataRequired
@@ -106,7 +106,7 @@ class Ban(Base):
         return cls.where('user_id', feed_id).get()
 
 
-class BanForm(Form):
+class BanForm(FlaskForm):
     user_id = HiddenField('User Id', [DataRequired()])
     reason = TextAreaField('Reason', [DataRequired()])
     duration = SelectField(

@@ -4,7 +4,7 @@ from typing import Optional, List
 
 from flask import current_app
 from flask_login import current_user, login_user, logout_user
-from flask_wtf import Form, FlaskForm
+from flask_wtf import FlaskForm
 from orator import accessor, Schema
 from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
@@ -312,7 +312,7 @@ class User(Base):
     def route(self):
         return "/u/{}".format(self.username)
 
-class SignUpForm(Form):
+class SignUpForm(FlaskForm):
 
     username = StringField('Username',
                            [DataRequired(message='You have to select username'),
@@ -334,7 +334,7 @@ class SignUpForm(Form):
         return user
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     username_or_email = StringField('Username or email',
                                     [DataRequired(message='Enter you email or username')],
                                     render_kw={'placeholder': 'Username or email'})
@@ -344,11 +344,11 @@ class LoginForm(Form):
     remember_me = BooleanField('Remember me')
 
     def __init__(self, *args, **kwargs):
-        Form.__init__(self, *args, **kwargs)
+        FlaskForm.__init__(self, *args, **kwargs)
         self._user = None
 
     def validate(self):
-        rv = Form.validate(self)
+        rv = FlaskForm.validate(self)
         if not rv:
             self.errors['general'] = 'Invalid username or password'
             return False
@@ -374,14 +374,14 @@ class LoginForm(Form):
     def user(self):
         return self._user
 
-class PreferencesForm(Form):
+class PreferencesForm(FlaskForm):
     subscribe = BooleanField('Subscribe to newsletter')
     send_digest = BooleanField('Subscribe to best articles of week')
     show_images = SelectField('Show Images', choices=[('y', 'Always'), ('m', 'Homepage only'), ('n', 'Never')])
     min_link_score = IntegerField('Minimal link score')
 
     def __init__(self, *args, **kwargs):
-        Form.__init__(self, *args, **kwargs)
+        FlaskForm.__init__(self, *args, **kwargs)
         self.user = None
 
     def validate(self):
@@ -393,7 +393,7 @@ class PreferencesForm(Form):
         return True
 
 
-class PasswordForm(Form):
+class PasswordForm(FlaskForm):
     new_password = PasswordField('New password',
                              [DataRequired('You have to choose password'),
                               Length(min=6, message='Password must be at least 6 characters long')],
@@ -450,11 +450,13 @@ class ProfileForm(FlaskForm):
     def validate(self):
         return True
 
+
 class ResetForm(FlaskForm):
     email = EmailField('Email', [DataRequired()], render_kw={'placeholder': 'Email'})
 
     def validate(self):
         return True
+
 
 class SetPasswordForm(FlaskForm):
     password = PasswordField('Password', [DataRequired(), Length(min=6)], render_kw={'placeholder': 'New password'})

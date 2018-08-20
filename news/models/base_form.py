@@ -1,7 +1,7 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 
 
-class BaseForm(Form):
+class BaseForm(FlaskForm):
     def fill(self, thing):
         raise NotImplemented
 

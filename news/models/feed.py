@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask_wtf import Form, FlaskForm
+from flask_wtf import FlaskForm
 from orator import mutator, Schema
 from orator.orm import belongs_to_many
 from rq.decorators import job
@@ -144,18 +144,17 @@ class Feed(Base):
         q.enqueue(handle_new_feed, self, result_ttl=0)
 
 
-class FeedForm(Form):
+class FeedForm(FlaskForm):
     name = StringField('Name', [DataRequired(), Length(max=128, min=3)])
     description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
     rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
 
-
     def __init__(self, *args, **kwargs):
-        Form.__init__(self, *args, **kwargs)
+        super.__init__(self, *args, **kwargs)
         self.feed = None
 
     def validate(self):
-        rv = Form.validate(self)
+        rv = super.validate(self)
         if not rv:
             return False
         self.feed = Feed(name=self.name.data, description=self.description.data, slug=slugify(self.name.data))
