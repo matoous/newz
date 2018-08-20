@@ -7,7 +7,7 @@ from orator import Schema
 from news.config.config import load_config, register_functions
 from news.config.routes import register_routes
 from news.lib.cache import cache
-from news.lib.db.db import db
+from news.lib.db.db import db, create_tables
 from news.lib.csrf import csrf
 from news.lib.login import login_manager
 from news.lib.mail import mail

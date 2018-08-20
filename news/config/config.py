@@ -49,10 +49,10 @@ def load_config(app):
             'default': 'postgres',
             'postgres': {
                 'driver': 'postgres',
-                'host': 'localhost',
-                'database': 'newsfeed',
-                'user': 'postgres',
-                'password': 'admin',
+                'host': 'news.c4ioot2pm9qy.eu-central-1.rds.amazonaws.com',
+                'database': 'news',
+                'user': 'newsadmin',
+                'password': 'Zub5t5SeBl2z2#yolo!',
                 'prefix': '',
             },
         }
