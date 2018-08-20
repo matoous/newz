@@ -22,7 +22,6 @@ def load_config(app):
     app.config['SECRET_KEY'] = get_string('SECRET_KEY', binascii.hexlify(os.urandom(24)))
     app.config['ME'] = get_string('ME', 'http://localhost:5000')
     app.config['NAME'] = get_string('ME_NAME')
-    app.config['NAME'] = 'News'
     assert app.config['NAME'] is not None
     app.config['URL'] = get_string('URL', 'localhost:5000')
 
@@ -38,14 +37,13 @@ def load_config(app):
     app.config['MAIL_URL'] = get_string('MAIL_URL', app.config['URL'])
     app.config['CONTACT_EMAIL'] = "{}@{}".format(get_string('CONTACT_EMAIL', 'contact'), app.config['MAIL_URL'])
 
-    app.config['FEED_LOGO_SIZE'] = 200, 160
-
+    app.config['FEED_LOGO_SIZE'] = get_int('FEED_LOGO_WIDTH', 200), get_int('FEED_LOGO_HEIGHT', 160)
 
     # SENTRY CONFIG
     app.config['DSN'] = get_string('SENTRY_URL', 'https://12a16a3e55454d369b85ae76b8d70db2:32c22327ed7a407baa89f5e212f86cd0@sentry.io/1186847')
 
     # DATABASE CONFIG
-    app.config['ORATOR_DATABASES'] = {
+    app.config['ORATOR_DATABASES'] = json.loads(os.getenv('DATABASES')) if os.getenv('DATABASES') else {
             'default': 'postgres',
             'postgres': {
                 'driver': 'postgres',
@@ -58,16 +56,17 @@ def load_config(app):
         }
 
     # REDIS CONFIG
-    app.config['REDIS'] = {
+    app.config['REDIS'] = json.loads(os.getenv('REDIS')) if os.getenv('REDIS') else {
             'URL': 'redis://localhost:6379/10',
         }
 
     # SOLR CONFIG
-    app.config['SOLR'] = {
+    app.config['SOLR'] = json.loads(os.getenv('SOLR')) if os.getenv('SOLR') else {
         'URL': 'http://localhost:8983/solr',
     }
-    app.config['SOLR_DISABLED'] = True,
-    app.config['DEFAULT_FEEDS'] = json.loads(os.getenv('DEFAULT_FEEDS') if os.getenv('DEFAULT_FEEDS') else '[]')
+
+    app.config['DEFAULT_FEEDS'] = json.loads(os.getenv('DEFAULT_FEEDS')) if os.getenv('DEFAULT_FEEDS') else []
+    print("CONFIG LOADED, name:", app.config['ME'])
 
 
 def register_functions(app):

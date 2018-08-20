@@ -1,3 +1,4 @@
+dotenv
 Babel==2.6.0
 boto3==1.7.80
 feedgen==0.7.0

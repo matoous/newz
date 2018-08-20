@@ -1,0 +1,33 @@
+DEBUG=False
+SECRET_KEY="ChangeMePlease"
+ME="http://ec2-18-185-127-209.eu-central-1.compute.amazonaws.com/"
+NAME="Popular Reads"
+URL="http://ec2-18-185-127-209.eu-central-1.compute.amazonaws.com/"
+GODS="matoous"
+DEFAULT_FEEDS="[]"
+MAIL_SERVER="smtp.gmail.com"
+MAIL_PORT=465
+MAIL_USE_SSL=True
+MAIL_USERNAME="matoousmaster@gmail.com"
+MAIL_PASSWORD="wfrylwazkglasodn"
+MAIL_DEFAULT_SENDER="matoousmaster@gmail.com"
+MAIL_URL="ec2-18-185-127-209.eu-central-1.compute.amazonaws.com"
+CONTACT_EMAIL="contact"
+
+FEED_LOGO_WIDTH=200
+FEED_LOGO_HEIGHT=160
+
+SENTRY_URL="https://12a16a3e55454d369b85ae76b8d70db2:32c22327ed7a407baa89f5e212f86cd0@sentry.io/1186847"
+DATABASES="{
+            'default': 'postgres',
+            'postgres': {
+                'driver': 'postgres',
+                'host': 'news.c4ioot2pm9qy.eu-central-1.rds.amazonaws.com',
+                'database': 'news',
+                'user': 'newsadmin',
+                'password': 'Zub5t5SeBl2z2#yolo!',
+                'prefix': '',
+            },
+        }"
+REDIS="{'URL': 'redis://localhost:6379/10'}"
+SOLR="{'URL': 'http://localhost:8983/solr'}"
