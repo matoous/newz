@@ -14,8 +14,16 @@ from news.lib.mail import mail
 from news.lib.metrics import REQUEST_TIME
 from news.lib.sentry import sentry
 from news.lib.solr import solr
-from news.scripts.archive_links import archive_links
-from news.scripts.create_testing_data import loadVotes
+from news.models.ban import Ban
+from news.models.comment import Comment
+from news.models.feed import Feed
+from news.models.feed_admin import FeedAdmin
+from news.models.link import Link
+from news.models.report import Report
+from news.models.subscriptions import create_subscriptions_table
+from news.models.token import DisposableToken
+from news.models.vote import CommentVote, LinkVote
+from news.scripts.create_testing_data import importHN, create_stories
 
 
 def make_app():
@@ -49,11 +57,10 @@ def make_app():
     #loadVotes()
     #create_tables(app)
 
-
-    #sentry.init_app(app)
-    #importHN()
     #from news.scripts.create_testing_data import create_stories
     #create_stories()
+    #sentry.init_app(app)
+    #importHN()
 
     #for feed in Feed.get():
     #   feed.commit()

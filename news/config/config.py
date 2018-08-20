@@ -4,11 +4,14 @@ import os
 
 from babel import dates
 
+
 def get_bool(env_name, default):
     return bool(os.getenv(env_name)) if os.getenv(env_name) else default
 
+
 def get_int(env_name, default):
     return int(os.getenv(env_name)) if os.getenv(env_name) else default
+
 
 def get_string(env_name, default=None):
     return os.getenv(env_name, default)
@@ -19,6 +22,7 @@ def load_config(app):
     app.config['SECRET_KEY'] = get_string('SECRET_KEY', binascii.hexlify(os.urandom(24)))
     app.config['ME'] = get_string('ME', 'http://localhost:5000')
     app.config['NAME'] = get_string('ME_NAME')
+    app.config['NAME'] = 'News'
     assert app.config['NAME'] is not None
     app.config['URL'] = get_string('URL', 'localhost:5000')
 
@@ -48,7 +52,7 @@ def load_config(app):
                 'host': 'localhost',
                 'database': 'newsfeed',
                 'user': 'postgres',
-                'password': 'postgres',
+                'password': 'admin',
                 'prefix': '',
             },
         }
@@ -63,6 +67,7 @@ def load_config(app):
         'URL': 'http://localhost:8983/solr',
     }
     app.config['DEFAULT_FEEDS'] = json.loads(os.getenv('DEFAULT_FEEDS') if os.getenv('DEFAULT_FEEDS') else '[]')
+
 
 def register_functions(app):
     def format_datetime(value, format='medium'):

@@ -161,7 +161,7 @@ def create_stories():
             url, title, text, feed = line.split(';')
             f = Feed.by_slug(slugify(feed))
             if f is None:
-                f = Feed(name=feed, slug=slugify(feed))
+                f = Feed(name=feed, slug=slugify(feed), description="")
                 f.commit()
             u = User.by_username('matoous')
             l = Link(title=title, slug=slugify(title), url=url, text=text, user_id=u.id, feed_id=f.id)
