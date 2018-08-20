@@ -21,7 +21,7 @@ def load_config(app):
     app.config['DEBUG'] = get_bool('DEBUG', True)
     app.config['SECRET_KEY'] = get_string('SECRET_KEY', binascii.hexlify(os.urandom(24)))
     app.config['ME'] = get_string('ME', 'http://localhost:5000')
-    app.config['NAME'] = get_string('ME_NAME')
+    app.config['NAME'] = get_string('NAME')
     assert app.config['NAME'] is not None
     app.config['URL'] = get_string('URL', 'localhost:5000')
 
