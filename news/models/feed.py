@@ -13,7 +13,9 @@ from news.lib.cache import cache
 from news.lib.db.db import db
 from news.lib.task_queue import redis_conn, q
 from news.lib.solr import add_feed_to_search
+from news.lib.utils.slugify import make_slug
 from news.models.base import Base
+from news.models.base_form import BaseForm
 from news.models.link import Link
 
 
@@ -138,32 +140,24 @@ class Feed(Base):
             cache.set(self.rules_cache_key, rules)
         return rules
 
-
     def commit(self):
         self.save()
         q.enqueue(handle_new_feed, self, result_ttl=0)
 
 
-class FeedForm(FlaskForm):
+class FeedForm(BaseForm):
     name = StringField('Name', [DataRequired(), Length(max=128, min=3)])
     description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
     rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
 
-    def __init__(self, *args, **kwargs):
-        super.__init__(self, *args, **kwargs)
-        self.feed = None
-
-    def validate(self):
-        rv = super.validate(self)
-        if not rv:
-            return False
-        self.feed = Feed(name=self.name.data, description=self.description.data, slug=slugify(self.name.data))
-        return True
-
-    def fill(self, feed):
+    def fill(self, feed: Feed):
         self.name.data = feed.name
         self.description.data = feed.description
         self.rules.data = feed.rules
+
+    def result(self) -> Feed:
+        return Feed(name=self.name.data, description=self.description.data, slug=make_slug(self.name.data))
+
 
 class EditFeedForm(FlaskForm):
     description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
@@ -173,6 +167,7 @@ class EditFeedForm(FlaskForm):
     def fill(self, feed):
         self.description.data = feed.description
         self.rules.data = feed.rules
+
 
 @job('medium', connection=redis_conn)
 def handle_new_feed(feed):

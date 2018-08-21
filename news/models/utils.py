@@ -5,7 +5,7 @@ from news.models.feed_admin import FeedAdmin
 from news.models.link import Link
 from news.models.report import Report
 from news.models.subscriptions import create_subscriptions_table
-from news.models.token import DisposableToken
+from news.models.disposable_token import DisposableToken
 from news.models.user import User
 from news.models.vote import CommentVote, LinkVote
 

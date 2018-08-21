@@ -23,7 +23,7 @@ from news.models.ban import Ban
 from news.models.base import Base
 from news.models.feed_admin import FeedAdmin
 from news.models.ip import Ip
-from news.models.token import DisposableToken
+from news.models.disposable_token import DisposableToken
 
 MAX_SUBSCRIPTIONS_FREE = 50
 
@@ -312,8 +312,8 @@ class User(Base):
     def route(self):
         return "/u/{}".format(self.username)
 
-class SignUpForm(FlaskForm):
 
+class SignUpForm(FlaskForm):
     username = StringField('Username',
                            [DataRequired(message='You have to select username'),
                             Length(min=3,max=20, message='Username must be between 3 and 20 characters long'),
@@ -373,6 +373,7 @@ class LoginForm(FlaskForm):
 
     def user(self):
         return self._user
+
 
 class PreferencesForm(FlaskForm):
     subscribe = BooleanField('Subscribe to newsletter')
@@ -508,7 +509,7 @@ class PasswordReset:
         Formatted URL with verification link
         :return:
         """
-        return "{}/reset_password/{}".format(current_app.config['ME'], self.token)
+        return "{}/reset_password/{}".format(current_app.config['URL'], self.token)
 
     def create(self):
         """

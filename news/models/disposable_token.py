@@ -1,7 +1,7 @@
 from base64 import urlsafe_b64encode
 from os import urandom
 
-from orator import Model, Schema
+from orator import Schema, Model
 
 from news.lib.db.db import db
 

@@ -30,6 +30,7 @@ def registration_email(user, url):
     msg.body = render_template("mails/registration.txt", user=user, url=url)
     return msg
 
+
 def reset_email(user, url):
     """
     Send email with link to reset password to the user
@@ -40,5 +41,5 @@ def reset_email(user, url):
     msg = Message("You can reset your password on following link",
                   sender=current_app.config['MAIL_DEFAULT_SENDER'],
                   recipients=[user.email])
-    msg.body = render_template("mails/reset.txt", user=user, url=url, new_reset=current_app.config['ME'] + "/reset_password")
+    msg.body = render_template("mails/reset.txt", user=user, url=url, new_reset=current_app.config['URL'] + "/reset_password")
     return msg

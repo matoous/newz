@@ -13,6 +13,7 @@ from news.lib.db.sorts import sorts
 from news.lib.task_queue import q
 from news.lib.solr import new_link_queue
 from news.lib.sorts import hot
+from news.lib.utils.slugify import make_slug
 from news.models.base import Base
 from news.models.report import Report
 
@@ -80,16 +81,15 @@ class Link(Base):
     def by_slug(cls, slug):
         cache_key = "lslug:{}".format(slug)
         id = cache.get(cache_key)
-
+        print('id found: {}'.format(id))
         if id is None:
             link = Link.where('slug', slug).first()
-            id = link.id if link is not None else ""
-            cache.set(cache_key, id)
+            print('l by slug', slug, link)
+            if link is not None:
+                id = link.id
+                cache.set(cache_key, id)
 
-        if id == "":
-            return None
-
-        return Link.by_id(id)
+        return Link.by_id(id) if id else None
 
     @accessor
     def user(self):
@@ -187,7 +187,7 @@ class LinkForm(FlaskForm):
         if not rv:
             return False
         self.link = Link(title=self.title.data,
-                         slug=slugify(self.title.data),
+                         slug=make_slug(self.title.data),
                          text=self.text.data,
                          url=self.url.data,
                          feed_id=feed.id,

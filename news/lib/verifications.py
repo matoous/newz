@@ -47,7 +47,7 @@ class EmailVerification:
         Formatted URL with verification link
         :return:
         """
-        return "localhost:5000/verify/{}".format(self.token)
+        return "{}/verify/{}".format(current_app.config['URL'], self.token)
 
     def create(self):
         """

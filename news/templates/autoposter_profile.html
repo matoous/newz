@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ user.name }} | Bot
+{% endblock %}
+
+{% block body %}
+    <div class="profile-section">
+        <div class="container">
+            <h1 style="text-align: center;">Autoposter</h1>
+            <h3 style="text-align: center;">I'm a Bot and I post links from rss feeds.<br>If I made a mistake don't
+                hesitate and point it out in comment under the link, thanks and sorry!</h3>
+            <img src="/static/images/roboto-logo.png"
+                 style="max-width: 320px; width: 100%; display: block; margin: 0 auto;">
+        </div>
+    </div>
+{% endblock %}

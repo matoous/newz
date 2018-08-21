@@ -1,11 +1,12 @@
 import argparse
 import time
+from datetime import datetime
 
 from flask import Flask, g
 from orator import Schema
 
 from news.config.config import load_config, register_functions
-from news.config.routes import register_routes
+from news.config.routes import register_routes, FullyQualifiedSource
 from news.lib.cache import cache
 from news.lib.db.db import db, create_tables
 from news.lib.csrf import csrf
@@ -14,6 +15,7 @@ from news.lib.mail import mail
 from news.lib.metrics import REQUEST_TIME
 from news.lib.sentry import sentry
 from news.lib.solr import solr
+from news.lib.utils.time_utils import convert_to_timedelta
 from news.models.ban import Ban
 from news.models.comment import Comment
 from news.models.feed import Feed
@@ -21,9 +23,11 @@ from news.models.feed_admin import FeedAdmin
 from news.models.link import Link
 from news.models.report import Report
 from news.models.subscriptions import create_subscriptions_table
-from news.models.token import DisposableToken
+from news.models.disposable_token import DisposableToken
+from news.models.user import User
 from news.models.vote import CommentVote, LinkVote
-from news.scripts.create_testing_data import importHN, create_stories
+from news.scripts.create_testing_data import importHN, create_stories, loadVotes
+from news.scripts.import_fqs import import_fqs
 
 
 def make_app():
@@ -68,16 +72,6 @@ def make_app():
     # with app.app_context():
     #     from news.models.report import Report
     #     Report.create_table()
-
-
-    @app.before_request
-    def before_request():
-        g.start = time.time()
-
-    @app.teardown_request
-    def teardown_request(exception=None):
-        if g.start:
-            diff = time.time() - g.start
-            REQUEST_TIME.observe(diff)
+    #import_fqs()
 
     return app

@@ -37,9 +37,13 @@ Function should be named by method name + underscore + what thay do, e.g.: get_f
 
 ### Instalation
 
-Minimal requirements: Python3.6 and PostgreSQL
-
 Instalation:
+
+1. Install python3.6
+2. Clone the project
+3. Install pip
+4. Install requirements
+5. Install redis ([how to](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04))
 
 ### Tech stack
 
@@ -66,6 +70,8 @@ Instalation:
 * check that we save to redis only the things we need to save
 * scrollable side-panels on small displays
 * fix sidepanals opening/closing
+* repair buttons on mobile
+* change search input on mobile
 
 ### Cool TODOSs
 * add site-local articles instead of long texts

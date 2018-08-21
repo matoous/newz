@@ -12,6 +12,8 @@ def users_profile(username):
     user = User.by_username(username)
     if user is None:
         abort(404)
+    if user.id == 12345:
+        return render_template('autoposter_profile.html', user=user)
     links = Link.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(11).get()
     comments = Comment.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(11).get()
     administrations = FeedAdmin.by_user_id(user.id)

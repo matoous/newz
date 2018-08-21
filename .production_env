@@ -1,6 +1,5 @@
 DEBUG=False
 SECRET_KEY="ChangeMePlease"
-ME="http://ec2-18-185-127-209.eu-central-1.compute.amazonaws.com/"
 NAME="Popular Reads"
 URL="http://ec2-18-185-127-209.eu-central-1.compute.amazonaws.com/"
 GODS="matoous"

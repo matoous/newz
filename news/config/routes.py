@@ -131,6 +131,8 @@ def register_routes(app):
         Route('/f/<feed:feed>/ban/<username>', ban_user),
         Route('/f/<feed:feed>/ban/<username>', post_ban_user, methods=['POST']),
         Route('/f/<feed:feed>/reports', feed_reports),
+        Route('/f/<feed:feed>/fqs', feed_fqs),
+        Route('/f/<feed:feed>/fqs/add', post_feed_fqs, methods=['POST']),
 
         # LINKS
         Route('/l/<link:link>', get_link),

@@ -14,9 +14,11 @@ from news.lib.rss import rss_page
 from news.lib.utils.file_type import imagefile
 from news.lib.utils.redirect import redirect_back
 from news.lib.utils.resize import create_feed_logo
+from news.lib.utils.time_utils import convert_to_timedelta
 from news.models.ban import BanForm, Ban
 from news.models.feed import FeedForm, EditFeedForm
 from news.models.feed_admin import FeedAdmin
+from news.models.fully_qualified_source import FullyQualifiedSource
 from news.models.link import LinkForm, Link
 from news.models.report import Report
 from news.models.user import User
@@ -30,7 +32,7 @@ def new_feed():
     """
     form = FeedForm()
     if request.method == 'POST' and form.validate():
-        feed = form.feed
+        feed = form.result()
         feed.commit()
         return redirect('/f/{feed}'.format(feed=feed.slug))
     return render_template("new_feed.html", form=form)
@@ -220,6 +222,7 @@ def feed_bans(feed):
 
     return render_template("feed_bans.html", feed=feed, bans=bans, active_tab='bans')
 
+
 @feed_admin_required
 def feed_reports(feed):
     reports = []
@@ -269,3 +272,20 @@ def post_ban_user(feed, username):
         return redirect(feed.route + "/bans")
 
     return render_template("ban_user.html", feed=feed, form=ban_form, user=user)
+
+
+@feed_admin_required
+def feed_fqs(feed):
+    sources = FullyQualifiedSource.where('feed_id', feed.id).get()
+    return render_template('feed_fqs.html', feed=feed, fqs=sources, active_tab='fqs')
+
+
+@feed_admin_required
+def post_feed_fqs(feed):
+    period = convert_to_timedelta(request.form['period'])
+    url = request.form['url']
+    if period and url:
+        fqs = FullyQualifiedSource(url=url, update_interval=period, feed_id=feed.id, next_update=datetime.now())
+        fqs.save()
+    sources = FullyQualifiedSource.where('feed_id', feed.id).get()
+    return render_template('feed_fqs.html', feed=feed, fqs=sources, active_tab='fqs', error="Input invalid")

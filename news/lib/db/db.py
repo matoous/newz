@@ -42,7 +42,7 @@ db = Orator()
 
 def create_tables(app):
     with app.app_context():
-        from news.models.token import DisposableToken
+        from news.models.disposable_token import DisposableToken
         DisposableToken.create_table()
 
         from news.models.feed import Feed

@@ -3,4 +3,4 @@ Hello {{ user.username }}!
 Please verify you email on: {{ url }}
 
 Have a nice day,
-{{ config['ME'] }} team
+{{ config['NAME'] }} team

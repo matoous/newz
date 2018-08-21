@@ -1,0 +1,59 @@
+{% extends "feed_admin_base.html" %}
+
+{% block admin_content %}
+    <h1>Fully Qualified Sources</h1>
+    <form method="POST" action="{{ feed.route }}/fqs/add" class="">
+    <fieldset>
+        <input name="url" type="url" placeholder="Source url">
+        <input name="period" type="text" placeholder="Update period">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit">
+            Add
+        </button>
+    </fieldset>
+    </form>
+    <table>
+        <thead>
+        <tr>
+            <td>
+                source
+            </td>
+            <td>
+                update period
+            </td>
+            <td>
+                last update
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for source in fqs %}
+            <tr>
+                <td>
+                    <a href="{{ source.url }}">
+                        {{ source.url }}
+                    </a>
+                </td>
+                <td>
+                    {{ source.interval }}
+                </td>
+                <td>
+                    {{ source.updated_at }}
+                </td>
+            <td>
+                <a href="{{ feed.route }}/fqs/{{ source.id }}/update">
+                    trigger update
+                </a>
+            </td>
+                <td>
+                <a href="{{ feed.route }}/fqs/{{ source.id }}/remove">
+                    remove
+                </a>
+            </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
