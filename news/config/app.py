@@ -56,7 +56,7 @@ def make_app():
 
     register_routes(app)
 
-
+    #cache.clear()
     #archive_links()
     #loadVotes()
     #create_tables(app)

@@ -27,6 +27,10 @@ class FullyQualifiedSource(Base):
             table.integer('feed_id').unsigned()
             table.foreign('feed_id').references('id').on('feeds').ondelete('cascade')
 
+    @classmethod
+    def _cache_prefix(cls):
+        return "fqs:"
+
     @accessor
     def update_interval(self) -> timedelta:
         return timedelta(seconds=self.get_raw_attribute('update_interval'))
@@ -38,17 +42,38 @@ class FullyQualifiedSource(Base):
     def should_update(self) -> bool:
         return self.updated_at + self.update_interval > datetime.now()
 
-    @accessor
+    @property
     def feed(self):
         from news.models.feed import Feed
-        if not 'feed' in self._relations:
+        if 'feed' not in self._relations:
             self._relations['feed'] = Feed.by_id(self.feed_id)
         return self._relations['feed']
 
     def get_links(self):
         d = feedparser.parse(self.url)
-        return [{'title': entry['title'],
-                 'slug': make_slug(entry['title']),
-                 'text': remove_html_tags(entry['summary']) if 'summary' in entry else '',
-                 'url': entry['link'],
-                 'feed_id': self.feed.id} for entry in d['entries'] if len(entry['title']) < 128]
+
+        res = []
+        for entry in d['entries']:
+            # get the link text
+            text = remove_html_tags(entry['summary']) if 'summary' in entry else ''
+            if len(text) > 300:
+                if 'content' in entry:
+                    for e in entry['content']:
+                        if 'value' in e and len(e['value']) < 300:
+                            text = remove_html_tags(e['value'])
+            if len(text) > 300:
+                idx = text.rfind('. ', 0, 300)
+                text = text[:idx + 1]
+
+            #img?
+            if 'links' in entry:
+                for link in entry['links']:
+                    if link['type'] == 'image/jpeg':
+                        print(link)
+
+            res.append({'title': entry['title'],
+                        'slug': make_slug(entry['title']),
+                        'text': text,
+                        'url': entry['link'],
+                        'feed_id': self.feed.id})
+        return res

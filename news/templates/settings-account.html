@@ -28,7 +28,7 @@
                 {{ pw_form.new_password_again }}
             </div>
             {{ pw_form.csrf_token }}
-            <input type="submit" value="Change">
+            <input type="submit" value="Change" class="btn">
         </fieldset>
     </form>
     <form action="/settings/email" method="POST">
@@ -57,7 +57,7 @@
                 {% endif %}
             </div>
             {{ email_form.csrf_token }}
-            <input type="submit" value="Change">
+            <input type="submit" value="Change" class="btn">
         </fieldset>
     </form>
     <form method="POST" action="/settings/deactivate">
@@ -76,7 +76,7 @@
             </div>
             {{ deactivate_form.csrf_token }}
             <input type="submit" value="Delete account"
-                   onclick="return confirm('Are you sure you want to delete your account?');">
+                   onclick="return confirm('Are you sure you want to delete your account?');" class="btn grey">
         </fieldset>
     </form>
 {% endblock %}

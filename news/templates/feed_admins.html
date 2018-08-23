@@ -6,7 +6,7 @@
                 <form method="post" action="/f/{{ feed.slug }}/add_admin">
                     <input type="text" name="username" id="username" placeholder="Email or username">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <button type="submit">Add</button>
+                    <button type="submit" class="btn">Add</button>
                 </form>
             </div>
             <table>

@@ -289,3 +289,23 @@ def post_feed_fqs(feed):
         fqs.save()
     sources = FullyQualifiedSource.where('feed_id', feed.id).get()
     return render_template('feed_fqs.html', feed=feed, fqs=sources, active_tab='fqs', error="Input invalid")
+
+
+@feed_admin_required
+def update_fqs(_, fqs_id):
+    source = FullyQualifiedSource.by_id(fqs_id)
+    articles = source.get_links()
+    for article in articles:
+        # skip if article already posted
+        if Link.by_slug(article['slug']) is not None:
+            continue
+        link = Link(title=article['title'],
+                    slug=article['slug'],
+                    text=article['text'],
+                    url=article['url'],
+                    feed_id=source.feed_id,
+                    user_id=12345)
+        link.commit()
+    source.next_update = datetime.now() + timedelta(seconds=source.update_interval)
+    source.save()
+    return redirect(redirect_back(source.feed.route))

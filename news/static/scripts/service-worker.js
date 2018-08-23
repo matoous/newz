@@ -1,6 +1,6 @@
 const cacheName = 'globaltimes-cache';
 let filesToCache = [
-    '/static/scripts/menu.js',
+    '/static/scripts/main.js',
     '/static/scripts/snuownd.js',
     '/static/stylesheets/main.css',
     '/static/images/bookmark.svg',

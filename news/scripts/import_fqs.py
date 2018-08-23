@@ -35,4 +35,4 @@ def import_fqs():
                             user_id=AUTOPOSTER_ID)
                 link.commit()
             source.next_update = now + timedelta(seconds=source.update_interval)
-            source.update()
+            source.save()

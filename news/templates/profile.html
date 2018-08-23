@@ -10,67 +10,65 @@
             {% endif %}
         </div>
     </div>
-    {% if administrations|length > 0 %}
-        <div class="profile-section">
-        <div class="container">
-                        <h2>Admin of</h2>
-            <div class="administrations">
-                {% for administration in administrations %}
-                    <div class="s-feed">
-                        <h2>
-                            <a href="{{ administration.feed.route }}">
-                                {{ administration.feed.name }}
-                            </a>
-                        </h2>
-                        <div>
-                            {{ administration.feed.description }}
-                        </div>
-                        <div class="bottom-line">
-                            <div class="subcribers">
-                                {{ administration.feed.subscribers_count }} subscribers
-                            </div>
-                            <div class="date">
-                                {{ administration.feed.time_ago() }}
-                            </div>
-                        </div>
-                    </div>
+    <div class="main-profile container">
+        <div class="profile-section section-links">
+            <h2>Best Links</h2>
+            <div class="links">
+                {% for link in links %}
+                    {% with link=link %}
+                        {% include 'link_listing.html' %}
+                    {% endwith %}
                 {% endfor %}
             </div>
+            {% if has_more_links %}
+                <div class="page-navigation">
+                    <a href="{{ user.route }}/posts?s=new">More</a>
+                </div>
+            {% endif %}
         </div>
-        </div>
-    {% endif %}
-    <div class="profile-section">
-    <div class="container">
-                <h2>Best Links</h2>
-        <div class="links">
-            {% for link in links %}
-                {% with link=link %}
-                    {% include 'link_listing.html' %}
-                {% endwith %}
-            {% endfor %}
-        </div>
-        {% if has_more_links %}
-            <div class="page-navigation">
-                <a href="{{ user.route }}/posts?s=new">More</a>
-            </div>
-        {% endif %}
-    </div>
-    </div>
-    <div class="profile-section">
-    <div class="container">
+        {% if comments %}
+            <div class="profile-section section-comments">
                 <h2>Best Comments</h2>
-        <div class="comments">
-            {% for comment in comments %}
-                {% with comment=comment %}
-                    {% include 'comment_listing.html' %}
-                {% endwith %}
-            {% endfor %}
-        </div>
-        {% if has_more_comments %}
-            <div class="page-navigation">
-                <a href="{{ user.route }}/comments?s=new">More</a>
+                <div class="comments">
+                    {% for comment in comments %}
+                        {% with comment=comment %}
+                            {% include 'comment_listing.html' %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+                {% if has_more_comments %}
+                    <div class="page-navigation">
+                        <a href="{{ user.route }}/comments?s=new">More</a>
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
-    </div>
+        {% if administrations|length > 0 %}
+            <div class="profile-section section-admin">
+                <h2>Admin of</h2>
+                <div class="administrations">
+                    {% for administration in administrations %}
+                        <div class="s-feed">
+                            <h2>
+                                <a href="{{ administration.feed.route }}">
+                                    {{ administration.feed.name }}
+                                </a>
+                            </h2>
+                            <div>
+                                {{ administration.feed.description }}
+                            </div>
+                            <div class="bottom-line">
+                                <div class="subcribers">
+                                    {{ administration.feed.subscribers_count }} subscribers
+                                </div>
+                                <div class="date">
+                                    {{ administration.feed.time_ago() }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

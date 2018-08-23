@@ -77,8 +77,8 @@ commentComment = function(id, route) {
 <textarea name="text" rows='6'></textarea>
 <input class="parent_id" name="parent_id" hidden value="${id}">
 <input name="csrf_token" value="${document.querySelector("#csrf_token").value}" type="hidden">
-<button class="small" type="submit">Submit</button>
-<button class="small" type="reset" onclick="return cancelComment('${nowId}')">Cancel</button>
+<button class="btn small" type="submit">Submit</button>
+<button class="btn small" type="reset" onclick="return cancelComment('${nowId}')">Cancel</button>
 </form>`;
     return false;
 };

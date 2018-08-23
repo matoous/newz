@@ -17,6 +17,7 @@ def feed_admin_required(func):
         return func(feed, *args, **kwargs)
     return check
 
+
 def not_banned(func):
     """
     Check that user is not banned from given feed

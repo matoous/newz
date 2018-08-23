@@ -70,10 +70,10 @@ class Link(Base):
     def hot(self):
         return hot(self.score, self.created_at)
 
-    @accessor
+    @property
     def feed(self):
         from news.models.feed import Feed
-        if not 'feed' in self._relations:
+        if 'feed' not in self._relations:
             self._relations['feed'] = Feed.by_id(self.feed_id)
         return self._relations['feed']
 
@@ -81,20 +81,18 @@ class Link(Base):
     def by_slug(cls, slug):
         cache_key = "lslug:{}".format(slug)
         id = cache.get(cache_key)
-        print('id found: {}'.format(id))
         if id is None:
             link = Link.where('slug', slug).first()
-            print('l by slug', slug, link)
             if link is not None:
                 id = link.id
                 cache.set(cache_key, id)
 
         return Link.by_id(id) if id else None
 
-    @accessor
+    @property
     def user(self):
         from news.models.user import User
-        if not 'user' in self._relations:
+        if 'user' not in self._relations:
             self._relations['user'] = User.by_id(self.user_id)
         return self._relations['user']
 
@@ -171,6 +169,9 @@ class Link(Base):
         with self.get_read_modify_write_lock():
             self.archived = True
             self.update_with_cache()
+
+    def is_autoposted(self) -> bool:
+        return self.user_id == 12345
 
 
 class LinkForm(FlaskForm):

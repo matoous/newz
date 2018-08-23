@@ -133,6 +133,7 @@ def register_routes(app):
         Route('/f/<feed:feed>/reports', feed_reports),
         Route('/f/<feed:feed>/fqs', feed_fqs),
         Route('/f/<feed:feed>/fqs/add', post_feed_fqs, methods=['POST']),
+        Route('/f/<feed:feed>/fqs/<fqs_id>/update', update_fqs),
 
         # LINKS
         Route('/l/<link:link>', get_link),
