@@ -14,15 +14,15 @@ def users_profile(username):
         abort(404)
     if user.id == 12345:
         return render_template('autoposter_profile.html', user=user)
-    links = Link.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(11).get()
-    comments = Comment.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(11).get()
+    links = Link.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(9).get()
+    comments = Comment.where('user_id', user.id).order_by_raw('ups - downs DESC').limit(6).get()
     administrations = FeedAdmin.by_user_id(user.id)
     return render_template('profile.html',
                            user=user,
-                           links=links[:min(len(links), 10)],
-                           has_more_links=len(links) > 10,
-                           comments=comments[:min(len(comments), 10)],
-                           has_more_comments=len(comments) > 10,
+                           links=links[:min(len(links), 8)],
+                           has_more_links=len(links) > 8,
+                           comments=comments[:min(len(comments), 5)],
+                           has_more_comments=len(comments) > 5,
                            administrations=administrations,
                            active_section='about')
 
