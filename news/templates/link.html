@@ -76,7 +76,6 @@
                     {% for comment_id, subcomments in comments recursive %}
                         {% set comment = get_comment(comment_id) %}
                         <div class="comment" id="c{{ comment.id }}">
-                            {% if not link.archived %}
                                 <div class="comment-voting">
                                     <div class="up">
                                         {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_upvote %}
@@ -101,7 +100,6 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                            {% endif %}
                             <div class="comment-body">
                                 <div class="comment-header">
                             <span>
