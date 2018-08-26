@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-epoch = datetime(1970, 1, 1)
+EPOCH = datetime(1970, 1, 1)
 
 
 def epoch_seconds(date):
@@ -9,7 +9,7 @@ def epoch_seconds(date):
     :param date: date
     :return: epoch seconds
     """
-    td = date - epoch
+    td = date - EPOCH
     return td.total_seconds()
 
 

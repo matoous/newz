@@ -10,6 +10,17 @@ from news.models.base import Base
 
 
 class FullyQualifiedSource(Base):
+    """Fully Qualified Sources are RSS feeds from which the links are automatically posted to given feed
+
+    Fully Qualified Sources (FQS) are periodically checked, new/not yet posted links are parsed and than posted
+    to the feed. These automatically posted links are editable by admins which allows correction of mistakes
+    such as badly trimmed titles, missing descriptions etc.
+
+    Args:
+        feed_id (int): Id of feed to which this FQS belongs
+        url (string): RSS feed URL
+        update_interval (timedelta): Time between automatic checks
+    """
     __table__ = 'fqs'
     __fillable__ = ['id', 'feed_id', 'url', 'update_interval', 'updated_at', 'created_at', 'next_update']
 
@@ -40,10 +51,19 @@ class FullyQualifiedSource(Base):
         self.set_raw_attribute('update_interval', value.total_seconds())
 
     def should_update(self) -> bool:
+        """
+        Should be feed be updated?
+        :return:
+        """
         return self.updated_at + self.update_interval > datetime.now()
 
     @property
     def feed(self):
+        """
+        Return feed to which this FQS belongs.
+        Caches the result in FQS relations.
+        :return: Feed
+        """
         from news.models.feed import Feed
         if 'feed' not in self._relations:
             self._relations['feed'] = Feed.by_id(self.feed_id)
@@ -71,8 +91,14 @@ class FullyQualifiedSource(Base):
                     if link['type'] == 'image/jpeg':
                         print(link)
 
-            res.append({'title': entry['title'],
-                        'slug': make_slug(entry['title']),
+            # title
+            title = entry['title']
+            if len(title) > 128:
+                idx = title.rfind(' ', 0, 128)
+                title = title[:idx]
+
+            res.append({'title': title,
+                        'slug': make_slug(title),
                         'text': text,
                         'url': entry['link'],
                         'feed_id': self.feed.id})
