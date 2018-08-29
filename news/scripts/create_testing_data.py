@@ -134,22 +134,18 @@ def importHN():
         except Exception as e:
             pass
 
+
 def loadVotes():
     print('Loading CommentVotes to cache...')
     cvotes = CommentVote.get()
-    pipe = cache.pipeline()
-    for v in cvotes:
-        cache_key = CommentVote._cache_key(v.comment_id, v.user_id)
-        pipe.set(cache_key, dumps(v))
-    pipe.execute()
+    for vote in cvotes:
+        vote.write_to_cache()
     print('Done')
 
     print('Loading LinkVotes to cache...')
     lvotes = LinkVote.get()
-    for v in lvotes:
-        cache_key = LinkVote._cache_key(v.link_id, v.user_id)
-        pipe.set(cache_key, dumps(v))
-    pipe.execute()
+    for vote in lvotes:
+        vote.write_to_cache()
     print('Done')
 
 def create_stories():

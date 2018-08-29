@@ -1,7 +1,8 @@
 from redis import StrictRedis
 from pickle import loads, dumps
 
-DEFAULT_CACHE_TTL= 12 * 60 * 60 # 12 hours
+DEFAULT_CACHE_TTL = 12 * 60 * 60 # 12 hours
+
 
 class Cache:
     def __init__(self, app=None):

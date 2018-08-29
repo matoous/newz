@@ -1,3 +1,5 @@
+from pickle import dumps
+
 from orator import Model, accessor, Schema
 from orator.orm import belongs_to
 
@@ -7,7 +9,6 @@ from news.lib.comments import update_comment
 from news.lib.db.db import db
 from news.lib.task_queue import q
 from news.models.comment import Comment
-from news.models.link import Link
 from news.models.user import User
 
 UPVOTE = 1
@@ -33,25 +34,42 @@ class Vote(Model):
     def create_table(cls):
         raise NotImplementedError
 
-    @belongs_to
+    @property
     def user(self):
-        return User
+        from news.models.user import User
+        if 'user' not in self._relations:
+            self._relations['user'] = User.by_id(self.user_id)
+        return self._relations['user']
 
     @belongs_to
     def thing(self):
         raise NotImplementedError
 
     @classmethod
-    def _cache_key(cls, link_id, user_id):
+    def _set_key(cls, link_id):
         raise NotImplementedError
 
     @property
+    def _thing_id(self):
+        raise NotImplementedError
+
+    def write_to_cache(self):
+        cache_key = self.__class__._set_key(self._thing_id)
+        cache_key += "+" if self.is_upvote else "-"
+        cache.sadd(cache_key, self.user_id)
+
+    def del_from_cache(self):
+        cache_key = self.__class__._set_key(self._thing_id)
+        cache_key += "+" if self.is_upvote else "-"
+        cache.srem(cache_key, self.user_id)
+
+    @property
     def is_downvote(self):
-        return self.vote_type == -1
+        return self.vote_type == DOWNVOTE
 
     @property
     def is_upvote(self):
-        return self.vote_type == 1
+        return self.vote_type == UPVOTE
 
     @property
     def affected_attribute(self):
@@ -65,11 +83,21 @@ class Vote(Model):
 class LinkVote(Vote):
     __table__ = 'link_votes'
     __fillable__ = ['user_id', 'link_id', 'vote_type']
-    __timestamps__ = False
-    __incrementing__ = False
 
+    @property
+    def _thing_id(self):
+        return self.link_id
+
+    @property
     def thing(self):
-        return None
+        return self.link
+
+    @property
+    def link(self):
+        from news.models.link import Link
+        if 'link' not in self._relations:
+            self._relations['link'] = Link.by_id(self.link_id)
+        return self._relations['link']
 
     @classmethod
     def create_table(cls):
@@ -92,17 +120,9 @@ class LinkVote(Vote):
     def __repr__(self):
         return "<LinkVote {}:{} {}>".format(self.user_id, self.link_id, self.vote_type)
 
-    @accessor
-    def user(self):
-        return User.by_id(self.user_id)
-
-    @accessor
-    def link(self):
-        return Link.by_id(self.link_id)
-
     @classmethod
-    def _cache_key(cls, link_id, user_id):
-        return 'lv:{}_{}'.format(link_id, user_id)
+    def _set_key(cls, link_id):
+        return 'lv:{}'.format(link_id)
 
     def commit(self):
         self.apply()
@@ -110,12 +130,12 @@ class LinkVote(Vote):
 
     @classmethod
     def by_link_and_user(cls, link_id, user_id):
-        cache_key = cls._cache_key(link_id, user_id)
-        return cache.get(cache_key)
-
-    def _write_to_cache(self):
-        cache_key = self.__class__._cache_key(self.link_id, self.user_id)
-        cache.set(cache_key, self, ttl=0)
+        cache_key = cls._set_key(link_id)
+        if cache.sismember(cache_key + "+", user_id):
+            return cls(link_id=link_id, user_id=user_id, vote_type=UPVOTE)
+        if cache.sismember(cache_key + "-", user_id):
+            return cls(link_id=link_id, user_id=user_id, vote_type=DOWNVOTE)
+        return None
 
     def apply(self):
         previous_vote = LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).first()
@@ -124,17 +144,18 @@ class LinkVote(Vote):
             return
 
         if previous_vote and previous_vote.affected_attribute:
+            print('deleting previous vote', previous_vote.__dict__)
+            previous_vote.del_from_cache()
             self.link.decr(previous_vote.affected_attribute, 1)
 
         if self.affected_attribute:
             self.link.incr(self.affected_attribute, 1)
+            self.write_to_cache()
 
         if previous_vote is None:
             self.save()
         else:
             LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).update({'vote_type': self.vote_type})
-
-        self._write_to_cache()
 
         if self.link.num_votes < 20 or self.link.num_votes % 8 == 0:
             q.enqueue(update_link, self.link, result_ttl=0)
@@ -143,8 +164,10 @@ class LinkVote(Vote):
 class CommentVote(Vote):
     __table__ = 'comment_votes'
     __fillable__ = ['user_id', 'comment_id', 'vote_type']
-    __timestamps__ = False
-    __incrementing__ = False
+
+    @property
+    def _thing_id(self):
+        return self.comment_id
 
     def thing(self):
         return None
@@ -173,8 +196,8 @@ class CommentVote(Vote):
         return Comment.by_id(self.comment_id)
 
     @classmethod
-    def _cache_key(cls, comment_id, user_id):
-        return 'cv:{}_{}'.format(comment_id, user_id)
+    def _set_key(cls, comment_id):
+        return 'cv:{}'.format(comment_id)
 
     def commit(self):
         self.apply()
@@ -182,12 +205,12 @@ class CommentVote(Vote):
 
     @classmethod
     def by_comment_and_user(cls, comment_id, user_id):
-        cache_key = cls._cache_key(comment_id, user_id)
-        return cache.get(cache_key)
-
-    def _write_to_cache(self):
-        cache_key = self.__class__._cache_key(self.comment_id, self.user_id)
-        cache.set(cache_key, self, ttl=0)
+        cache_key = cls._set_key(comment_id)
+        if cache.sismember(cache_key + "+", user_id):
+            return cls(comment_id=comment_id, user_id=user_id, vote_type=UPVOTE)
+        if cache.sismember(cache_key + "-", user_id):
+            return cls(comment_id=comment_id, user_id=user_id, vote_type=DOWNVOTE)
+        return None
 
     def apply(self):
         previous_vote = CommentVote.where('user_id', self.user_id).where('comment_id', self.comment_id).first()
@@ -195,17 +218,17 @@ class CommentVote(Vote):
             return
 
         if previous_vote and previous_vote.affected_attribute:
+            previous_vote.del_from_cache()
             self.comment.decr(previous_vote.affected_attribute, 1)
 
         if self.affected_attribute:
+            self.write_to_cache()
             self.comment.incr(self.affected_attribute, 1)
 
         if previous_vote is None:
             self.save()
         else:
             CommentVote.where('user_id', self.user_id).where('comment_id', self.comment_id).update({'vote_type': self.vote_type})
-
-        self._write_to_cache()
 
         if self.comment.num_votes < 20 or self.comment.num_votes % 8 == 0:
             q.enqueue(update_comment, self.comment, result_ttl=0)
