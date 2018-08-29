@@ -4,6 +4,9 @@ from news.lib.db.db import db
 
 
 def create_subscriptions_table():
+    """
+    Create table for feed subscriptions
+    """
     schema = Schema(db)
     schema.drop_if_exists('feeds_users')
     with schema.create('feeds_users') as table:

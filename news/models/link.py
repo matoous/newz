@@ -2,20 +2,21 @@ from flask_wtf import FlaskForm
 from orator import Model, accessor, Schema
 from orator.exceptions.query import QueryException
 from orator.orm import morph_many
-from slugify import slugify
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, URL
 
-from news.lib.cache import cache, cache
+from news.lib.cache import cache
 from news.lib.db.db import db
 from news.lib.db.query import add_to_queries
 from news.lib.db.sorts import sorts
-from news.lib.task_queue import q
 from news.lib.solr import new_link_queue
 from news.lib.sorts import hot
+from news.lib.task_queue import q
 from news.lib.utils.slugify import make_slug
 from news.models.base import Base
+from news.models.comment import Comment
 from news.models.report import Report
+from news.models.vote import CommentVote, LinkVote
 
 MAX_IN_CACHE = 1000
 
@@ -161,11 +162,20 @@ class Link(Base):
         return "/l/{}".format(self.id)
 
     def archive(self):
-        from news.models.vote import LinkVote
-        # TODO delete them from cache too?
+        # delete link votes
         LinkVote.where('link_id', self.id).delete()
-        # TODO delete them from cache too?
-        db.statement('DELETE FROM comment_votes USING comments WHERE comment_votes.comment_id = comments.id AND comments.link_id = {}'.format(self.id))
+        link_upvotes_key, link_downvotes_key = LinkVote.set_keys(self.id)
+        cache.delete(link_upvotes_key)
+        cache.delete(link_downvotes_key)
+
+        # delete comment votes
+        for comment in Comment.where('link_id', self.id):
+            comment_upvotes_key, comment_downvotes_key = CommentVote.set_keys(comment.id)
+            cache.delete(comment_upvotes_key)
+            cache.delete(comment_downvotes_key)
+            CommentVote.where('comment_id', comment.id).delete()
+
+        # update self
         with self.get_read_modify_write_lock():
             self.archived = True
             self.update_with_cache()
@@ -175,25 +185,18 @@ class Link(Base):
 
 
 class LinkForm(FlaskForm):
-    title = StringField('Title', [DataRequired(), Length(max=128, min=6)], render_kw={'placeholder': 'Title', 'autocomplete': 'off'})
-    url = StringField('Url', [DataRequired(), URL(), Length(max=256)], render_kw={'placeholder': 'URL', 'oninput': 'handleUrlChange()', 'autocomplete': 'off'})
-    text = TextAreaField('Summary', [Length(max=8192)], render_kw={'placeholder': 'Summary or text', 'rows': 6, 'autocomplete': 'off'})
+    title = StringField('Title', [DataRequired(), Length(max=128, min=6)],
+                        render_kw={'placeholder': 'Title', 'autocomplete': 'off'})
+    url = StringField('Url', [DataRequired(), URL(), Length(max=256)],
+                      render_kw={'placeholder': 'URL', 'oninput': 'handleUrlChange()', 'autocomplete': 'off'})
+    text = TextAreaField('Summary', [Length(max=8192)],
+                         render_kw={'placeholder': 'Summary or text', 'rows': 6, 'autocomplete': 'off'})
 
-    def __init__(self, *args, **kwargs):
-        FlaskForm.__init__(self, *args, **kwargs)
-        self.link = None
-
-    def validate(self, feed, user):
-        rv = FlaskForm.validate(self)
-        if not rv:
-            return False
-        self.link = Link(title=self.title.data,
-                         slug=make_slug(self.title.data),
-                         text=self.text.data,
-                         url=self.url.data,
-                         feed_id=feed.id,
-                         user_id=user.id)
-        return True
+    def result(self):
+        return Link(title=self.title.data,
+                    slug=make_slug(self.title.data),
+                    text=self.text.data,
+                    url=self.url.data)
 
 
 class SavedLink(Model):

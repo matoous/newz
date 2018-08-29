@@ -72,6 +72,7 @@ Instalation:
 * fix sidepanals opening/closing
 * repair buttons on mobile
 * change search input on mobile
+* ban user completely when he has too many bans
 
 ### Cool TODOSs
 * add site-local articles instead of long texts

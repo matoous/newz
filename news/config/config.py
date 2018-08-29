@@ -66,6 +66,8 @@ def load_config(app):
 
     app.config['DEFAULT_FEEDS'] = json.loads(os.getenv('DEFAULT_FEEDS')) if os.getenv('DEFAULT_FEEDS') else []
 
+    app.config['S3_BUCKET'] = get_string('S3_BUCKET', 'newspublic')
+
 
 def register_functions(app):
     def format_datetime(value, format='medium'):

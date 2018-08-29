@@ -9,20 +9,6 @@ from news.views.links import *
 
 
 class Route:
-    """ A basic Flask router, used for the most basic form of flask routes,
-    namely functionally based views which would normally use the ``@route``
-    decorator.
-    .. versionadded:: 2014.05.19
-    Example
-    -------
-    .. sourcecode:: python
-        from flask.ext.via.routes import default
-        from yourapp.views import foo_view, bar_view
-        routes = [
-            default.Functional('/foo', 'foo', foo_view),
-            default.Functional('/bar', 'bar', bar_view),
-        ]
-    """
 
     def __init__(self, url, func, endpoint=None, methods=None):
         """ Basic router constructor, stores passed arguments on the

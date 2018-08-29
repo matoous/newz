@@ -5,6 +5,9 @@ DEFAULT_CACHE_TTL = 12 * 60 * 60 # 12 hours
 
 
 class Cache:
+    """
+    Cache serves as universal object for access to Redis
+    """
     def __init__(self, app=None):
         self.conn = None
         self._config = None
@@ -13,6 +16,10 @@ class Cache:
             self.init_app(app)
 
     def init_app(self, app):
+        """
+        Init Redis Cache and add config
+        :param app: application
+        """
         if 'REDIS' not in app.config:
             raise RuntimeError('Missing "REDIS" configuration')
 
@@ -20,6 +27,10 @@ class Cache:
         self.conn = StrictRedis.from_url(self._config['URL'])
 
     def get(self, key: str, raw: bool = False) -> object:
+        """
+        Get object from cache
+        :rtype: object
+        """
         data = self.conn.get(key)
         if raw:
             return data
@@ -48,5 +59,6 @@ class Cache:
 
     def __delitem__(self, name):
         del self.conn[name]
+
 
 cache = Cache()

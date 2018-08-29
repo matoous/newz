@@ -55,8 +55,7 @@ def users_posts(username):
 
 @login_required
 def saved_links():
-    saved_links = SavedLink.by_user(current_user)
-    links, less, more = paginate(saved_links, 20)
+    links = SavedLink.by_user(current_user)
+    links, less, more = paginate(links, 20)
     return render_template("saved_links.html", user=current_user, links=links, less_links=less, more_links=more)
 
-# TODO turnoff / turnon amdin tools

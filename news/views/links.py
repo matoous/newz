@@ -114,9 +114,10 @@ def comment_link(link):
         abort(405)
 
     comment_form = CommentForm()
-    if comment_form.validate(current_user, link):
-        # TODO one universal style for doing this in whole app, maybe form.get_model()
-        comment = comment_form.comment
+    if comment_form.validate():
+        comment = comment_form.result()
+        comment.user_id = current_user.id
+        comment.link_id = link.id
         comment.commit()
 
     return redirect(link.route)

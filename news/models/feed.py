@@ -59,7 +59,6 @@ class Feed(Base):
     def by_slug(cls, slug: str) -> Optional['Feed']:
         """
         Get feed by slug
-        TODO now it needs two roundtrips, would be nice if it would be possible to do it in one
         :param username: slug
         :return:
         """

@@ -1,11 +1,11 @@
-from flask_wtf import FlaskForm
-from orator import accessor, Schema
+from orator import Schema
 from wtforms import SelectField, HiddenField, TextAreaField
 from wtforms.validators import DataRequired
 
 from news.lib.cache import cache
 from news.lib.db.db import db
 from news.models.base import Base
+from news.models.base_form import BaseForm
 
 
 class Ban(Base):
@@ -13,7 +13,6 @@ class Ban(Base):
     Ban user
     Bans are issued per user per feed
     Bans are permanently cached in redis, so they need to do be loaded in case of cache failure
-    TODO maybe ban user completely or delete him if he has too many bans
     """
     __table__ = 'bans'
     __fillable__ = ['reason', 'feed_id', 'user_id', 'until']
@@ -21,6 +20,9 @@ class Ban(Base):
 
     @classmethod
     def create_table(cls):
+        """
+        Create table for bans
+        """
         schema = Schema(db)
         schema.drop_if_exists('bans')
         with schema.create('bans') as table:
@@ -32,32 +34,36 @@ class Ban(Base):
             table.datetime('created_at')
             table.datetime('updated_at')
             table.datetime('until')
-            table.primary(['feed_id','user_id'])
+            table.primary(['feed_id', 'user_id'])
 
     @classmethod
     def _cache_prefix(cls):
-        return "ban:"
+        """
+        Bans cache prefix
+        :return: 'ban'
+        """
+        return 'ban:'
 
     @property
-    def id(self):
+    def id(self) -> str:
         return "{feed}:{user}".format(feed=self.feed_id, user=self.user_id)
 
-    @accessor
-    def user(self):
+    @property
+    def user(self) -> 'User':
         from news.models.user import User
-        if not 'user' in self._relations:
+        if 'user' not in self._relations:
             self._relations['user'] = User.by_id(self.user_id)
         return self._relations['user']
 
-    @accessor
-    def feed(self):
+    @property
+    def feed(self) -> 'Feed':
         from news.models.feed import Feed
-        if not 'feed' in self._relations:
+        if 'feed' not in self._relations:
             self._relations['feed'] = Feed.by_id(self.feed_id)
         return self._relations['feed']
 
     @classmethod
-    def cache_key(cls, user_id, feed_id):
+    def cache_key(cls, user_id, feed_id) -> str:
         return "{feed}:{user}".format(feed=feed_id, user=user_id)
 
     def apply(self, user=None, feed=None):
@@ -106,12 +112,13 @@ class Ban(Base):
         return cls.where('user_id', feed_id).get()
 
 
-class BanForm(FlaskForm):
+class BanForm(BaseForm):
     user_id = HiddenField('User Id', [DataRequired()])
     reason = TextAreaField('Reason', [DataRequired()])
     duration = SelectField(
         'Duration',
-        choices=[('week', 'Week'), ('month', 'Month'), ('3months', '3 months'), ('6months', '6 months'), ('year', 'Year')]
+        choices=[('week', 'Week'), ('month', 'Month'), ('3months', '3 months'), ('6months', '6 months'),
+                 ('year', 'Year')]
     )
 
     def get_duration(self):

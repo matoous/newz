@@ -12,6 +12,7 @@ from news.models.link import Link
 
 DEFAULT_FEEDS = [3, 4, 5, 7, 78, 79, 80, 81, 2, 82, 6, 83, 1, 84, 85, 86, 87, 88, 89, 90]
 
+
 class LinksListing(View):
     def dispatch_request(self):
         pass
@@ -21,6 +22,7 @@ class LinksListing(View):
 
     def get(self):
         pass
+
 
 class CommonListing(LinksListing):
     def feed_ids(self):
@@ -39,7 +41,8 @@ def index():
                            show_logo=True,
                            less_links=has_less,
                            more_links=has_more,
-                           title="Home")
+                           title="eSource news")
+
 
 def index_rss():
     if current_user.is_authenticated:
@@ -72,7 +75,7 @@ def new():
                            links=links,
                            less_links=has_less,
                            more_links=has_more,
-                           title="New")
+                           title="eSource news - new")
 
 
 def best():
@@ -85,7 +88,7 @@ def best():
                            links=links,
                            less_links=has_less,
                            more_links=has_more,
-                           title="Best")
+                           title="eSource news - best")
 
 
 def trending():
@@ -97,34 +100,42 @@ def trending():
                            links=links,
                            less_links=has_less,
                            more_links=has_more,
-                           title="Trending")
+                           title="eSource news - trending")
 
 
 def how_it_works():
     return render_template("how_it_works.html")
 
+
 def contact():
     return render_template("contact.html")
+
 
 def get_help():
     return render_template("help.html")
 
+
 def terms():
     return render_template("terms.html")
+
 
 def privacy():
     return render_template("privacy.html")
 
+
 def rules():
     return render_template("rules.html")
+
 
 def jobs():
     return render_template("jobs.html")
 
+
 def suggest_feed():
     return render_template("suggest_feed.html")
+
 
 def metrics():
     registry = core.REGISTRY
     output = generate_latest(registry)
-    return(output)
+    return (output)

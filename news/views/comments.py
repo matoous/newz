@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect, escape
 
-from news.lib.access import feed_admin_required
 from news.lib.utils.redirect import redirect_back
 from news.models.report import Report, ReportForm
 from news.models.vote import CommentVote, vote_type_from_string
@@ -23,7 +22,7 @@ def comment_report(comment):
 def post_comment_report(comment):
     """
     Handle comment report
-    :param id: comment id
+    :param comment: comment
     :return:
     """
     if comment.link.archived:
@@ -31,10 +30,10 @@ def post_comment_report(comment):
 
     report_form = ReportForm()
     if report_form.validate():
-        report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id,
-                        feed_id=comment.link.feed.id)
+        report = report_form.result()
+        report.user_id = current_user.id
+        report.feed_id = comment.link.feed.id
 
-        # todo do this in one function (same as link report)
         comment.reports().save(report)
         comment.incr('reported', 1)
 
@@ -47,7 +46,7 @@ def post_comment_report(comment):
 def remove_comment(comment):
     """
     Remove comment
-    :param id: comment id
+    :param comment: comment
     :return:
     """
     if not current_user.is_feed_admin(comment.link.feed) and not current_user.is_god():
@@ -56,10 +55,7 @@ def remove_comment(comment):
     if comment.link.archived:
         abort(405)
 
-    # save the path where to go
-    # TODO inform user
-    comment.text = escape('<removed>')
-    comment.update_with_cache()
+    comment.remove()
 
     return redirect(redirect_back(comment.route))
 

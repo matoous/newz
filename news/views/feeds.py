@@ -82,7 +82,9 @@ def get_feed_rss(feed):
 def add_link(feed):
     form = LinkForm()
     if request.method == 'POST' and form.validate(feed, current_user):
-        link = form.link
+        link = form.result()
+        link.user_id = current_user.id
+        link.feed_id = feed.id
         link.commit()
         flash('Link successfully posted', 'success')
         return redirect(feed.route)

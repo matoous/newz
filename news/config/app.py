@@ -49,12 +49,14 @@ def make_app():
 
     mail.init_app(app)
 
+    # init sentry only if not in DEBUG mode
     if not app.config['DEBUG']:
         sentry.init_app(app, dsn=app.config['DSN'])
 
     # register view function and other utilities for templates
     register_functions(app)
 
+    # register all routes
     register_routes(app)
 
     #cache.clear()

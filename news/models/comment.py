@@ -5,8 +5,9 @@ from markdown2 import markdown
 from orator import accessor, Schema
 from orator.orm import has_many, morph_many
 from redis_lock import Lock
+from werkzeug.utils import escape
 from wtforms import HiddenField, TextAreaField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import DataRequired, Optional, Length
 
 from news.lib.cache import cache, cache
 from news.lib.comments import add_new_comment
@@ -15,6 +16,7 @@ from news.lib.metrics import CACHE_MISSES, CACHE_HITS
 from news.lib.task_queue import q
 from news.lib.utils.confidence import confidence
 from news.models.base import Base
+from news.models.base_form import BaseForm
 from news.models.report import Report
 
 
@@ -94,7 +96,6 @@ class Comment(Base):
         from news.models.vote import CommentVote
         return CommentVote
 
-
     def vote_by(self, user):
         """
         Get comment vote by user
@@ -139,7 +140,13 @@ class Comment(Base):
     def route(self):
         return '/c/{}'.format(self.id)
 
-    # TODO implement delete(self) so the comments get actually removed or just change the test to [REMOVED] or smthng
+    def remove(self):
+        """
+        Soft remove of the comment from Link
+        Changes the text of the comment to <removed>
+        """
+        self.text = escape('<removed>')
+        self.update_with_cache()
 
 
 class TreeNotBuildException(Exception):
@@ -150,6 +157,7 @@ class CommentTreeCache:
     """
     Caching class for comment tree for link
     """
+
     def __init__(self, link_id, tree):
         self.link_id = link_id
         self.tree = tree
@@ -199,7 +207,8 @@ class CommentTreeCache:
         :param comments: comments
         :return:
         """
-        with Lock(cache.conn, cls._lock_key(link)): # todo lock in CommentTree not here, so we dont fetch all comments more times on miss
+        with Lock(cache.conn, cls._lock_key(
+                link)):  # todo lock in CommentTree not here, so we dont fetch all comments more times on miss
             tree = {}
             for comment in comments:
                 tree.setdefault(comment.parent_id, []).append(comment.id)
@@ -218,6 +227,7 @@ class CommentTree:
 
     CommentTree uses CommentTreeCache od background to access and modify comments for given link
     """
+
     def __init__(self, link, tree):
         self.link = link
         self.tree = tree
@@ -270,6 +280,7 @@ class SortedComments:
     This way all we need to do to update the tree is update comments only under the parent comment
     To get the tree we recursively traverse the tree a fetch children comments
     """
+
     def __init__(self, link):
         self.link = link
         self._tree = CommentTree.by_link(link).tree
@@ -341,18 +352,10 @@ class SortedComments:
         return tree[1]
 
 
-class CommentForm(FlaskForm):
-    text = TextAreaField('comment', [DataRequired()])
+class CommentForm(BaseForm):
+    text = TextAreaField('comment', [DataRequired(), Length(max=8192)])
     parent_id = HiddenField('parent_id', [Optional()], render_kw={'class': 'parent_comment_id'})
 
-    def __init__(self, *args, **kwargs):
-        FlaskForm.__init__(self, *args, **kwargs)
-        self.comment = None
-
-    def validate(self, user, link):
-        # todo add validation
-        self.comment = Comment(text=markdown(self.text.data, safe_mode="escape"),
-                               parent_id=int(self.parent_id.data) if self.parent_id.data != '' else None,
-                               user_id=user.id,
-                               link_id=link.id)
-        return True
+    def result(self):
+        return Comment(text=markdown(self.text.data, safe_mode="escape"),
+                       parent_id=int(self.parent_id.data) if self.parent_id.data != '' else None)

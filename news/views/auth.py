@@ -30,7 +30,7 @@ def post_signup():
 
     form = SignUpForm()
     if form.validate():
-        user = form.user()
+        user = form.result()
         user.register()
         user.login(remember_me=True)
         return redirect('/')

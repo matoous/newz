@@ -21,21 +21,20 @@ from news.lib.validators import UniqueUsername, UniqueEmail
 from news.lib.verifications import EmailVerification
 from news.models.ban import Ban
 from news.models.base import Base
-from news.models.feed_admin import FeedAdmin
-from news.models.ip import Ip
 from news.models.disposable_token import DisposableToken
+from news.models.feed_admin import FeedAdmin
 
 MAX_SUBSCRIPTIONS_FREE = 50
 
 
 class User(Base):
     __table__ = 'users'
-    __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified', 'subscribed', 'preferred_sort', 'bio', 'url',
+    __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified',
+                    'subscribed', 'preferred_sort', 'bio', 'url',
                     'profile_pic', 'email_public', 'feed_subs', 'p_show_images', 'p_min_link_score']
     __hidden__ = ['password']
     __append__ = ['session_token']
     __searchable__ = ['id', 'username', 'full_name']
-
 
     @classmethod
     def create_table(cls):
@@ -90,29 +89,48 @@ class User(Base):
 
     @property
     def name(self) -> str:
+        """
+        Get users name
+        Full name if available, username otherwise
+        :return: users nae
+        """
         return self.full_name or self.username
 
     def set_password(self, password: str):
+        """
+        Set users password
+        :param password: new password
+        """
         self.set_attribute('password', bcrypt.hash(password))
 
     def check_password(self, password: str) -> bool:
+        """
+        Check users password
+        :param password: submitted password
+        :return:
+        """
         return bcrypt.verify(password, self.password)
 
     def get_id(self) -> str:
         return self.session_token or ''
 
     @accessor
-    def session_token(self):
+    def session_token(self) -> str:
         return self._accessor_cache['session_token']
 
     def login(self, remember_me: bool = False):
+        """
+        Login the user
+        Generate access token which gets saved in session, info about user is then saved to redis
+        :param remember_me:
+        """
         token = DisposableToken.get()
         self._accessor_cache['session_token'] = token.id
         session_key = 'us:{}'.format(self.session_token)
         cache.set(session_key, self.id, ttl=0 if remember_me else 60 * 60 * 2, raw=True)
         login_user(self, remember=remember_me)
 
-        #Ip.from_request()
+        # Ip.from_request()
 
     def logout(self):
         """
@@ -123,7 +141,7 @@ class User(Base):
 
     def register(self):
         """
-        Register new user and send email verification email
+        Register new user and send email verification
         """
         # save self
         self.save()
@@ -155,6 +173,14 @@ class User(Base):
     @staticmethod
     @login_manager.user_loader
     def load_user(session_id: str) -> Optional['User']:
+        """
+        Load user by session id
+
+        Loads the user by session id from cache
+
+        :param session_id: session id
+        :return: maybe user
+        """
         user_id = cache.get('us:{}'.format(session_id), raw=True)
 
         if not user_id:
@@ -169,6 +195,11 @@ class User(Base):
 
     @classmethod
     def by_id(cls, id: int) -> Optional['User']:
+        """
+        Get user by id
+        :param id:
+        :return:
+        """
         u = cls.load_from_cache(id)
         if u is not None:
             return u
@@ -178,7 +209,7 @@ class User(Base):
         return u
 
     @classmethod
-    def _cache_prefix(cls):
+    def _cache_prefix(cls) -> str:
         return "u:"
 
     @property
@@ -294,29 +325,29 @@ class User(Base):
             return False
         return self.username in current_app.config['GODS']
 
-    def is_feed_admin(self, feed: object) -> bool:
+    def is_feed_admin(self, feed: 'Feed') -> bool:
         if not self.is_authenticated:
             return False
         return FeedAdmin.by_user_and_feed_id(self.id, feed.id) is not None
 
-    def is_feed_god(self, feed):
+    def is_feed_god(self, feed: 'Feed') -> bool:
         if not self.is_authenticated:
             return False
         feed_admin = FeedAdmin.by_user_and_feed_id(self.id, feed.id)
         return feed_admin.god if feed_admin is not None else False
 
-    def is_baned_from(self, feed):
+    def is_baned_from(self, feed: 'Feed') -> bool:
         return Ban.by_user_and_feed(self, feed) is not None
 
     @property
-    def route(self):
+    def route(self) -> str:
         return "/u/{}".format(self.username)
 
 
 class SignUpForm(FlaskForm):
     username = StringField('Username',
                            [DataRequired(message='You have to select username'),
-                            Length(min=3,max=20, message='Username must be between 3 and 20 characters long'),
+                            Length(min=3, max=20, message='Username must be between 3 and 20 characters long'),
                             UniqueUsername(message='This username is already taken')],
                            render_kw={'placeholder': 'Username'})
     email = EmailField('Email',
@@ -328,7 +359,7 @@ class SignUpForm(FlaskForm):
                               Length(min=6, message='Password must be at least 6 characters long')],
                              render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
 
-    def user(self):
+    def result(self):
         user = User(username=self.username.data, email=self.email.data)
         user.set_password(self.password.data)
         return user
@@ -396,13 +427,13 @@ class PreferencesForm(FlaskForm):
 
 class PasswordForm(FlaskForm):
     new_password = PasswordField('New password',
-                             [DataRequired('You have to choose password'),
-                              Length(min=6, message='Password must be at least 6 characters long')],
-                             render_kw={'placeholder': 'New password', 'autocomplete': "new-password"})
+                                 [DataRequired('You have to choose password'),
+                                  Length(min=6, message='Password must be at least 6 characters long')],
+                                 render_kw={'placeholder': 'New password', 'autocomplete': "new-password"})
     new_password_again = PasswordField('New password again',
-                             [DataRequired('You have to choose password'),
-                              Length(min=6, message='Password must be at least 6 characters long')],
-                             render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
+                                       [DataRequired('You have to choose password'),
+                                        Length(min=6, message='Password must be at least 6 characters long')],
+                                       render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
     old_password = PasswordField('Old password', render_kw={'autocomplete': 'off'})
 
     def validate(self):
@@ -468,7 +499,7 @@ class SetPasswordForm(FlaskForm):
         return self.password.data == self.password_again.data
 
 
-PASSWORD_RESET_EXPIRE = 60*60* 1  # 48 hours
+PASSWORD_RESET_EXPIRE = 60 * 60 * 1  # 48 hours
 
 
 class PasswordReset:

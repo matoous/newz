@@ -43,3 +43,17 @@ def reset_email(user, url):
                   recipients=[user.email])
     msg.body = render_template("mails/reset.txt", user=user, url=url, new_reset=current_app.config['URL'] + "/reset_password")
     return msg
+
+
+def registration_email(user, url):
+    """
+    Send registration email to user with email verification link
+    :param user: user
+    :param url: verification url
+    :return: prepared email
+    """
+    msg = Message("Please confirm your account",
+                  sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                  recipients=[user.email])
+    msg.body = render_template("mails/registration.txt", user=user, url=url)
+    return msg

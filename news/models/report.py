@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from orator import Model, accessor, Schema
 from orator.orm import morph_to
 from wtforms import TextAreaField, RadioField, IntegerField
-from wtforms.validators import Length
+from wtforms.validators import Length, Required, DataRequired
 
 from news.lib.db.db import db
 
@@ -13,6 +13,9 @@ class Report(Model):
 
     @classmethod
     def create_table(cls):
+        """
+        Create table for reports
+        """
         schema = Schema(db)
         schema.drop_if_exists('reports')
         with schema.create('reports') as table:
@@ -35,9 +38,13 @@ class Report(Model):
         return
 
     @accessor
-    def user(self):
+    def user(self) -> 'User':
+        """
+        Get report author
+        :return: author of report
+        """
         from news.models.user import User
-        if not 'user' in self._relations:
+        if 'user' not in self._relations:
             self._relations['user'] = User.by_id(self.user_id)
         return self._relations['user']
 
@@ -51,7 +58,7 @@ class Report(Model):
 
     @accessor
     def thing(self):
-        if not 'thing' in self._relations:
+        if 'thing' not in self._relations:
             if self.reportable_type == 'comments':
                 from news.models.comment import Comment
                 self._relations['thing'] = Comment.by_id(self.reportable_id)
@@ -63,8 +70,9 @@ class Report(Model):
 
 class ReportForm(FlaskForm):
     comment = TextAreaField("Comment", [Length(max=2048)], render_kw={"placeholder": "Comment", "autocomplete": "off"})
-    reason = RadioField("Reason", choices=[('breaks_rules',''),('spam',''), ('offensive', ''), ('other', '')])
-    think_id = IntegerField("think_id")
+    reason = RadioField("Reason", choices=[('breaks_rules', ''), ('spam', ''), ('offensive', ''), ('other', '')])
+    think_id = IntegerField("think_id", [DataRequired()])
 
-    def validate(self):
-        return True
+    def result(self):
+        return Report(reason=self.reason.data,
+                      comment=self.comment.data)
