@@ -1,49 +1,66 @@
-<nav class="main-nav">
+<nav class="main-nav container">
 
-    {% if current_user.is_authenticated and not hide_menues %}
-    <div class="nav-left">
-        <div class="menu-opener left" onclick="toggleMenu('feeds-nav',event);">
-            <img src="/static/images/menu.svg">
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="nav-up">
+{#    {% if current_user.is_authenticated and not hide_menues %}#}
+{#    <div class="nav-left">#}
+{#        <div class="menu-opener left" onclick="toggleMenu('feeds-nav',event);">#}
+{#            <img src="/static/images/menu.svg">#}
+{#        </div>#}
+{#    </div>#}
+{#    {% endif %}#}
         <div class="logo">
             <a href="/">
                 <img src="/static/images/logo02.png" alt="eSource">
             </a>
-        </div>
     </div>
-
-    {% if not hide_menues %}
-    <div class="nav-right">
-        <div class="menu-opener right" onclick="toggleMenu('side-nav',event);">
-            <img src="/static/images/user.svg">
-        </div>
-    </div>
-    {% endif %}
-
-    {% if not hide_menues %}
-    <div class="nav-menu">
-        <div class="index-menu">
-            <div class="options">
+        <ul class="menu-items">
+            <li class="item">
                 <a href="/">Home</a>
-                <a href="/trending">Trending</a>
-                <a href="/new">New</a>
-                <a href="/best">Best</a>
-            </div>
-            <div class="search">
-                <form method="get" action="/search">
-                    <input name="q" type="text" autocomplete="off" placeholder="Search" required>
-                    <button type="submit">
-                        <img src="/static/images/search.svg" alt="S">
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+                <div class="sub-items">
+                    <a href="/trending">Trending</a>
+                    <a href="/new">New</a>
+                    <a href="/best">Best</a>
+                </div>
+            </li>
+            <li class="item">
+                <a href="/">Subscriptions</a>
+                <div class="sub-items">
+                {% for feed in current_user.subscribed_feeds %}
+                    <a href="/f/{{feed.slug}}">
+                        {{ feed.name }}
+                    </a>
+                {% endfor %}
+                </div>
+            </li>
+        </ul>
+
+{#    {% if not hide_menues %}#}
+{#    <div class="nav-right">#}
+{#        <div class="menu-opener right" onclick="toggleMenu('side-nav',event);">#}
+{#            <img src="/static/images/user.svg">#}
+{#        </div>#}
+{#    </div>#}
+{#    {% endif %}#}
+
+{#    {% if not hide_menues %}#}
+{#    <div class="nav-menu">#}
+{#        <div class="index-menu">#}
+{#            <div class="options">#}
+{#                <a href="/">Home</a>#}
+{#                <a href="/trending">Trending</a>#}
+{#                <a href="/new">New</a>#}
+{#                <a href="/best">Best</a>#}
+{#            </div>#}
+{#            <div class="search">#}
+{#                <form method="get" action="/search">#}
+{#                    <input name="q" type="text" autocomplete="off" placeholder="Search" required>#}
+{#                    <button type="submit">#}
+{#                        <img src="/static/images/search.svg" alt="S">#}
+{#                    </button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    {% endif %}#}
 </nav>
 <nav class="t-nav hidden" id="side-nav">
     <div class="menu-hider" onclick="toggleMenu('side-nav',event);">
@@ -140,11 +157,3 @@
         </li>
     </ul>
 </nav>
-{% if current_user.is_authenticated %}
-<nav class="t-nav hidden" id="feeds-nav">
-    <div class="menu-hider" onclick="toggleMenu('feeds-nav', event);">
-        <img src="/static/images/x.svg">
-    </div>
-    {% include 'feeds_menu.html' %}
-</nav>
-{% endif %}

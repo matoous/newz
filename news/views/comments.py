@@ -1,10 +1,10 @@
 from flask import render_template, flash
 from flask_login import login_required, current_user
 from werkzeug.exceptions import abort
-from werkzeug.utils import redirect, escape
+from werkzeug.utils import redirect
 
 from news.lib.utils.redirect import redirect_back
-from news.models.report import Report, ReportForm
+from news.models.report import ReportForm
 from news.models.vote import CommentVote, vote_type_from_string
 
 
