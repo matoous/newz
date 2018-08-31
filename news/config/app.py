@@ -77,4 +77,10 @@ def make_app():
     #     Report.create_table()
     #import_fqs()
 
+    print("""eSource news
+    Running on URL: {}
+    Database: {}
+    Redis: {}
+    """.format(app.config['NAME'], app.config['ORATOR_DATABASES'][app.config['ORATOR_DATABASES']['default']]['host'], app.config['REDIS']['URL']))
+
     return app

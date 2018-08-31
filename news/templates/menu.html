@@ -1,150 +1,65 @@
-<nav class="main-nav">
-
-    {% if current_user.is_authenticated and not hide_menues %}
-    <div class="nav-left">
-        <div class="menu-opener left" onclick="toggleMenu('feeds-nav',event);">
-            <img src="/static/images/menu.svg">
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="nav-up">
-        <div class="logo">
+<nav class="nav">
+    <div class="main-nav">
+        <div class="nav-logo">
             <a href="/">
-                <img src="/static/images/logo02.png" alt="eSource">
+                <img src="/static/images/icon01.png" alt="eSource">
             </a>
         </div>
-    </div>
-
-    {% if not hide_menues %}
-    <div class="nav-right">
-        <div class="menu-opener right" onclick="toggleMenu('side-nav',event);">
-            <img src="/static/images/user.svg">
-        </div>
-    </div>
-    {% endif %}
-
-    {% if not hide_menues %}
-    <div class="nav-menu">
-        <div class="index-menu">
-            <div class="options">
+        <div class="nav-links">
+            <div class="nav-nav">
                 <a href="/">Home</a>
                 <a href="/trending">Trending</a>
                 <a href="/new">New</a>
                 <a href="/best">Best</a>
             </div>
-            <div class="search">
+            <div class="nav-search">
                 <form method="get" action="/search">
-                    <input name="q" type="text" autocomplete="off" placeholder="Search" required>
-                    <button type="submit">
-                        <img src="/static/images/search.svg" alt="S">
-                    </button>
+                    <label for="q">
+                        <span>
+                            <svg class="svg-icon" width="25" height="25" viewBox="0 0 25 25">
+                                <path d="M20.067 18.933l-4.157-4.157a6 6 0 1 0-.884.884l4.157 4.157a.624.624 0 1 0 .884-.884zM6.5 11c0-2.62 2.13-4.75 4.75-4.75S16 8.38 16 11s-2.13 4.75-4.75 4.75S6.5 13.62 6.5 11z"></path>
+                            </svg>
+                        </span>
+                        <input type="text" id="q" name="q" title="q" placeholder="Search" required>
+                    </label>
                 </form>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-</nav>
-<nav class="t-nav hidden" id="side-nav">
-    <div class="menu-hider" onclick="toggleMenu('side-nav',event);">
-        <img src="/static/images/x.svg">
-    </div>
-    <ul>
-        <li class="menu-section">
-            <div class="header">
-                Account
-            </div>
-            {% if current_user.is_authenticated %}
-            <div class="user">
-                <div class="info">
-                    {% if current_user.full_name %}
-                    <div class="name">
-                        {{ current_user.full_name }}
-                    </div>
+                <div class="nav-us">
+                    {% if current_user.is_authenticated %}
+                        <div class="name">
+                        {{ current_user.name }}
+                        </div>
+                        <ul class="nav-sub">
+                            <li>
+                                <a href="{{ current_user.route }}">
+                                    Your profile
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/saved">
+                                    Saved links
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/settings">
+                                    Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/logout">
+                                    Sign out
+                                </a>
+                            </li>
+                        </ul>
+                    {% else %}
+                        <a href="/login">Log in</a>
                     {% endif %}
-                    <div class="username">
-                        {{ current_user.username }}
-                    </div>
                 </div>
             </div>
-            <ul>
-                <li>
-                    <a href="{{ current_user.route }}">
-                        Your profile
-                    </a>
-                </li>
-                <li>
-                    <a href="/saved">
-                        Saved links
-                    </a>
-                </li>
-                <li>
-                    <a href="/settings">
-                        Settings
-                    </a>
-                </li>
-                <li>
-                    <a href="/logout">
-                        Sign out
-                    </a>
-                </li>
-            </ul>
-            {% else %}
-            <ul>
-                <li>
-                    <a href="/join">
-                        Sign up
-                    </a>
-                </li>
-                <li>
-                    <a href="/login">
-                        Sign in
-                    </a>
-                </li>
-            </ul>
+        </div>
+        <div class="nav-user">
+            {% if not current_user.is_authenticated %}
+                <a href="/join" class="btn">Join</a>
             {% endif %}
-        </li>
-        <li class="menu-section">
-            <div class="header">
-                Menu
-            </div>
-            <ul>
-                <li>
-                    <a href="/contact">
-                        Contact
-                    </a>
-                </li>
-                <li>
-                    <a href="/help">
-                        Help
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-section">
-            <div class="header">
-                Privacy
-            </div>
-            <ul>
-                <li>
-                    <a href="/terms">
-                        Terms
-                    </a>
-                </li>
-                <li>
-                    <a href="/privacy">
-                        Privacy
-                    </a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-</nav>
-{% if current_user.is_authenticated %}
-<nav class="t-nav hidden" id="feeds-nav">
-    <div class="menu-hider" onclick="toggleMenu('feeds-nav', event);">
-        <img src="/static/images/x.svg">
+        </div>
     </div>
-    {% include 'feeds_menu.html' %}
 </nav>
-{% endif %}
