@@ -13,6 +13,21 @@ toggleMenu = function(tag, ev){
         ev.stopPropagation();
 };
 
+mobileMenuTrigger = function() {
+  let nav = document.querySelector(".mobile-nav");
+  nav.classList.toggle("open");
+};
+
+mobileMenuShowProfile = function() {
+  let nav = document.querySelector(".mobile-profile");
+  nav.classList.toggle("open");
+};
+
+mobileMenuShowSubscribed = function() {
+  let nav = document.querySelector(".mobile-subscribed");
+  nav.classList.toggle("open");
+};
+
 document.addEventListener("click", function(ev){
     if (openMenu && !openMenu.contains(ev.target)) {
         openMenu.classList.toggle('hidden');

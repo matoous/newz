@@ -221,15 +221,15 @@ class User(Base):
         from news.models.feed import Feed
         return Feed
 
-    @has_many
+    @property
     def links(self):
         from news.models.link import Link
-        return Link
+        return Link.where('user_id', self.id).get()
 
     @has_many
     def comments(self):
         from news.models.comment import Comment
-        return Comment
+        return Comment.where('user_id', self.id).get()
 
     @accessor
     def subscribed_feed_ids(self) -> List[str]:
@@ -245,7 +245,7 @@ class User(Base):
         return ids
 
     @accessor
-    def subscribed_feeds(self) -> List[object]:
+    def subscribed_feeds(self) -> List['Feed']:
         from news.models.feed import Feed
         return [Feed.by_id(x) for x in self.subscribed_feed_ids]
 
@@ -269,8 +269,10 @@ class User(Base):
         if Ban.by_user_and_feed(self, feed) is not None:
             return False
 
-        self.feeds().attach(feed)
-        self.incr('feed_subs', 1)
+        with self.get_read_modify_write_lock():
+            self.feeds().attach(feed)
+            self.incr('feed_subs', 1)
+            self.update_with_cache()
 
         # TODO DO IN QUEUE
         feed.incr('subscribers_count', 1)

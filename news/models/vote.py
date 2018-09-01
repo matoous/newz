@@ -162,8 +162,6 @@ class LinkVote(Vote):
     @classmethod
     def by_link_and_user(cls, link_id, user_id):
         cache_key = cls._set_key(link_id)
-        print(cache.smembers(cache_key + "+"))
-        print(cache.smembers(cache_key + "-"))
         if cache.sismember(cache_key + "+", user_id):
             return cls(link_id=link_id, user_id=user_id, vote_type=UPVOTE)
         if cache.sismember(cache_key + "-", user_id):

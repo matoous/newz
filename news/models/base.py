@@ -77,6 +77,7 @@ class Base(Model):
             self.set_raw_attributes(cached)
 
     def update_with_cache(self):
+        print(self.__dict__)
         self.save()
         self.write_to_cache()
 
