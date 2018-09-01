@@ -553,6 +553,7 @@ section {
   display: none;
   padding: 18px 16px;
   font-family: 'Raleway', sans-serif;
+  font-weight: bold;
   cursor: pointer;
 }
 @media screen and (max-width: 720px) {
@@ -564,6 +565,8 @@ section {
   display: none;
   width: 100%;
   color: white;
+  font-family: 'Raleway', sans-serif;
+  font-weight: bold;
 }
 .mobile-nav.open {
   display: block;
