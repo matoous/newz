@@ -47,7 +47,7 @@ class Base(Model):
         Mainly used for read - modify - write procedures
         :return: lock key
         """
-        return "lock:".format(self._cache_key)
+        return "lock:{}".format(self._cache_key)
 
     @classmethod
     def _cache_key_from_id(cls, id: str) -> str:
@@ -65,7 +65,7 @@ class Base(Model):
         Used when updating in cache or database
         :return: RedisLock
         """
-        return Lock(cache.conn, self._lock_key)
+        return Lock(cache.conn, self._lock_key, expire=1)
 
     def update_from_cache(self):
         """
@@ -77,7 +77,6 @@ class Base(Model):
             self.set_raw_attributes(cached)
 
     def update_with_cache(self):
-        print(self.__dict__)
         self.save()
         self.write_to_cache()
 

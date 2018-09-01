@@ -112,6 +112,21 @@ section {
     display: block;
   }
 }
+.mobile-menu-closer {
+  display: none;
+}
+
+body.open {
+  .mobile-nav {
+    display: block;
+  }
+  .mobile-menu-opener {
+    display: none;
+  }
+  .mobile-menu-closer {
+    display: block;
+  }
+}
 
 .mobile-nav {
   display: none;
@@ -119,15 +134,14 @@ section {
   color: white;
     font-family: 'Raleway', sans-serif;
   font-weight: bold;
-  &.open {
-    display: block;
-  }
+  font-size: 1.2rem;
 
   ul {
     list-style: none;
     width: 100%;
     background-color: black;
     padding: 8px 16px;
+    margin: 0;
   }
 
   li {
@@ -140,12 +154,16 @@ section {
 
   .plus, .minus {
     float: right;
+    font-weight: bold;
+    font-size: 1.4rem;
+    line-height: 20px;
   }
 }
 
 .mobile-profile, .mobile-subscribed {
   ul {
     display: none;
+    font-size: 1rem;
   }
   .minus {
     display: none;
@@ -162,7 +180,28 @@ section {
     }
   }
 }
-
+.mobile-search {
+  form {
+    position: relative;
+    margin: 8px 0 4px 0;
+  }
+  span {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 44px;
+  }
+  button {
+    height: 44px;
+    width: 44px;
+    padding: 0;
+    border: none;
+  }
+  input {
+    width: 100%;
+    padding: 12px 16px!important;
+  }
+}
 .nav-nav {
   vertical-align: bottom;
   display: flex;

@@ -269,10 +269,9 @@ class User(Base):
         if Ban.by_user_and_feed(self, feed) is not None:
             return False
 
-        with self.get_read_modify_write_lock():
-            self.feeds().attach(feed)
-            self.incr('feed_subs', 1)
-            self.update_with_cache()
+        self.feeds().attach(feed)
+        self.incr('feed_subs', 1)
+        self.update_with_cache()
 
         # TODO DO IN QUEUE
         feed.incr('subscribers_count', 1)

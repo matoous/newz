@@ -1,63 +1,77 @@
-mobileMenuTrigger = function() {
-  let nav = document.querySelector(".mobile-nav");
-  nav.classList.toggle("open");
-};
+function mobileMenuTrigger(e) {
+    let nav = document.querySelector("body");
+    nav.classList.toggle("open");
+    e.stopPropagation();
+}
+function findClosest(ele, fn) {
+    if (!ele) return undefined;
+    return fn(ele) ? ele : findClosest(ele.parentElement, fn);
+}
 
-window.addEventListener("resize", function(){
-      let nav = document.querySelector(".mobile-nav");
-  if(nav.classList.contains("open") && window.innerWidth > 720){
-      nav.classList.remove("open");
-  }
+document.addEventListener("click", function (e) {
+    let nav = document.querySelector("body");
+    let target = findClosest(e.target, function (el) {
+        return el.classList.contains("mobile-nav")
+    });
+    if (!target && nav.classList.contains("open")) {
+        nav.classList.remove("open");
+    }
 });
 
-mobileMenuShowProfile = function() {
-  let nav = document.querySelector(".mobile-profile");
-  nav.classList.toggle("open");
-};
+window.addEventListener("resize", function () {
+    let nav = document.querySelector("body");
+    if (nav.classList.contains("open") && window.innerWidth > 720) {
+        nav.classList.remove("open");
+    }
+});
 
-mobileMenuShowSubscribed = function() {
-  let nav = document.querySelector(".mobile-subscribed");
-  nav.classList.toggle("open");
-};
+function mobileMenuShowProfile(){
+    let nav = document.querySelector(".mobile-profile");
+    nav.classList.toggle("open");
+}
+function mobileMenuShowSubscribed(){
+    let nav = document.querySelector(".mobile-subscribed");
+    nav.classList.toggle("open");
+}
 
-handleUrlChange = function(){
+handleUrlChange = function () {
     const url = document.querySelector('#url').value;
-    if(url && url !== ''){
+    if (url && url !== '') {
         document.querySelector('#summary').placeholder = 'Short description';
     } else {
         document.querySelector('#summary').placeholder = 'Summary or text';
     }
 };
 
-deleteById = function(id) {
+deleteById = function (id) {
     document.getElementById(id).outerHTML = '';
     return false;
 };
 
-generatePreview = function(){
+generatePreview = function () {
     const md = document.querySelector('#text').value;
     document.querySelector('#preview').innerHTML = SnuOwnd.getParser().render(md);
 };
 
-closeModal = function(id) {
+closeModal = function (id) {
     const reportModal = document.getElementById(id);
     reportModal.style.display = "none";
     return false;
 };
 
-setReplyTo = function(id){
+setReplyTo = function (id) {
     document.querySelectorAll('.parent_comment_id').forEach(i => {
         i.value = id;
     })
 };
 
-cancelComment = function(id) {
-  const ele = document.getElementById(id);
-  ele.parentElement.style.display = "none";
-  ele.outerHTML = "";
+cancelComment = function (id) {
+    const ele = document.getElementById(id);
+    ele.parentElement.style.display = "none";
+    ele.outerHTML = "";
 };
 
-commentComment = function(id, route) {
+commentComment = function (id, route) {
     const nowId = '#c' + id + 'c';
     const commentDiv = document.querySelector("#c" + id + " .comment-comment");
     const submitUrl = route + "/comment";
@@ -73,13 +87,13 @@ commentComment = function(id, route) {
     return false;
 };
 
-triggerFeedDescription = function(){
+triggerFeedDescription = function () {
     document.querySelector('.feed').classList.toggle('hidden');
     document.querySelector('#description-trigger').innerHTML = document.querySelector('#description-trigger').innerHTML.toLowerCase().includes("hide") ? "Display feed details" : "Hide feed details";
 };
 
-  if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator) {
     // navigator.serviceWorker
     //          .register('./static/scripts/service-worker.js')
     //          .then(function() { console.log('Service Worker Registered'); });
-  }
+}
