@@ -154,15 +154,18 @@ def create_stories():
         feed.save()
     with open('news/scripts/stories.csv', 'r') as f:
         for line in f.readlines():
-            url, title, text, feed = line.split(';')
-            f = Feed.by_slug(slugify(feed))
-            if f is None:
-                f = Feed(name=feed, slug=slugify(feed), description="")
-                f.commit()
-            u = User.by_username('matoous')
-            l = Link(title=title, slug=slugify(title), url=url, text=text, user_id=u.id, feed_id=f.id)
-            if Link.by_slug(slugify(title)) is None:
-                try:
-                    l.commit()
-                except Exception as e:
-                    print(e)
+            try:
+                url, title, text, feed = line.split(';')
+                f = Feed.by_slug(slugify(feed))
+                if f is None:
+                    f = Feed(name=feed, slug=slugify(feed), description="")
+                    f.commit()
+                u = User.by_username('matoous')
+                l = Link(title=title, slug=slugify(title), url=url, text=text, user_id=u.id, feed_id=f.id)
+                if Link.by_slug(slugify(title)) is None:
+                    try:
+                        l.commit()
+                    except Exception as e:
+                        print(e)
+            except Exception as e:
+                print("Error on line:", line, e)
