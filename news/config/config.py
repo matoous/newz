@@ -2,6 +2,7 @@ import binascii
 import json
 import os
 
+import dj_database_url
 from babel import dates
 
 
@@ -42,8 +43,7 @@ def load_config(app):
     app.config['DSN'] = get_string('SENTRY_URL', 'https://12a16a3e55454d369b85ae76b8d70db2:32c22327ed7a407baa89f5e212f86cd0@sentry.io/1186847')
 
     # DATABASE CONFIG
-    app.config['ORATOR_DATABASES'] = json.loads(os.getenv('DATABASES')) if os.getenv('DATABASES') else {
-            'default': 'postgres',
+    app.config['ORATOR_DATABASES'] = dj_database_url.parse(os.getenv('DATABASE_URL')) if os.getenv('DATABASE_URL') else {
             'postgres': {
                 'driver': 'postgres',
                 'host': 'news.c4ioot2pm9qy.eu-central-1.rds.amazonaws.com',
@@ -55,9 +55,7 @@ def load_config(app):
         }
 
     # REDIS CONFIG
-    app.config['REDIS'] = json.loads(os.getenv('REDIS')) if os.getenv('REDIS') else {
-            'URL': 'redis://localhost:6379/10',
-        }
+    app.config['REDIS_URL'] = get_string('REDIS_URL', 'redis://localhost:6379/10')
 
     # SOLR CONFIG
     app.config['SOLR'] = json.loads(os.getenv('SOLR')) if os.getenv('SOLR') else {

@@ -10,7 +10,7 @@ class Cache:
     """
     def __init__(self, app=None):
         self.conn = None
-        self._config = None
+        self._url = None
 
         if app is not None:
             self.init_app(app)
@@ -20,11 +20,11 @@ class Cache:
         Init Redis Cache and add config
         :param app: application
         """
-        if 'REDIS' not in app.config:
-            raise RuntimeError('Missing "REDIS" configuration')
+        if 'REDIS_URL' not in app.config:
+            raise RuntimeError('Missing "REDIS_URL" configuration')
 
-        self._config = app.config['REDIS']
-        self.conn = StrictRedis.from_url(self._config['URL'])
+        self._url = app.config['REDIS_URL']
+        self.conn = StrictRedis.from_url(self._url)
 
     def get(self, key: str, raw: bool = False) -> object:
         """
