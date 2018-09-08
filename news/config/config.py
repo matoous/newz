@@ -2,7 +2,6 @@ import binascii
 import json
 import os
 
-import dj_database_url
 from babel import dates
 
 
@@ -43,7 +42,8 @@ def load_config(app):
     app.config['DSN'] = get_string('SENTRY_URL', 'https://12a16a3e55454d369b85ae76b8d70db2:32c22327ed7a407baa89f5e212f86cd0@sentry.io/1186847')
 
     # DATABASE CONFIG
-    app.config['ORATOR_DATABASES'] = dj_database_url.parse(os.getenv('DATABASE_URL')) if os.getenv('DATABASE_URL') else {
+    app.config['ORATOR_DATABASES'] = json.loads(os.getenv('DATABASES')) if os.getenv('DATABASES') else {
+            'default': 'postgres',
             'postgres': {
                 'driver': 'postgres',
                 'host': 'news.c4ioot2pm9qy.eu-central-1.rds.amazonaws.com',
@@ -52,6 +52,20 @@ def load_config(app):
                 'password': 'Zub5t5SeBl2z2#yolo!',
                 'prefix': '',
             },
+        }
+
+    if os.getenv('DATABASE_URL') is not None:
+        url = os.getenv('DATABASE_URL')
+        f, s = url[10:].split('@')
+        name, password = f.split(':')
+        host, db = s.split('/')
+        app.config['ORATOR_DATABASES']['postgres'] = {
+            'driver': 'postgres',
+            'host': host,
+            'database': db,
+            'user': name,
+            'password': password,
+            'prefix': '',
         }
 
     # REDIS CONFIG
