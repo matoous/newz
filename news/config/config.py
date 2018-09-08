@@ -61,7 +61,7 @@ def load_config(app):
         host, db = s.split('/')
         app.config['ORATOR_DATABASES']['postgres'] = {
             'driver': 'postgres',
-            'host': host,
+            'host': host.split(':')[0],
             'database': db,
             'user': name,
             'password': password,
