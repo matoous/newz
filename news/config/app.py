@@ -62,7 +62,10 @@ def make_app():
     #cache.clear()
     #archive_links()
     #loadVotes()
-    #create_tables(app)
+    try:
+        create_tables(app)
+    except:
+        pass
 
     #from news.scripts.create_testing_data import create_stories
     #create_stories()
