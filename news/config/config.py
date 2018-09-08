@@ -56,7 +56,7 @@ def load_config(app):
 
     if os.getenv('DATABASE_URL') is not None:
         url = os.getenv('DATABASE_URL')
-        f, s = url[10:].split('@')
+        f, s = url[11:].split('@')
         name, password = f.split(':')
         host, db = s.split('/')
         app.config['ORATOR_DATABASES']['postgres'] = {
