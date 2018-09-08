@@ -1,2 +1,2 @@
-release: cd ./news && echo "yes" | orator migrate -c orator.py
+release: cd ./news && echo "yes" | orator migrate
 web: gunicorn news:app
