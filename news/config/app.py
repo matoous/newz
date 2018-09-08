@@ -81,6 +81,6 @@ def make_app():
     Running on URL: {}
     Database: {}
     Redis: {}
-    """.format(app.config['NAME'], app.config['ORATOR_DATABASES'][app.config['ORATOR_DATABASES']['default']]['host'], app.config['REDIS']['URL']))
+    """.format(app.config['NAME'], app.config['ORATOR_DATABASES'][app.config['ORATOR_DATABASES']['default']]['host'], app.config['REDIS_URL']))
 
     return app
