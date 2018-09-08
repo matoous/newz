@@ -17,16 +17,6 @@ from news.lib.metrics import REQUEST_TIME
 from news.lib.sentry import sentry
 from news.lib.solr import solr
 from news.lib.utils.time_utils import convert_to_timedelta
-from news.models.ban import Ban
-from news.models.comment import Comment
-from news.models.feed import Feed
-from news.models.feed_admin import FeedAdmin
-from news.models.link import Link
-from news.models.report import Report
-from news.models.subscriptions import create_subscriptions_table
-from news.models.disposable_token import DisposableToken
-from news.models.user import User
-from news.models.vote import CommentVote, LinkVote
 from news.scripts.create_testing_data import importHN, create_stories, loadVotes
 from news.scripts.import_fqs import import_fqs
 
@@ -62,10 +52,7 @@ def make_app():
     #cache.clear()
     #archive_links()
     #loadVotes()
-    try:
-        create_tables(app)
-    except:
-        pass
+    #create_tables(app)
 
     #from news.scripts.create_testing_data import create_stories
     #create_stories()
