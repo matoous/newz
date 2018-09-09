@@ -17,6 +17,7 @@ from news.lib.metrics import REQUEST_TIME
 from news.lib.sentry import sentry
 from news.lib.solr import solr
 from news.lib.utils.time_utils import convert_to_timedelta
+from news.models.link import Link
 from news.scripts.create_testing_data import importHN, create_stories, loadVotes
 from news.scripts.import_fqs import import_fqs
 
@@ -53,9 +54,11 @@ def make_app():
     #create_tables(app)
 
     #from news.scripts.create_testing_data import create_stories
-    create_stories()
+    #create_stories()
     #sentry.init_app(app)
     #importHN()
+    for link in Link.get():
+        link.commit()
 
     # with app.app_context():
     #     from news.models.report import Report
@@ -65,7 +68,6 @@ def make_app():
     print("""eSource news
     Running on URL: {}
     Database: {}
-    Redis: {}
-    """.format(app.config['NAME'], app.config['ORATOR_DATABASES'][app.config['ORATOR_DATABASES']['default']]['host'], app.config['REDIS_URL']))
+    Redis: {}""".format(app.config['NAME'], app.config['ORATOR_DATABASES'][app.config['ORATOR_DATABASES']['default']]['host'], app.config['REDIS_URL']))
 
     return app
