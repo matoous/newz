@@ -1,2 +1,2 @@
-release: cd ./news && echo "yes" | orator migrate
+release: cd ./news && orator migrate -f
 web: gunicorn news:app

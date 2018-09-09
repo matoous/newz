@@ -59,9 +59,6 @@ def make_app():
     #sentry.init_app(app)
     #importHN()
 
-    #for feed in Feed.get():
-    #   feed.commit()
-
     # with app.app_context():
     #     from news.models.report import Report
     #     Report.create_table()

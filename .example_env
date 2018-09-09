@@ -1,5 +1,0 @@
-SECRET_KEY="WubbaLubbaDubDub!Pickle!12354112#yolo!"
-
-DEBUG=False
-ME="popularreads.news"
-ME_NAME="Popular Reads"

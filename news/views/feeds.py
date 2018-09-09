@@ -81,7 +81,7 @@ def get_feed_rss(feed):
 @not_banned
 def add_link(feed):
     form = LinkForm()
-    if request.method == 'POST' and form.validate(feed, current_user):
+    if request.method == 'POST' and form.validate():
         link = form.result()
         link.user_id = current_user.id
         link.feed_id = feed.id

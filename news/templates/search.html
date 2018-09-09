@@ -61,34 +61,30 @@
                             <div class="link-body">
                                 <div class="link-text">
                                     <div class="link-feed">
-                                        <a href="{{ link.link.feed.route }}">
-                                            {{ link.link.feed.name }}
+                                        <a href="{{ link.feed.route }}">
+                                            {{ link.feed.name }}
                                         </a>
                                     </div>
                                     <h2>
-                                        <a href="{{ link.link.url }}">
-                                            {% if link.title %}
-                                                {{ link.title|safe }}
-                                            {% else %}
-                                                {{ link.link.title }}
-                                            {% endif %}
+                                        <a href="{{ link.url }}">
+                                                {{ link.title_highlight|safe }}
                                         </a>
                                     </h2>
-                                    {% if link.text %}
+                                    {% if link.text_highlight %}
                                         <div>
-                                            {{ link.text|safe }}
+                                            {{ link.text_highlight|safe }}
                                         </div>
                                     {% endif %}
                                     <div class="bottom-line">
                                         <div class="comments">
-                                            <a href="{{ link.link.full_route }}">{{ link.link.comments_count }}
+                                            <a href="{{ link.full_route }}">{{ link.comments_count }}
                                                 comments</a>
                                         </div>
                                         <div class="date">
-                                            {{ link.link.time_ago() }}
+                                            {{ link.time_ago() }}
                                         </div>
                                         <div class="author">
-                                            by <a href="{{ link.link.user.route }}">{{ link.link.user.name }}</a>
+                                            by <a href="{{ link.user.route }}">{{ link.user.name }}</a>
                                         </div>
                                     </div>
                                 </div>

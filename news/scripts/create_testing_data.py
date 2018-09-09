@@ -1,8 +1,5 @@
-from pickle import dumps
-
 from slugify import slugify
 
-from news.lib.cache import cache
 from news.models.feed import Feed
 from news.models.link import Link
 from news.models.user import User

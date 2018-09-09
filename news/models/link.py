@@ -183,6 +183,11 @@ class Link(Base):
     def is_autoposted(self) -> bool:
         return self.user_id == 12345
 
+    @classmethod
+    def search(cls, q):
+        q = " & ".join(q.split())
+        return cls.select_raw('ts_headline(\'english\', "title", plainto_tsquery(\'"{}"\')) AS title_highlight, ts_headline(\'english\', "text", plainto_tsquery(\'"{}"\')) AS text_highlight, id, title, text, feed_id, user_id, ups, downs, created_at'.format(q, q)).where_raw('textsearchable_title @@ to_tsquery(\'"{}"\') OR textsearchable_text @@ to_tsquery(\'"{}"\')'.format(q, q)).order_by_raw('ups - downs DESC').get()
+
 
 class LinkForm(FlaskForm):
     title = StringField('Title', [DataRequired(), Length(max=128, min=6)],
