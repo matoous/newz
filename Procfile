@@ -1,2 +1,2 @@
-release: cd ./news && orator migrate -f
+release: ./on_release.sh
 web: gunicorn news:app

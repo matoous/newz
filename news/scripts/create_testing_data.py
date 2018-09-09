@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from passlib.handlers.bcrypt import bcrypt
 from slugify import slugify
 
 from news.models.feed import Feed
@@ -146,9 +149,7 @@ def loadVotes():
     print('Done')
 
 def create_stories():
-    for feed in Feed.get():
-        feed.name = feed.name.strip()
-        feed.save()
+    u = User.by_username('matoous')
     with open('news/scripts/stories.csv', 'r') as f:
         for line in f.readlines():
             try:
@@ -157,12 +158,8 @@ def create_stories():
                 if f is None:
                     f = Feed(name=feed, slug=slugify(feed), description="")
                     f.commit()
-                u = User.by_username('matoous')
-                l = Link(title=title, slug=slugify(title), url=url, text=text, user_id=u.id, feed_id=f.id)
                 if Link.by_slug(slugify(title)) is None:
-                    try:
-                        l.commit()
-                    except Exception as e:
-                        print(e)
+                    l = Link(title=title, slug=slugify(title), url=url, text=text, user_id=u.id, feed_id=f.id)
+                    l.commit()
             except Exception as e:
                 print("Error on line:", line, e)

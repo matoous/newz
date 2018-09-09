@@ -29,8 +29,6 @@ def make_app():
 
     db.init_app(app)
 
-    solr.init_app(app)
-
     csrf.init_app(app)
 
     cache.init_app(app)
@@ -55,7 +53,7 @@ def make_app():
     #create_tables(app)
 
     #from news.scripts.create_testing_data import create_stories
-    #create_stories()
+    create_stories()
     #sentry.init_app(app)
     #importHN()
 
