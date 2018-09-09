@@ -15,7 +15,6 @@ from news.lib.login import login_manager
 from news.lib.mail import mail
 from news.lib.metrics import REQUEST_TIME
 from news.lib.sentry import sentry
-from news.lib.solr import solr
 from news.lib.utils.time_utils import convert_to_timedelta
 from news.models.link import Link
 from news.scripts.create_testing_data import importHN, create_stories, loadVotes
@@ -57,8 +56,6 @@ def make_app():
     #create_stories()
     #sentry.init_app(app)
     #importHN()
-    for link in Link.get():
-        link.commit()
 
     # with app.app_context():
     #     from news.models.report import Report

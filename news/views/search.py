@@ -2,8 +2,6 @@ import time
 
 from flask import request, render_template
 
-from news.lib.solr import solr
-from news.models.feed import Feed
 from news.models.link import Link
 
 

@@ -12,7 +12,6 @@ from markdown2 import markdown
 from news.lib.cache import cache
 from news.lib.db.db import db
 from news.lib.task_queue import redis_conn, q
-from news.lib.solr import add_feed_to_search
 from news.lib.utils.slugify import make_slug
 from news.models.base import Base
 from news.models.base_form import BaseForm
@@ -170,5 +169,4 @@ class EditFeedForm(FlaskForm):
 
 @job('medium', connection=redis_conn)
 def handle_new_feed(feed):
-    add_feed_to_search(feed)
     return None

@@ -9,7 +9,6 @@ from news.lib.cache import cache
 from news.lib.db.db import db
 from news.lib.db.query import add_to_queries
 from news.lib.db.sorts import sorts
-from news.lib.solr import new_link_queue
 from news.lib.sorts import hot
 from news.lib.task_queue import q
 from news.lib.utils.slugify import make_slug
@@ -151,7 +150,6 @@ class Link(Base):
     def commit(self):
         self.save()
         q.enqueue(add_to_queries, self, result_ttl=0)
-        q.enqueue(new_link_queue, self, result_ttl=0)
 
     @property
     def full_route(self):

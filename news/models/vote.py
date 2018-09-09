@@ -175,7 +175,6 @@ class LinkVote(Vote):
             return
 
         if previous_vote and previous_vote.affected_attribute:
-            print('deleting previous vote', previous_vote.__dict__)
             previous_vote.del_from_cache()
             self.link.decr(previous_vote.affected_attribute, 1)
 
