@@ -8,7 +8,6 @@ from news.models.link import Link
 def search():
     q = request.args.get('q')
 
-
     start = time.perf_counter()
 
     links = Link.search(q)

@@ -60,11 +60,11 @@
                         <img class="disabled" src="/static/images/play-disabled.svg">
                     {% else %}
                         {% if link.vote_by(current_user) and link.vote_by(current_user).is_upvote %}
-                            <a href="{{ link.route }}/vote/unvote">
+                            <a href="{{ link.route }}/vote/unvote?next={{ request.path|urlencode }}">
                                 <img class="voted" src="/static/images/play-clicked.svg">
                             </a>
                         {% else %}
-                            <a href="{{ link.route }}/vote/upvote">
+                            <a href="{{ link.route }}/vote/upvote?next={{ request.path|urlencode }}">
                                 <img src="/static/images/play.svg">
                             </a>
                         {% endif %}
@@ -78,12 +78,12 @@
                         <img class="disabled" src="/static/images/play-disabled.svg">
                     {% else %}
                         {% if link.vote_by(current_user) and link.vote_by(current_user).is_downvote %}
-                            <a href="{{ link.route }}/vote/unvote">
+                            <a href="{{ link.route }}/vote/unvote?next={{ request.path|urlencode }}">
                                 <img class="voted" src="/static/images/play-clicked.svg">
                             </a>
                         {% else %}
                             <a href="{{ link.route }}/vote/downvote">
-                                <img src="/static/images/play.svg">
+                                <img src="/static/images/play.svg?next={{ request.path|urlencode }}">
                             </a>
                         {% endif %}
                     {% endif %}
