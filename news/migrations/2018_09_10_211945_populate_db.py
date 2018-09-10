@@ -1,5 +1,6 @@
 import random
 import string
+from datetime import datetime
 
 from orator.migrations import Migration
 from passlib.handlers.bcrypt import bcrypt
@@ -14,12 +15,16 @@ class PopulateDb(Migration):
         self.db.table('users').insert(
             {'username': 'autoposter',
              'password': bcrypt.hash(''.join(random.choices(string.ascii_uppercase + string.digits, k=32))), 'id': 12345,
-             'email': 'autoposter'}
+             'email': 'autoposter',
+             'created_at': datetime.utcnow(),
+             'updated_at': datetime.utcnow() }
         )
         self.db.table('users').insert(
             {'username': 'admin',
              'password': bcrypt.hash(''.join(random.choices(string.ascii_uppercase + string.digits, k=32))),
-             'email': 'admin@esourcenews.com'}
+             'email': 'admin@esourcenews.com',
+             'created_at': datetime.utcnow(),
+             'updated_at': datetime.utcnow()}
         )
 
     def down(self):
