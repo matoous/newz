@@ -8,6 +8,7 @@ from orator import Schema
 
 from news.config.config import load_config, register_functions
 from news.config.routes import register_routes, FullyQualifiedSource
+from news.lib.amazons3 import S3
 from news.lib.cache import cache
 from news.lib.db.db import db, create_tables
 from news.lib.csrf import csrf
@@ -36,6 +37,8 @@ def make_app():
     login_manager.init_app(app)
 
     mail.init_app(app)
+
+    S3.init_app(app)
 
     # init sentry only if not in DEBUG mode
     if not app.config['DEBUG']:
