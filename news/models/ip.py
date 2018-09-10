@@ -15,7 +15,6 @@ class Ip(Base):
 
     @classmethod
     def from_request(cls):
-        print(request.headers)
         return cls(ip=request.remote_addr, agent=request.headers.get('User-Agent'))
 
     @classmethod

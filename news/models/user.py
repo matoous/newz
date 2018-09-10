@@ -6,7 +6,6 @@ from flask import current_app
 from flask_login import current_user, login_user, logout_user
 from flask_wtf import FlaskForm
 from orator import accessor, Schema
-from orator.orm import belongs_to_many, has_many
 from passlib.hash import bcrypt
 from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField, BooleanField
 from wtforms.fields.html5 import EmailField, URLField
@@ -30,15 +29,14 @@ MAX_SUBSCRIPTIONS_FREE = 50
 class User(Base):
     __table__ = 'users'
     __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified',
-                    'subscribed', 'preferred_sort', 'bio', 'url',
-                    'profile_pic', 'email_public', 'feed_subs', 'p_show_images', 'p_min_link_score']
-    __hidden__ = ['password']
+                    'subscribed', 'preferred_sort', 'bio', 'url', 'profile_pic', 'email_public', 'feed_subs',
+                    'p_show_images', 'p_min_link_score']
+    __hidden__ = ['password', 'feeds', 'links', 'comments', 'age']
     __append__ = ['session_token']
-    __searchable__ = ['id', 'username', 'full_name']
 
     @classmethod
-    def create_table(cls):
-        schema = Schema(db)
+    def create_table(cls, database):
+        schema = Schema(database)
         schema.drop_if_exists('users')
         with schema.create('users') as table:
             table.increments('id').unsigned()
@@ -92,7 +90,7 @@ class User(Base):
         """
         Get users name
         Full name if available, username otherwise
-        :return: users nae
+        :return: users name
         """
         return self.full_name or self.username
 
@@ -214,22 +212,37 @@ class User(Base):
 
     @property
     def age(self) -> datetime:
+        """
+        Users eSource news age
+        :return: age
+        """
         return datetime.utcnow() - self.created_at
-
-    @belongs_to_many('feeds_users')
-    def feeds(self):
-        from news.models.feed import Feed
-        return Feed
 
     @property
     def links(self):
+        """
+        Users posted links
+        :return: links
+        """
         from news.models.link import Link
         return Link.where('user_id', self.id).get()
 
-    @has_many
+    @property
     def comments(self):
+        """
+        Users posted comments
+        :return: comments
+        """
         from news.models.comment import Comment
         return Comment.where('user_id', self.id).get()
+
+    @property
+    def feeds(self):
+        """
+        Users subscribed feeds
+        :return: feeds
+        """
+        return db.table('feeds_users').where('user_id', self.id).get()
 
     @accessor
     def subscribed_feed_ids(self) -> List[str]:
@@ -249,7 +262,7 @@ class User(Base):
         from news.models.feed import Feed
         return [Feed.by_id(x) for x in self.subscribed_feed_ids]
 
-    def subscribed_to(self, feed: object) -> bool:
+    def subscribed_to(self, feed: 'Feed') -> bool:
         """
         Check if user is subscribed to given feed
         :param feed: feed
@@ -257,7 +270,7 @@ class User(Base):
         """
         return feed.id in self.subscribed_feed_ids
 
-    def subscribe(self, feed):
+    def subscribe(self, feed: 'Feed'):
         """
         Subscribe user to given feed
         :param feed: feed to subscribe
@@ -266,23 +279,26 @@ class User(Base):
         if self.feed_subs >= MAX_SUBSCRIPTIONS_FREE:
             return False
 
+        # if user is banned from feed he can't subscribe
         if Ban.by_user_and_feed(self, feed) is not None:
             return False
 
-        self.feeds().attach(feed)
+        # save subscription
+        db.table('feeds_users').insert(user_id=self.id, feed_id=feed.id)
+        key = 'subs:{}'.format(self.id)
+        ids = cache.get(key) or []
+        ids.append(feed.id)
+        cache.set(key, ids)
+
         self.incr('feed_subs', 1)
         self.update_with_cache()
 
         # TODO DO IN QUEUE
         feed.incr('subscribers_count', 1)
-        key = 'subs:{}'.format(self.id)
-        ids = cache.get(key) or []
-        ids.append(feed.id)
-        cache.set(key, ids)
         return True
 
-    def unsubscribe(self, feed):
-        self.feeds().detach(feed.id)
+    def unsubscribe(self, feed: 'Feed'):
+        db.table('feeds_users').where('user_id', '=', self.id).where('feed_id', '=', feed.id).delete()
         self.decr('feed_subs', 1)
 
         # TODO DO IN QUEUE
@@ -322,9 +338,7 @@ class User(Base):
         return u
 
     def is_god(self) -> bool:
-        if not self.is_authenticated:
-            return False
-        return self.username in current_app.config['GODS']
+        return self.is_authenticated and self.username in current_app.config['GODS']
 
     def is_feed_admin(self, feed: 'Feed') -> bool:
         if not self.is_authenticated:
@@ -375,10 +389,6 @@ class LoginForm(FlaskForm):
                              render_kw={'placeholder': 'Password'})
     remember_me = BooleanField('Remember me')
 
-    def __init__(self, *args, **kwargs):
-        FlaskForm.__init__(self, *args, **kwargs)
-        self._user = None
-
     def validate(self):
         rv = FlaskForm.validate(self)
         if not rv:
@@ -412,18 +422,6 @@ class PreferencesForm(FlaskForm):
     send_digest = BooleanField('Subscribe to best articles of week')
     show_images = SelectField('Show Images', choices=[('y', 'Always'), ('m', 'Homepage only'), ('n', 'Never')])
     min_link_score = IntegerField('Minimal link score')
-
-    def __init__(self, *args, **kwargs):
-        FlaskForm.__init__(self, *args, **kwargs)
-        self.user = None
-
-    def validate(self):
-        changes = {}
-        if self.show_images.data != current_user.p_show_images:
-            changes['p_show_images'] = self.show_images.data
-        if self.min_link_score != current_user.p_min_link_score:
-            changes['p_min_link_score'] = self.min_link_score.data
-        return True
 
 
 class PasswordForm(FlaskForm):

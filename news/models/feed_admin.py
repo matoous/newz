@@ -11,6 +11,7 @@ class FeedAdmin(Base):
 
     __table__ = 'feed_admins'
     __fillable__ = ['id', 'god', 'user_id', 'feed_id']
+    __hidden__ = ['user', 'feed']
     __incrementing__ = False
 
     @classmethod

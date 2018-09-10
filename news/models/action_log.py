@@ -25,4 +25,3 @@ class Action:
             table.datetime('updated_at')
             table.index('user_id')
             table.index('feed_id')
-

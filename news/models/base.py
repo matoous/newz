@@ -1,12 +1,11 @@
 from datetime import datetime
 from typing import List
 
+import timeago
 from orator import Model
 from redis_lock import Lock
 
 from news.lib.cache import cache
-import timeago
-
 from news.lib.metrics import CACHE_HITS, CACHE_MISSES
 
 CACHE_EXPIRE_TIME = 12 * 60 * 60
@@ -20,7 +19,6 @@ class Base(Model):
     If model-specific methods for cache access are needed be really careful
     when implementing them and try to use as much code from this class as possible
     """
-
 
     @classmethod
     def _cache_prefix(cls) -> str:
@@ -65,16 +63,16 @@ class Base(Model):
         Used when updating in cache or database
         :return: RedisLock
         """
-        return Lock(cache.conn, self._lock_key, expire=1)
+        return Lock(cache.conn, self._lock_key, expire=3)
 
     def update_from_cache(self):
         """
         Update model from redis
         This is usually performed before updates or when updating for data consistency
         """
-        cached = cache.get(self._cache_key)
-        if cached is not None:
-            self.set_raw_attributes(cached)
+        data = cache.get(self._cache_key)
+        if data is not None:
+            self.set_raw_attributes(data)
 
     def update_with_cache(self):
         self.save()
@@ -144,16 +142,7 @@ class Base(Model):
             self.save()
             self.write_to_cache()
 
-    def to_solr(self) -> dict:
-        """
-        Convert object to it's solr representation
-        Attributes stored in solr can be modified by class __searchable__ property which is list of attributes to store
-        :return:
-        """
-        assert self.__class__.__searchable__
-        return {x: self.get_attribute(x) for x in self.__class__.__searchable__}
-
-    def time_ago(self):
+    def time_ago(self) -> str:
         return timeago.format(self.created_at, datetime.utcnow())
 
     @property
@@ -221,5 +210,8 @@ class Base(Model):
         self.write_to_cache()
 
     def delete(self):
-        cache.__delitem__(self._cache_key)
+        """
+        Delete self from cache and db
+        """
+        cache.delete(self._cache_key)
         super().delete()

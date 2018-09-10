@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 import feedparser
 from orator import Schema, accessor, mutator
-from slugify import slugify
 
 from news.lib.db.db import db
 from news.lib.utils.slugify import make_slug, remove_html_tags
@@ -44,10 +43,18 @@ class FullyQualifiedSource(Base):
 
     @accessor
     def update_interval(self) -> timedelta:
+        """
+        Game update interval representation as timedelta
+        :return: update interval
+        """
         return timedelta(seconds=self.get_raw_attribute('update_interval'))
 
     @mutator
     def update_interval(self, value: timedelta):
+        """
+        Set update interval, accepts timedelta, saves as total seconds between updates
+        :param value:
+        """
         self.set_raw_attribute('update_interval', value.total_seconds())
 
     def should_update(self) -> bool:
@@ -70,6 +77,10 @@ class FullyQualifiedSource(Base):
         return self._relations['feed']
 
     def get_links(self):
+        """
+        Get new links
+        :return:
+        """
         d = feedparser.parse(self.url)
 
         res = []
@@ -85,7 +96,7 @@ class FullyQualifiedSource(Base):
                 idx = text.rfind('. ', 0, 300)
                 text = text[:idx + 1]
 
-            #img?
+            # img?
             if 'links' in entry:
                 for link in entry['links']:
                     if link['type'] == 'image/jpeg':

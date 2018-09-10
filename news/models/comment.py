@@ -1,15 +1,12 @@
-from pickle import dumps, loads
-
-from flask_wtf import FlaskForm
 from markdown2 import markdown
-from orator import accessor, Schema
+from orator import Schema
 from orator.orm import has_many, morph_many
 from redis_lock import Lock
 from werkzeug.utils import escape
 from wtforms import HiddenField, TextAreaField
 from wtforms.validators import DataRequired, Optional, Length
 
-from news.lib.cache import cache, cache
+from news.lib.cache import cache
 from news.lib.comments import add_new_comment
 from news.lib.db.db import db
 from news.lib.metrics import CACHE_MISSES, CACHE_HITS
@@ -23,7 +20,7 @@ from news.models.report import Report
 class Comment(Base):
     __table__ = 'comments'
     __fillable__ = ['id', 'reported', 'spam', 'ups', 'downs', 'link_id', 'parent_id', 'text', 'user_id']
-    __hidden__ = ['link', 'feed', 'user']
+    __hidden__ = ['link', 'feed', 'user', 'votes', 'reports']
 
     @classmethod
     def create_table(cls):
@@ -64,7 +61,7 @@ class Comment(Base):
     def __repr__(self):
         return '<Comment {}>'.format(self.id)
 
-    @accessor
+    @property
     def link(self):
         """
         Get link to which this comments belongs
@@ -75,13 +72,12 @@ class Comment(Base):
             self._relations['link'] = Link.by_id(self.link_id)
         return self._relations['link']
 
-    @accessor
+    @property
     def user(self):
         """
         Get user who created this link
         :return: Creator of Comment
         """
-        # TODO use this method in all models
         from news.models.user import User
         if not 'user' in self._relations:
             self._relations['user'] = User.by_id(self.user_id)

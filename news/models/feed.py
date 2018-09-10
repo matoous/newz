@@ -1,13 +1,12 @@
 from typing import Optional
 
 from flask_wtf import FlaskForm
+from markdown2 import markdown
 from orator import mutator, Schema
 from orator.orm import belongs_to_many
 from rq.decorators import job
-from slugify import slugify
 from wtforms import StringField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Length
-from markdown2 import markdown
 
 from news.lib.cache import cache
 from news.lib.db.db import db
@@ -20,8 +19,10 @@ from news.models.link import Link
 
 class Feed(Base):
     __table__ = 'feeds'
-    __fillable__ = ['id', 'name', 'img', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo', 'reported', 'subscribers_count']
+    __fillable__ = ['id', 'name', 'img', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo',
+                    'reported', 'subscribers_count']
     __searchable__ = ['id', 'name', 'description', 'lang', 'over_18', 'created_at']
+    __hidden__ = ['users']
 
     @classmethod
     def create_table(cls):
@@ -47,11 +48,7 @@ class Feed(Base):
     def __init__(self, **attributes):
         super().__init__(**attributes, over_18=False, lang='en')
 
-    @property
-    def b_id(self):
-        return self.id.to_bytes(8, 'big')
-
-    def links_query(self, sort: str = 'trending') -> Link:
+    def links_query(self, sort: str = 'trending') -> [Link]:
         return Link.by_feed(self, sort)
 
     @classmethod
@@ -105,6 +102,10 @@ class Feed(Base):
 
     @property
     def url(self) -> str:
+        """
+        Feed URL
+        :return: url
+        """
         return "/f/{}".format(self.slug)
 
     @property
@@ -116,7 +117,11 @@ class Feed(Base):
         return "f:"
 
     @belongs_to_many('feeds_users')
-    def users(self):
+    def users(self) -> ['User']:
+        """
+        Subscribed users
+        :return: users
+        """
         from news.models.user import User
         return User
 
@@ -145,8 +150,10 @@ class Feed(Base):
 
 class FeedForm(BaseForm):
     name = StringField('Name', [DataRequired(), Length(max=128, min=3)])
-    description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
-    rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
+    description = TextAreaField('Description', [DataRequired(), Length(max=8192)],
+                                render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
+    rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)],
+                          render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
 
     def fill(self, feed: Feed):
         self.name.data = feed.name
@@ -158,8 +165,10 @@ class FeedForm(BaseForm):
 
 
 class EditFeedForm(FlaskForm):
-    description = TextAreaField('Description', [DataRequired(), Length(max=8192)], render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
-    rules = TextAreaField('Rules', [Length(max=8192)], render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
+    description = TextAreaField('Description', [DataRequired(), Length(max=8192)],
+                                render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
+    rules = TextAreaField('Rules', [Length(max=8192)],
+                          render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
     img = FileField('Logo')
 
     def fill(self, feed):

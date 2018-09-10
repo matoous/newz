@@ -46,10 +46,18 @@ class Ban(Base):
 
     @property
     def id(self) -> str:
+        """
+        Ban id
+        :return: id
+        """
         return "{feed}:{user}".format(feed=self.feed_id, user=self.user_id)
 
     @property
     def user(self) -> 'User':
+        """
+        Get user which received the ban
+        :return: user
+        """
         from news.models.user import User
         if 'user' not in self._relations:
             self._relations['user'] = User.by_id(self.user_id)
@@ -57,6 +65,10 @@ class Ban(Base):
 
     @property
     def feed(self) -> 'Feed':
+        """
+        Get feed for which the ban applies
+        :return: feed
+        """
         from news.models.feed import Feed
         if 'feed' not in self._relations:
             self._relations['feed'] = Feed.by_id(self.feed_id)
@@ -64,6 +76,12 @@ class Ban(Base):
 
     @classmethod
     def cache_key(cls, user_id, feed_id) -> str:
+        """
+        Get ban cache key by user id and feed id
+        :param user_id: user id
+        :param feed_id: feed id
+        :return: cache key
+        """
         return "{feed}:{user}".format(feed=feed_id, user=user_id)
 
     def apply(self, user=None, feed=None):
@@ -85,30 +103,65 @@ class Ban(Base):
         self.write_to_cache()
 
     def write_to_cache(self):
+        """
+        Write self to cache
+        """
         cache.set(self.id, 'y')
 
     @classmethod
     def by_user_and_feed(cls, user, feed):
+        """
+        Get ban by user and feed
+        :param user: user
+        :param feed: feed
+        :return: ban
+        """
         return cls.by_user_and_feed_id(user.id, feed.id)
 
     @classmethod
-    def by_user_and_feed_id(cls, user_id, feed_id):
+    def by_user_and_feed_id(cls, user_id, feed_id) -> 'Ban':
+        """
+        Get ban by user id and feed id
+        :param user_id: user id
+        :param feed_id: feed id
+        :return: ban
+        """
         return cache.get(cls.cache_key(user_id, feed_id))
 
     @classmethod
-    def by_user(cls, user):
+    def by_user(cls, user) -> 'Ban':
+        """
+        Get bans by user
+        :param user: user
+        :return: bans
+        """
         return cls.by_user_id(user.id)
 
     @classmethod
-    def by_user_id(cls, user_id):
+    def by_user_id(cls, user_id) -> 'Ban':
+        """
+        Get bans by user id
+        :param user_id: user id
+        :return: bans
+        """
         return cls.where('user_id', user_id).get()
 
     @classmethod
-    def by_feed(cls, feed):
+    def by_feed(cls, feed) -> 'Ban':
+        """
+        Get bans by feed
+        :param feed: feed
+        :return: bans
+        """
         return cls.by_user_id(feed.id)
 
     @classmethod
-    def by_feed_id(cls, feed_id):
+    def by_feed_id(cls, feed_id) -> 'Ban':
+        """
+        Get bans by feed id
+        :param feed_id: feed id
+        :return: bans
+        """
         return cls.where('user_id', feed_id).get()
 
 
@@ -137,3 +190,6 @@ class BanForm(BaseForm):
 
     def fill(self, user):
         self.user_id.data = user.id
+
+    def result(self) -> 'Ban':
+        return Ban(user_id=self.user_id.data, reason=self.reason.data, duration=self.get_duration())
