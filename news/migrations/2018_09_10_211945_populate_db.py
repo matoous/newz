@@ -13,7 +13,7 @@ class PopulateDb(Migration):
         """
         self.db.table('users').insert([
             {'username': 'autoposter',
-             'password': bcrypt.hash(''.join(random.choices(string.ascii_uppercase + string.digits, k=32))), id: 12345,
+             'password': bcrypt.hash(''.join(random.choices(string.ascii_uppercase + string.digits, k=32))), 'id': 12345,
              'email': 'autoposter'},
             {'username': 'admin',
              'password': bcrypt.hash(''.join(random.choices(string.ascii_uppercase + string.digits, k=32))),
