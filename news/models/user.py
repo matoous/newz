@@ -242,7 +242,7 @@ class User(Base):
         Users subscribed feeds
         :return: feeds
         """
-        return db.table('feeds_users').where('user_id', self.id).get()
+        return db.table('feeds').join('feeds_users', 'feeds.id', '=', 'feeds_users.feed_id').where('feeds_users.user_id', self.id).get()
 
     @accessor
     def subscribed_feed_ids(self) -> List[str]:

@@ -8,6 +8,20 @@
         <div class="nav-links">
             <div class="nav-nav">
                 <a href="/">Home</a>
+                {% if current_user.is_authenticated %}
+                    <div class="subs-menu">
+                        Subscriptions
+                        <ul>
+                            {% for feed in current_user.subscribed_feeds %}
+                                <li>
+                                    <a href="{{ feed.route }}">
+                                        {{ feed.name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
                 <a href="/trending">Trending</a>
                 <a href="/new">New</a>
                 <a href="/best">Best</a>
@@ -149,19 +163,27 @@
                         {% endfor %}
                     </ul>
                 </li>
+            {% else %}
+                <li class="with-break">
+                    <a href="/login">Sign in</a>
+                </li>
+                <li>
+                    <a href="/join">Join</a>
+                </li>
             {% endif %}
-        <li class="mobile-search">
+            <li class="mobile-search">
                 <form method="get" action="/search">
                         <span>
                             <button type="submit">
-                                                            <svg class="svg-icon" width="25" height="25" viewBox="0 0 25 25">
+                                                            <svg class="svg-icon" width="25" height="25"
+                                                                 viewBox="0 0 25 25">
                                 <path d="M20.067 18.933l-4.157-4.157a6 6 0 1 0-.884.884l4.157 4.157a.624.624 0 1 0 .884-.884zM6.5 11c0-2.62 2.13-4.75 4.75-4.75S16 8.38 16 11s-2.13 4.75-4.75 4.75S6.5 13.62 6.5 11z"></path>
                             </svg>
                             </button>
                         </span>
-                        <input type="text" id="q" name="q" title="q" placeholder="Search" required>
+                    <input type="text" id="q" name="q" title="q" placeholder="Search" required>
                 </form>
-        </li>
+            </li>
         </ul>
     </div>
 </nav>

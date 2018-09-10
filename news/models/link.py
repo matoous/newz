@@ -26,7 +26,7 @@ class Link(Base):
     __table__ = 'links'
     __fillable__ = ['title', 'slug', 'text', 'user_id', 'url', 'feed_id', 'id', 'image',
                     'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
-    __searchable__ = ['id', 'title', 'text', 'url', 'user_id', 'feed_id', 'created_at', 'ups', 'downs']
+    __searchable__ = ['title', 'text']
     __hidden__ = ['user', 'feed']
 
     @classmethod
@@ -255,27 +255,6 @@ class Link(Base):
         :return:
         """
         return self.user_id == 12345
-
-    @classmethod
-    def search(cls, q):
-        """
-        Search for link by query
-
-        Searches for link by given query
-        Uses full text search ability of postgreSQL, currently allows only searching by phrase/words
-        no logic is implemented
-        :param q: search query
-        :return: links
-        """
-        q = " & ".join(q.split())
-        return cls.select_raw(
-            'ts_headline(\'english\', "title", plainto_tsquery(\'"{}"\')) AS title_highlight, '
-            'ts_headline(\'english\', "text", plainto_tsquery(\'"{}"\')) AS text_highlight, '
-            'id, title, text, feed_id, user_id, ups, downs, created_at'.format(q, q)
-        ).where_raw(
-            'textsearchable_title @@ to_tsquery(\'"{}"\') '
-            'OR textsearchable_text @@ to_tsquery(\'"{}"\')'.format(q, q)
-        ).order_by_raw('ups - downs DESC').get()
 
 
 class LinkForm(FlaskForm):

@@ -5,66 +5,69 @@
 {% endblock %}
 
 {% block body %}
-    <section class="container">
-        {% set subscribed = current_user.is_authenticated and current_user.subscribed_to(feed) %}
-        <div class="feed">
-            <div class="feed-head">
-                <div class="feed-logo">
-                    <img src="{% if feed.img %}https://s3.eu-central-1.amazonaws.com/newspublic/{{ feed.img }}{% else %}/static/images/testimg.png{% endif %}">
-                </div>
-                <h1>{{ feed.name }}</h1>
-            {% if feed.description %}
-                <div class="feed-description">
-                    {{ feed.description }}
-                </div>
-            {% endif %}
-            <div class="feed-subs">
-                {{ feed.subscribers_count + 1 }} subscribers
-            </div>
-            </div>
-            <div class="feed-options">
-                {% if current_user.is_authenticated %}
-                    {% if subscribed %}
-                        <div>
-                            <a class="btn grey" href="{{ feed.route }}/unsubscribe">Unsubscribe</a>
-                        </div>
-                    {% else %}
-                        <div>
-                            <a class="btn" href="{{ feed.route }}/subscribe">Subscribe</a>
+    {% set subscribed = current_user.is_authenticated and current_user.subscribed_to(feed) %}
+    <div class="feed" style="background: url('https://s3.eu-central-1.amazonaws.com/newspublic/{{ feed.img }}') no-repeat scroll center top / cover;">
+      <div class="feed-wrapper">
+            <div class="container">
+                <div class="feed-head">
+                    <h1>{{ feed.name }}</h1>
+                    {% if feed.description %}
+                        <div class="feed-description">
+                            {{ feed.description }}
                         </div>
                     {% endif %}
-                    <div>
-                        <a class="btn" href="{{ feed.route }}/add">Post</a>
+                    <div class="feed-subs">
+                        {{ feed.subscribers_count + 1 }} subscribers
                     </div>
-                    {% if current_user.is_feed_admin(feed) %}
-                        <div>
-                            <a class="btn" href="{{ feed.route }}/admin">Admin</a>
-                        </div>
-                    {% endif %}
-                {% endif %}
+                </div>
             </div>
         </div>
+    </div>
+    <section class="container">
         <div class="links">
             <div class="menu">
-                <div class="sorting">
-                    <div class="selected-sort">{{ sort }}</div>
-                    <ul>
-                        <li class="{% if sort == 'trending' %}selected{% endif %}">
-                            <a href="{{ feed.route }}/trending">
-                                Trending
-                            </a>
-                        </li>
-                        <li class="{% if sort == 'new' %}selected{% endif %}">
-                            <a href="{{ feed.route }}/new">
-                                New
-                            </a>
-                        </li>
-                        <li class="{% if sort == 'best' %}selected{% endif %}">
-                            <a href="{{ feed.route }}/best">
-                                Best
-                            </a>
-                        </li>
-                    </ul>
+                <div>
+                    <div class="sorting">
+                        <div class="selected-sort">{{ sort }}</div>
+                        <ul>
+                            <li class="{% if sort == 'trending' %}selected{% endif %}">
+                                <a href="{{ feed.route }}/trending">
+                                    Trending
+                                </a>
+                            </li>
+                            <li class="{% if sort == 'new' %}selected{% endif %}">
+                                <a href="{{ feed.route }}/new">
+                                    New
+                                </a>
+                            </li>
+                            <li class="{% if sort == 'best' %}selected{% endif %}">
+                                <a href="{{ feed.route }}/best">
+                                    Best
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feed-options">
+                    {% if current_user.is_authenticated %}
+                        {% if subscribed %}
+                            <div>
+                                <a class="btn grey" href="{{ feed.route }}/unsubscribe">Unsubscribe</a>
+                            </div>
+                        {% else %}
+                            <div>
+                                <a class="btn" href="{{ feed.route }}/subscribe">Subscribe</a>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <a class="btn" href="{{ feed.route }}/add">Post</a>
+                        </div>
+                        {% if current_user.is_feed_admin(feed) %}
+                            <div>
+                                <a class="btn" href="{{ feed.route }}/admin">Admin</a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
             {% set single_feed = True %}

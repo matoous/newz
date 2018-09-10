@@ -2,7 +2,7 @@ import time
 
 from flask import request, render_template
 
-from news.models.link import Link
+from news.lib.db.search import link_search
 
 
 def search():
@@ -10,11 +10,7 @@ def search():
 
     start = time.perf_counter()
 
-    links = Link.search(q)
-    for l in links:
-        print(l)
-        print(l.title_highlight)
-        print(l.text_highlight)
+    links = link_search.search(q)
 
     end = time.perf_counter()
 

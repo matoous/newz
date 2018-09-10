@@ -1,5 +1,7 @@
+import io
 from datetime import datetime, timedelta
 
+from PIL import Image
 from flask import redirect, render_template, request, abort, flash
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -13,7 +15,7 @@ from news.lib.ratelimit import rate_limit
 from news.lib.rss import rss_page
 from news.lib.utils.file_type import imagefile
 from news.lib.utils.redirect import redirect_back
-from news.lib.utils.resize import create_feed_logo
+from news.lib.utils.resize import create_feed_images
 from news.lib.utils.time_utils import convert_to_timedelta
 from news.models.ban import BanForm, Ban
 from news.models.feed import FeedForm, EditFeedForm
@@ -199,11 +201,13 @@ def post_feed_admin(feed):
         if form.img.data:
             filename = secure_filename(form.img.data.filename)
             if imagefile(filename):
-                img = create_feed_logo(form.img.data)
-                filename = feed.slug + ".png"
-                upload_to_s3(img, filename)
-                feed.img = filename
-                needs_update = True
+                img = Image.open(form.img.data)
+                if not img.width > 2000 and not img.height > 1000:
+                    in_mem_file = io.BytesIO()
+                    img.save(in_mem_file, format="PNG")
+                    feed.img = "{}.png".format(feed.slug)
+                    upload_to_s3(in_mem_file.getvalue(), feed.img)
+                    needs_update = True
 
         if needs_update:
             feed.update_with_cache()

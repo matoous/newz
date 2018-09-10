@@ -21,7 +21,7 @@ class Feed(Base):
     __table__ = 'feeds'
     __fillable__ = ['id', 'name', 'img', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo',
                     'reported', 'subscribers_count']
-    __searchable__ = ['id', 'name', 'description', 'lang', 'over_18', 'created_at']
+    __searchable__ = ['name', 'description']
     __hidden__ = ['users']
 
     @classmethod
@@ -150,7 +150,7 @@ class Feed(Base):
 
 class FeedForm(BaseForm):
     name = StringField('Name', [DataRequired(), Length(max=128, min=3)])
-    description = TextAreaField('Description', [DataRequired(), Length(max=8192)],
+    description = TextAreaField('Description', [Length(max=256)],
                                 render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
     rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)],
                           render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
