@@ -7,7 +7,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from news.lib.access import feed_admin_required, not_banned
-from news.lib.amazons3 import upload_to_s3
+from news.lib.amazons3 import S3
 from news.lib.db.query import LinkQuery
 from news.lib.filters import min_score_filter
 from news.lib.pagination import paginate
@@ -206,7 +206,7 @@ def post_feed_admin(feed):
                     in_mem_file = io.BytesIO()
                     img.save(in_mem_file, format="PNG")
                     feed.img = "{}.png".format(feed.slug)
-                    upload_to_s3(in_mem_file.getvalue(), feed.img)
+                    S3.upload_to_s3(in_mem_file.getvalue(), feed.img)
                     needs_update = True
 
         if needs_update:
