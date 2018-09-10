@@ -79,6 +79,8 @@ def load_config(app):
     app.config['DEFAULT_FEEDS'] = json.loads(os.getenv('DEFAULT_FEEDS')) if os.getenv('DEFAULT_FEEDS') else []
 
     app.config['S3_BUCKET'] = get_string('S3_BUCKET', 'newspublic')
+    app.config['AWS_SECRET_ACCESS_KEY'] = os.getenv('AWS_SECRET_ACCESS_KEY')
+    app.config['AWS_ACCESS_KEY_ID'] = os.getenv('AWS_ACCESS_KEY_ID')
 
 
 def register_functions(app):
