@@ -11,14 +11,16 @@ class PopulateDb(Migration):
         """
         Run the migrations.
         """
-        self.db.table('users').insert([
+        self.db.table('users').insert(
             {'username': 'autoposter',
              'password': bcrypt.hash(''.join(random.choices(string.ascii_uppercase + string.digits, k=32))), 'id': 12345,
-             'email': 'autoposter'},
+             'email': 'autoposter'}
+        )
+        self.db.table('users').insert(
             {'username': 'admin',
              'password': bcrypt.hash(''.join(random.choices(string.ascii_uppercase + string.digits, k=32))),
-             'email': 'admin@esourcenews.com'},
-        ])
+             'email': 'admin@esourcenews.com'}
+        )
 
     def down(self):
         """
