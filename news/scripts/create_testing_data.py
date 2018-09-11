@@ -149,7 +149,6 @@ def loadVotes():
     print('Done')
 
 def create_stories():
-    u = User.by_username('matoous')
     with open('news/scripts/stories.csv', 'r', encoding="utf8") as f:
         for line in f.readlines():
             try:
@@ -159,7 +158,7 @@ def create_stories():
                     f = Feed(name=feed, slug=slugify(feed), description="")
                     f.commit()
                 if Link.by_slug(slugify(title)) is None:
-                    l = Link(title=title, slug=slugify(title), url=url, text=text, user_id=u.id, feed_id=f.id)
+                    l = Link(title=title, slug=slugify(title), url=url, text=text, user_id=12345, feed_id=f.id)
                     l.commit()
             except Exception as e:
                 print("Error on line:", line, e)
