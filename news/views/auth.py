@@ -1,7 +1,6 @@
 from flask import render_template, redirect, abort, flash, request
-from flask_login import login_required, current_user, LoginManager
+from flask_login import login_required, current_user
 
-from news.lib.login import login_manager
 from news.lib.ratelimit import rate_limit
 from news.lib.utils.redirect import redirect_back
 from news.lib.verifications import EmailVerification

@@ -1,3 +1,4 @@
+from news.views.admin import admin, add_testing_data
 from news.views.web import *
 from news.views.auth import *
 from news.views.search import *
@@ -158,7 +159,10 @@ def register_routes(app):
         Route('/settings/preferences', preferences_setting),
         Route('/settings/password', post_new_password, methods=['POST']),
         Route('/settings/deactivate', post_deactivate, methods=['POST']),
-        Route('/settings/email', post_change_email, methods=['POST'])
+        Route('/settings/email', post_change_email, methods=['POST']),
+
+        Route('/admin', admin),
+        Route('/add-testing-data', add_testing_data),
     ]
 
     for route in routes:

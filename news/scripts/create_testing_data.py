@@ -150,7 +150,7 @@ def loadVotes():
 
 def create_stories():
     u = User.by_username('matoous')
-    with open('news/scripts/stories.csv', 'r') as f:
+    with open('news/scripts/stories.csv', 'r', encoding="utf8") as f:
         for line in f.readlines():
             try:
                 url, title, text, feed = line.split(';')

@@ -55,8 +55,6 @@ def make_app():
     #loadVotes()
     #create_tables(app)
 
-    #from news.scripts.create_testing_data import create_stories
-    #create_stories()
     #sentry.init_app(app)
     #importHN()
 

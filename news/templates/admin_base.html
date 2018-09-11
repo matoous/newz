@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block body %}
+    <div class="admin">
+        <div class="sub-menu">
+        <div class="container">
+             <div class="items">
+                <div>
+                    <a href="/admin" {% if active_tab == 'admin' %}class="active"{% endif %}>
+                        General
+                    </a>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="container">
+            <div class="admin-tab">
+                {% block admin_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
