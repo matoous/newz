@@ -7,12 +7,31 @@
 {% block body %}
     <div class="sub-menu">
         <div class="container">
-            <h1>{{ user.name }}</h1>
-            {% if user.url %}
-                <div class="profile-url">
-                    <a href="{{ user.url }}">{{ user.url }}</a>
+            <div class="profile">
+                <div class="profile-avatar">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar }}">
+                    {% else %}
+                        <div class="avatar-placeholder">
+                            <span>?</span>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
+                <div class="profile-body">
+                    <h1>{{ user.name }}</h1>
+                    {% if user.url %}
+                        <div class="profile-url">
+                            <a href="{{ user.url }}">{{ user.url }}</a>
+                        </div>
+                    {% endif %}
+                    {% if user.bio %}
+                        <div class="bio">
+                            {{ user.bio }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
         </div>
         <div class="container items">
             <div>

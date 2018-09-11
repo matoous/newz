@@ -6,7 +6,7 @@
 
 {% block body %}
     {% set subscribed = current_user.is_authenticated and current_user.subscribed_to(feed) %}
-    <div class="feed" style="background: url('https://s3.eu-central-1.amazonaws.com/newspublic/{{ feed.img }}') no-repeat scroll center top / cover;">
+    <div class="feed" >
       <div class="feed-wrapper">
             <div class="container">
                 <div class="feed-head">

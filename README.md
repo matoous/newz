@@ -68,8 +68,6 @@ Instalation:
 * SEO, head optimization
 * cache all simple relationships
 * check that we save to redis only the things we need to save
-* scrollable side-panels on small displays
-* fix sidepanals opening/closing
 * repair buttons on mobile
 * change search input on mobile
 * ban user completely when he has too many bans

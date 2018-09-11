@@ -8,7 +8,7 @@
         <div class="nav-links">
             <div class="nav-nav">
                 <a href="/">Home</a>
-                {% if current_user.is_authenticated %}
+                {% if current_user.is_authenticated and current_user.subscribed_feeds %}
                     <div class="subs-menu">
                         Subscriptions
                         <ul>

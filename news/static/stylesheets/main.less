@@ -402,7 +402,7 @@ body.open {
 }
 
 .feed-wrapper {
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(255, 255, 255, 0.7);
   position: relative;
   width: 100%;
   height: 100%;
@@ -410,8 +410,7 @@ body.open {
 }
 
 .feed {
-  border-bottom: 1px solid #aaa;
-  color: white;
+  color: black;
   overflow: hidden;
   position: relative;
 
@@ -436,9 +435,6 @@ body.open {
     margin: 0;
   }
 
-  .feed-head {
-    margin-bottom: 24px;
-  }
 }
 
 .links {
@@ -803,10 +799,10 @@ body.open {
 
 .sub-menu {
   padding: 48px 0 0;
-  background-color: black;
+  background-color: white;
 
   h1 {
-    color: white;
+    color: black;
     margin: 0 0 16px;
   }
 
@@ -815,33 +811,21 @@ body.open {
     flex-direction: row;
     flex-wrap: nowrap;
     overflow: auto;
+    border-bottom: 1px solid black;
   }
 
   a {
     display: inline-block;
-    color: white;
+    color: black;
     font-weight: bold;
     font-family: @custom-sans;
     margin-right: 12px;
     padding: 0 0 4px;
-    border-bottom: 4px solid black;
+    border-bottom: 4px solid white;
     text-decoration: none !important;
 
     &:hover, &.active {
-      border-bottom: 4px solid white;
+      border-bottom: 4px solid black;
     }
   }
-  .profile-url {
-    font-family: 'Roboto Condensed', sans-serif;
-    margin-bottom: 12px;
-    a {
-      font-weight: bold;
-      color: white;
-      border-bottom: none !important;
-    }
-  }
-}
-
-.profile-tab {
-  margin-top: 32px;
 }
