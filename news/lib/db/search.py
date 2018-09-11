@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from news.models.feed import Feed
 from news.models.link import Link
 
 
@@ -64,4 +65,8 @@ class Search():
 link_search = Search(Link, sorts={
     'score': 'ups - downs DESC',
     'comments': 'comments_count DESC',
+})
+
+feed_search = Search(Feed, sorts={
+    'subscribers': 'subscribers_count DESC',
 })

@@ -1,6 +1,16 @@
 {% extends "admin_base.html" %}
 
 {% block admin_content %}
-            <h1>Feed Administration</h1>
+    <h1>Feed Administration</h1>
+    <ul>
+        <li>
             <a href="/add-testing-data">Add testing data</a>
+        </li>
+        <li>
+            <a href="/trigger-fqs-update">Trigger FQS update</a>
+        </li>
+        <li>
+            <a href="/archive-old-links">Archive old links</a>
+        </li>
+    </ul>
 {% endblock %}

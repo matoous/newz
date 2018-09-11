@@ -121,6 +121,7 @@ def register_routes(app):
         Route('/f/<feed:feed>/fqs', feed_fqs),
         Route('/f/<feed:feed>/fqs/add', post_feed_fqs, methods=['POST']),
         Route('/f/<feed:feed>/fqs/<fqs_id>/update', update_fqs),
+        Route('/f/<feed:feed>/fqs/<fqs_id>/remove', remove_fqs),
 
         # LINKS
         Route('/l/<link:link>', get_link),
@@ -146,9 +147,6 @@ def register_routes(app):
         # OTHER
         Route('/saved', saved_links),
 
-        # METRICS todo remove
-        Route('/metrics', metrics),
-
         # SEARCH
         Route('/search', search),
 
@@ -161,6 +159,8 @@ def register_routes(app):
         Route('/settings/deactivate', post_deactivate, methods=['POST']),
         Route('/settings/email', post_change_email, methods=['POST']),
 
+        # OTHER todo remove
+        Route('/metrics', metrics),
         Route('/admin', admin),
         Route('/add-testing-data', add_testing_data),
     ]

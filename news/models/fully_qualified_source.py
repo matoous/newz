@@ -24,20 +24,6 @@ class FullyQualifiedSource(Base):
     __fillable__ = ['id', 'feed_id', 'url', 'update_interval', 'updated_at', 'created_at', 'next_update']
 
     @classmethod
-    def create_table(cls):
-        schema = Schema(db)
-        schema.drop_if_exists('fqs')
-        with schema.create('fqs') as table:
-            table.increments('id').unsigned()
-            table.text('url').unique()
-            table.datetime('created_at')
-            table.datetime('updated_at')
-            table.datetime('next_update')
-            table.integer('update_interval')
-            table.integer('feed_id').unsigned()
-            table.foreign('feed_id').references('id').on('feeds').ondelete('cascade')
-
-    @classmethod
     def _cache_prefix(cls):
         return "fqs:"
 
@@ -83,6 +69,9 @@ class FullyQualifiedSource(Base):
         """
         d = feedparser.parse(self.url)
 
+        if d['bozo'] == 1:
+            raise NameError
+
         res = []
         for entry in d['entries']:
             # get the link text
@@ -92,11 +81,12 @@ class FullyQualifiedSource(Base):
                     for e in entry['content']:
                         if 'value' in e and len(e['value']) < 300:
                             text = remove_html_tags(e['value'])
+            # if the text is still longer trim by sentences to 300 characters max
             if len(text) > 300:
                 idx = text.rfind('. ', 0, 300)
                 text = text[:idx + 1]
 
-            # img?
+            # TODO img?
             if 'links' in entry:
                 for link in entry['links']:
                     if link['type'] == 'image/jpeg':
@@ -104,6 +94,9 @@ class FullyQualifiedSource(Base):
 
             # title
             title = entry['title']
+
+            # if the title is too long trim it by words to 128 chars max
+            # we allow admins to edit autoposted links, so they can fix badly trimmed titles later
             if len(title) > 128:
                 idx = title.rfind(' ', 0, 128)
                 title = title[:idx]

@@ -11,12 +11,15 @@ def search():
     start = time.perf_counter()
 
     links = link_search.search(q)
+    feeds = link_search.search(q)
 
     end = time.perf_counter()
 
+    hits = sum([x[0].full_count if len(x) > 0 else 0 for x in [links, feeds]])
+
     search_info = {
         'elapsed': "{0:.2f}".format(end - start),
-        'hits': links[0].full_count if len(links) > 0 else 0,
+        'hits': hits,
     }
 
-    return render_template('search.html', links=links, q=q, search_info=search_info)
+    return render_template('search.html', links=links, q=q, search_info=search_info, feeds=feeds)

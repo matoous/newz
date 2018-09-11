@@ -28,25 +28,17 @@
                     {% for feed in feeds %}
                         <div class="s-feed">
                             <h2>
-                                <a href="{{ feed.feed.route }}">
-                                    {% if feed.name %}
-                                        {{ feed.name|safe }}
-                                    {% else %}
-                                        {{ feed.feed.name }}
-                                    {% endif %}
+                                <a href="{{ feed.route }}">
+                                    {{ feed.name_highlight|safe }}
                                 </a>
                             </h2>
-                            {% if feed.description %}
-                                <div>
-                                    {{ feed.description|safe }}
-                                </div>
-                            {% endif %}
+                            {{ feed.description_highlight|safe }}
                             <div class="bottom-line">
                                 <div class="subcribers">
-                                    {{ feed.feed.subscribers_count }} subscribers
+                                    {{ feed.subscribers_count }} subscribers
                                 </div>
                                 <div class="date">
-                                    {{ feed.feed.time_ago() }}
+                                    {{ feed.time_ago() }}
                                 </div>
                             </div>
                         </div>

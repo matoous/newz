@@ -1,29 +1,24 @@
-import argparse
-import json
-import time
-from datetime import datetime
+import logging
+from logging.handlers import RotatingFileHandler
 
-from flask import Flask, g
-from orator import Schema
+from flask import Flask
 
 from news.config.config import load_config, register_functions
-from news.config.routes import register_routes, FullyQualifiedSource
+from news.config.routes import register_routes
 from news.lib.amazons3 import S3
 from news.lib.cache import cache
-from news.lib.db.db import db, create_tables
+from news.lib.db.db import db
 from news.lib.csrf import csrf
 from news.lib.login import login_manager
 from news.lib.mail import mail
-from news.lib.metrics import REQUEST_TIME
 from news.lib.sentry import sentry
-from news.lib.utils.time_utils import convert_to_timedelta
-from news.models.link import Link
-from news.scripts.create_testing_data import importHN, create_stories, loadVotes
-from news.scripts.import_fqs import import_fqs
 
 
 def make_app():
     app = Flask(__name__, static_url_path='/static', static_folder='../static', template_folder='../templates')
+
+    app.logger.setLevel(logging.INFO)
+
 
     # load config
     load_config(app)
@@ -50,22 +45,6 @@ def make_app():
     # register all routes
     register_routes(app)
 
-    #cache.clear()
-    #archive_links()
-    #loadVotes()
-    #create_tables(app)
-
-    #sentry.init_app(app)
-    #importHN()
-
-    # with app.app_context():
-    #     from news.models.report import Report
-    #     Report.create_table()
-    #import_fqs()
-
-    print("""eSource news
-    Running on URL: {}
-    Database: {}
-    Redis: {}""".format(app.config['NAME'], app.config['ORATOR_DATABASES'][app.config['ORATOR_DATABASES']['default']]['host'], app.config['REDIS_URL']))
+    app.logger.info(f"eSource news: running on URL: {app.config['NAME']}, DB: {app.config['ORATOR_DATABASES'][app.config['ORATOR_DATABASES']['default']]['host']}, redis: {app.config['REDIS_URL']}")
 
     return app
