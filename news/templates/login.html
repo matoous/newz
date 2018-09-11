@@ -6,9 +6,6 @@
 
 {% block body %}
 <div class="page-container">
-    <a href="/" class="black-link small">
-        < Back to homepage
-    </a>
     <div class="one-page-form">
         <form action="/login{% if next %}?next={{ next|urlencode }}{% endif %}" method="POST">
             <h2>Sign In</h2>

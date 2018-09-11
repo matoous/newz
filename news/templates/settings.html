@@ -7,21 +7,23 @@
 {% block body %}
     <div class="settings">
         <div class="sub-menu">
-            <div class="container items">
-                <div>
-                    <a href="/settings/profile" {% if active_tab == 'profile' %}class="active"{% endif %}>
-                        Profile
-                    </a>
-                </div>
-                <div>
-                    <a href="/settings/account" {% if active_tab == 'account' %}class="active"{% endif %}>
-                        Account
-                    </a>
-                </div>
-                <div>
-                    <a href="/settings/preferences" {% if active_tab == 'preferences' %}class="active"{% endif %}>
-                        Preferences
-                    </a>
+            <div class="container">
+                <div class="items">
+                    <div>
+                        <a href="/settings/profile" {% if active_tab == 'profile' %}class="active"{% endif %}>
+                            Profile
+                        </a>
+                    </div>
+                    <div>
+                        <a href="/settings/account" {% if active_tab == 'account' %}class="active"{% endif %}>
+                            Account
+                        </a>
+                    </div>
+                    <div>
+                        <a href="/settings/preferences" {% if active_tab == 'preferences' %}class="active"{% endif %}>
+                            Preferences
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

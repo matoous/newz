@@ -800,6 +800,7 @@ body.open {
 .sub-menu {
   padding: 48px 0 0;
   background-color: white;
+  z-index: 20;
 
   h1 {
     color: black;
@@ -810,22 +811,36 @@ body.open {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    overflow: auto;
-    border-bottom: 1px solid black;
+    overflow: visible;
+    border-bottom: 2px solid #999;
+    > div {
+      margin-right: 12px;
+      overflow: visible;
+    }
   }
 
   a {
     display: inline-block;
-    color: black;
+    color: #999;
     font-weight: bold;
     font-family: @custom-sans;
-    margin-right: 12px;
-    padding: 0 0 4px;
-    border-bottom: 4px solid white;
+    padding: 0 8px 4px 8px;
+    margin-bottom: -2px;
+    border-bottom: 2px solid #999;
     text-decoration: none !important;
 
-    &:hover, &.active {
-      border-bottom: 4px solid black;
+    &.active {
+      border-bottom: 2px solid #333;
+      color: #333;
     }
+    &:hover {
+      color: #333;
+    }
+  }
+}
+
+.feed-admin {
+  .sub-menu {
+    padding-top: 12px;
   }
 }

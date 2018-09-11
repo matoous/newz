@@ -6,8 +6,26 @@
 
 {% block body %}
     <div class="feed-admin">
+        <div class="feed" >
+      <div class="feed-wrapper">
+            <div class="container">
+                <div class="feed-head">
+                    <h1>{{ feed.name }}</h1>
+                    {% if feed.description %}
+                        <div class="feed-description">
+                            {{ feed.description }}
+                        </div>
+                    {% endif %}
+                    <div class="feed-subs">
+                        {{ feed.subscribers_count + 1 }} subscribers
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
         <div class="sub-menu">
-            <div class="container items">
+        <div class="container">
+             <div class="items">
                 <div>
                     <a href="/f/{{ feed.slug }}/admin" {% if active_tab == 'admin' %}class="active"{% endif %}>
                         General
@@ -39,6 +57,7 @@
                     </a>
                 </div>
             </div>
+        </div>
         </div>
         <div class="container">
             <div class="admin-tab">
