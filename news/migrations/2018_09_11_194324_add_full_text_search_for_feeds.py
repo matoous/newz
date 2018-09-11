@@ -9,9 +9,9 @@ class AddFullTextSearchForFeeds(Migration):
         """
         conn = self.schema.get_connection()
         conn.statement(str(conn.raw(
-            "ALTER TABLE links ADD COLUMN textsearchable_name tsvector; UPDATE links SET textsearchable_name = to_tsvector('english', name);")))
+            "ALTER TABLE feeds ADD COLUMN textsearchable_name tsvector; UPDATE links SET textsearchable_name = to_tsvector('english', name);")))
         conn.statement(str(conn.raw(
-            "ALTER TABLE links ADD COLUMN textsearchable_description tsvector; UPDATE links SET textsearchable_description = to_tsvector('english', description);")))
+            "ALTER TABLE feeds ADD COLUMN textsearchable_description tsvector; UPDATE links SET textsearchable_description = to_tsvector('english', description);")))
         conn.statement(str(conn.raw("CREATE OR REPLACE FUNCTION feed_create_tsvectors()   \n"
                                     "    RETURNS TRIGGER AS $$\n"
                                     "    BEGIN\n"
