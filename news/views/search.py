@@ -16,7 +16,7 @@ def search():
 
     search_info = {
         'elapsed': "{0:.2f}".format(end - start),
-        'hits': len(links),
+        'hits': links[0].full_count if len(links) > 0 else 0,
     }
 
     return render_template("search.html", links=links, q=q, search_info=search_info)
