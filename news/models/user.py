@@ -7,7 +7,9 @@ from flask_login import current_user, login_user, logout_user
 from flask_wtf import FlaskForm
 from orator import accessor, Schema
 from passlib.hash import bcrypt
-from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField, BooleanField
+from rq.decorators import job
+from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField, BooleanField, \
+    FileField
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import DataRequired, URL, Length
 
@@ -15,7 +17,7 @@ from news.lib.cache import cache
 from news.lib.db.db import db
 from news.lib.login import login_manager
 from news.lib.mail import reset_email, send_mail
-from news.lib.task_queue import q
+from news.lib.task_queue import q, redis_conn
 from news.lib.validators import UniqueUsername, UniqueEmail
 from news.lib.verifications import EmailVerification
 from news.models.ban import Ban
@@ -477,6 +479,7 @@ class ProfileForm(FlaskForm):
     full_name = StringField('Full name', )
     bio = TextAreaField('Bio', [Length(max=8192)], render_kw={'rows': 6, 'autocomplete': 'off'})
     url = URLField(validators=[URL()])
+    img = FileField('Avatar')
 
     def validate(self):
         return True
@@ -559,3 +562,8 @@ class PasswordReset:
 
     def delete(self):
         cache.delete(self._cache_key)
+
+
+@job('medium', connection=redis_conn)
+def make_new_avatar(file_name):
+    pass

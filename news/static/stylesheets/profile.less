@@ -16,13 +16,21 @@
   }
 
   .profile-avatar {
-  }
-
-  .avatar-placeholder {
-    background-color: #efefef;
     border-radius: 50%;
     width: 200px;
     height: 200px;
+    background-color: rgba(0,0,0,.1);
+    overflow: hidden;
+  }
+
+  img {
+    height: 100%;
+    width: 100%;
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 50%;
+  }
+
+  .avatar-placeholder {
     margin: 0 auto 10px;
     font-size: 72px;
     font-weight: 300;
@@ -39,6 +47,7 @@
 
   h1 {
     margin-bottom: 12px!important;
+    margin-top: 6px!important;
     @media screen and (max-width: 770px) {
       font-size: 26px;
       font-weight: bold;

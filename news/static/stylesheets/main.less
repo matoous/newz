@@ -443,6 +443,7 @@ body.open {
     display: flex;
     flex-direction: row;
     margin-bottom: 32px;
+    flex-wrap: wrap-reverse;
     font-family: @custom-small;
     justify-content: space-between;
 
@@ -741,6 +742,14 @@ body.open {
   flex-direction: row;
   font-size: 13px;
   flex-wrap: wrap;
+  min-width: 320px;
+
+  @media screen and (max-width: 640px) {
+    width: 100%;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    flex-direction: row-reverse;
+  }
 
   > div {
     margin-right: 12px;

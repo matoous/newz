@@ -1,17 +1,27 @@
 {% extends "base.html" %}
 
 {% block title %}
-    {{ user.name }} | Bot
+    {{ user.name }}
 {% endblock %}
 
 {% block body %}
-    <div class="profile-section">
+    <div class="sub-menu">
         <div class="container">
-            <h1 style="text-align: center;">Autoposter</h1>
-            <h3 style="text-align: center;">I'm a Bot and I post links from rss feeds.<br>If I made a mistake don't
-                hesitate and point it out in comment under the link, thanks and sorry!</h3>
-            <img src="/static/images/roboto-logo.png"
-                 style="max-width: 320px; width: 100%; display: block; margin: 0 auto;">
+            <div class="profile">
+                <div class="profile-avatar">
+                        <div class="avatar-placeholder">
+                            <span>🤖</span>
+                        </div>
+                </div>
+                <div class="profile-body">
+                    <h1>Autoposter</h1>
+                        <div class="bio">
+                            Hello! I am bot. I post links. If I make a mistake do not hesitate and contact the
+                        admin of related feed.
+                        </div>
+                </div>
+            </div>
+
         </div>
     </div>
 {% endblock %}

@@ -1,7 +1,7 @@
 import io
 
 import boto3 as boto3
-from PIL import Image
+from PIL.Image import Image
 from flask import current_app
 
 
@@ -15,7 +15,8 @@ class AmazonS3():
                     aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'])
 
     def upload_to_s3(self, file, filename):
-        if type(file) is Image:
+        if isinstance(file, Image):
+            print("is img")
             in_mem_file = io.BytesIO()
             file.save(in_mem_file, format="PNG")
             data = in_mem_file.getvalue()

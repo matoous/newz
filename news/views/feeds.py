@@ -293,7 +293,6 @@ def post_feed_fqs(feed):
     if period and url:
         fqs = FullyQualifiedSource(url=url, update_interval=period, feed_id=feed.id, next_update=datetime.now())
         fqs.save()
-    sources = FullyQualifiedSource.where('feed_id', feed.id).get()
     return redirect('{}/fqs'.format(feed.route))
 
 
