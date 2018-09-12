@@ -33,7 +33,7 @@ class User(Base):
     __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified',
                     'subscribed', 'preferred_sort', 'bio', 'url', 'profile_pic', 'email_public', 'feed_subs',
                     'p_show_images', 'p_min_link_score']
-    __hidden__ = ['password', 'feeds', 'links', 'comments', 'age', 'link_upvotes']
+    __hidden__ = ['password', 'feeds', 'links', 'comments', 'age', 'ld', 'lu', 'cd', 'cu']
     __append__ = ['session_token']
 
     @classmethod

@@ -99,7 +99,7 @@ class Vote(Model):
         set_key = cls._set_key(user_id, vote_type)
         vote_ids = cache.smembers(set_key)
         if not vote_ids:
-            votes = cls.where('user_id', '=', user_id).where('vote_type', '=', UPVOTE).get()
+            votes = cls.where('user_id', '=', user_id).where('vote_type', '=', vote_type).get()
             vote_ids = [str(vote.link_id).encode() for vote in votes]
             if vote_ids:
                 cache.sadd(set_key, *vote_ids)
