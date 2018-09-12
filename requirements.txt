@@ -23,3 +23,4 @@ timeago==1.0.8
 WTForms==2.2.1
 bcrypt==3.1.4
 gunicorn==19.9.0
+newrelic
