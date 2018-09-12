@@ -27,7 +27,6 @@ def make_app():
     csrf.init_app(app)
 
     cache.init_app(app)
-    cache.clear()
 
     login_manager.init_app(app)
 
