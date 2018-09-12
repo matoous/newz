@@ -134,20 +134,6 @@ def importHN():
         except Exception as e:
             pass
 
-
-def load_votes():
-    print('Loading CommentVotes to cache...')
-    cvotes = CommentVote.get()
-    for vote in cvotes:
-        vote.write_to_cache()
-    print('Done')
-
-    print('Loading LinkVotes to cache...')
-    lvotes = LinkVote.get()
-    for vote in lvotes:
-        vote.write_to_cache()
-    print('Done')
-
 def create_stories():
     with open('news/scripts/stories.csv', 'r', encoding="utf8") as f:
         for line in f.readlines():

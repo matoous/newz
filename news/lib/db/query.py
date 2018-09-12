@@ -22,10 +22,10 @@ def tuple_maker(sort):
     :return:
     """
     if sort == 'new':
-        return lambda x: (x.id, epoch_seconds(x.created_at))
+        return lambda x: [x.id, epoch_seconds(x.created_at)]
     if sort == 'best':
-        return lambda x: (x.id, x.score, epoch_seconds(x.created_at))
-    return lambda x: (x.id, x.hot) # default to trending
+        return lambda x: [x.id, x.score, epoch_seconds(x.created_at)]
+    return lambda x: [x.id, x.hot] # default to trending
 
 
 class LinkQuery:

@@ -24,6 +24,7 @@ def trending_links(ids):
     ret = list(itertools.islice((link for _, link in merged), MAX_LINKS))
     return ret
 
+
 def new_tuples(fid):
     query = LinkQuery(fid, 'new')
     return [(-time, link) for link, time in query.fetch()]

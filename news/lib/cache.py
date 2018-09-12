@@ -1,5 +1,5 @@
 from redis import StrictRedis
-from pickle import loads, dumps
+from json import loads, dumps
 
 DEFAULT_CACHE_TTL = 12 * 60 * 60 # 12 hours
 
@@ -37,19 +37,30 @@ class Cache:
         return loads(data) if data else None
 
     def mget(self, ids: [str], raw: bool = False) -> [object]:
+        """
+        Get multiple objects
+        :param ids: ids to get
+        :param raw: get objects raw or pickle-load them
+        :return: objects
+        """
         data = self.conn.mget(ids)
         if raw:
             return data
-        return [loads(x) for x in data] if data else None
+        return [loads(x) if x else None for x in data] if data else None
 
     def set(self, key: str, val: object, ttl: int = DEFAULT_CACHE_TTL, raw: bool = False):
+        """
+        Put key-value pair into the cache
+        :param key: key
+        :param val: value
+        :param ttl: time to live in seconds
+        :param raw: raw object or use pickle
+        :return:
+        """
         if ttl == 0:
             return self.conn.set(key, val if raw else dumps(val))
         else:
-            pipe = self.pipeline()
-            pipe.set(key, val if raw else dumps(val))
-            pipe.expire(key, ttl)
-            pipe.execute()
+            return self.conn.setex(key, ttl, val if raw else dumps(val))
 
     def clear(self):
         return self.conn.flushdb()

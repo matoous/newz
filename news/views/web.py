@@ -36,6 +36,8 @@ def index():
         links = trending_links(DEFAULT_FEEDS)
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
+    if current_user.is_authenticated:
+        print(current_user.link_upvotes)
     return render_template('index.html',
                            links=links,
                            show_logo=True,

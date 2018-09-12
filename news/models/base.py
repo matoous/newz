@@ -21,6 +21,10 @@ class Base(Model):
     when implementing them and try to use as much code from this class as possible
     """
 
+    @property
+    def b_id(self):
+        return str(self.id).encode()
+
     @classmethod
     def _cache_prefix(cls) -> str:
         """

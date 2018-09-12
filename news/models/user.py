@@ -33,7 +33,7 @@ class User(Base):
     __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified',
                     'subscribed', 'preferred_sort', 'bio', 'url', 'profile_pic', 'email_public', 'feed_subs',
                     'p_show_images', 'p_min_link_score']
-    __hidden__ = ['password', 'feeds', 'links', 'comments', 'age']
+    __hidden__ = ['password', 'feeds', 'links', 'comments', 'age', 'link_upvotes']
     __append__ = ['session_token']
 
     @classmethod
@@ -244,7 +244,8 @@ class User(Base):
         Users subscribed feeds
         :return: feeds
         """
-        return db.table('feeds').join('feeds_users', 'feeds.id', '=', 'feeds_users.feed_id').where('feeds_users.user_id', self.id).get()
+        return db.table('feeds').join('feeds_users', 'feeds.id', '=', 'feeds_users.feed_id').where(
+            'feeds_users.user_id', self.id).get()
 
     @accessor
     def subscribed_feed_ids(self) -> List[str]:
@@ -359,6 +360,34 @@ class User(Base):
     @property
     def route(self) -> str:
         return "/u/{}".format(self.username)
+
+    @property
+    def link_upvotes(self):
+        from news.models.vote import LinkVote
+        if 'lu' not in self._relations:
+            self._relations['lu'] = LinkVote.upvotes_by_user(self)
+        return self._relations['lu']
+
+    @property
+    def link_downvotes(self):
+        from news.models.vote import LinkVote
+        if 'ld' not in self._relations:
+            self._relations['ld'] = LinkVote.downvotes_by_user(self)
+        return self._relations['ld']
+
+    @property
+    def comment_upvotes(self):
+        from news.models.vote import LinkVote
+        if 'cu' not in self._relations:
+            self._relations['cu'] = LinkVote.upvotes_by_user(self)
+        return self._relations['cu']
+
+    @property
+    def comment_downvotes(self):
+        from news.models.vote import LinkVote
+        if 'cd' not in self._relations:
+            self._relations['cd'] = LinkVote.downvotes_by_user(self)
+        return self._relations['cd']
 
 
 class SignUpForm(FlaskForm):

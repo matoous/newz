@@ -1,5 +1,3 @@
-from pickle import dumps
-
 from orator import Model, accessor, Schema
 from orator.orm import belongs_to
 
@@ -56,7 +54,7 @@ class Vote(Model):
         raise NotImplementedError
 
     @classmethod
-    def _set_key(cls, link_id):
+    def _set_key(cls, user_id, vote_type):
         raise NotImplementedError
 
     @property
@@ -66,21 +64,19 @@ class Vote(Model):
         """
         raise NotImplementedError
 
-    def cache_key(self):
-        return self.__class__._set_key(self._thing_id) + "+" if self.is_upvote else "-"
-
     def write_to_cache(self):
         """
         Write the vote in to the cache
         """
-        print("writing to cache", self.cache_key(), self.user_id)
-        cache.sadd(self.cache_key(), self.user_id)
+        set_key = self._set_key(self.user_id, self.vote_type)
+        cache.sadd(set_key, self.thing.id)
 
     def del_from_cache(self):
         """
         Delete the vote in to the cache
         """
-        cache.srem(self.cache_key(), self.user_id)
+        set_key = self._set_key(self.user_id, self.vote_type)
+        cache.srem(set_key, self.thing.id)
 
     @property
     def is_downvote(self):
@@ -97,6 +93,25 @@ class Vote(Model):
         if self.is_upvote:
             return 'ups'
         return None
+
+    @classmethod
+    def by_user_and_vote_type(cls, user_id, vote_type):
+        set_key = cls._set_key(user_id, vote_type)
+        vote_ids = cache.smembers(set_key)
+        if not vote_ids:
+            votes = cls.where('user_id', '=', user_id).where('vote_type', '=', UPVOTE).get()
+            vote_ids = [str(vote.link_id).encode() for vote in votes]
+            if vote_ids:
+                cache.sadd(set_key, *vote_ids)
+        return set(vote_ids)
+
+    @classmethod
+    def upvotes_by_user(cls, user):
+        return cls.by_user_and_vote_type(user.id, UPVOTE)
+
+    @classmethod
+    def downvotes_by_user(cls, user):
+        return cls.by_user_and_vote_type(user.id, DOWNVOTE)
 
 
 class LinkVote(Vote):
@@ -147,26 +162,12 @@ class LinkVote(Vote):
         return "<LinkVote {}:{} {}>".format(self.user_id, self.link_id, self.vote_type)
 
     @classmethod
-    def _set_key(cls, link_id):
-        return 'lv:{}'.format(link_id)
+    def _set_key(cls, user_id, vote_type):
+        return 'luv:{}'.format(user_id) if vote_type == UPVOTE else 'ldv:{}'.format(user_id)
 
     def commit(self):
         self.apply()
         # change users params (more karma/trust factor or something)
-
-    @classmethod
-    def set_keys(cls, link_id):
-        cache_key = cls._set_key(link_id)
-        return cache_key + '+', cache_key + '-'
-
-    @classmethod
-    def by_link_and_user(cls, link_id, user_id):
-        cache_key = cls._set_key(link_id)
-        if cache.sismember(cache_key + "+", user_id):
-            return cls(link_id=link_id, user_id=user_id, vote_type=UPVOTE)
-        if cache.sismember(cache_key + "-", user_id):
-            return cls(link_id=link_id, user_id=user_id, vote_type=DOWNVOTE)
-        return None
 
     def apply(self):
         previous_vote = LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).first()
@@ -199,8 +200,20 @@ class CommentVote(Vote):
     def _thing_id(self):
         return self.comment_id
 
-    def thing(self):
-        return None
+    @property
+    def thing(self) -> 'Comment':
+        return self.comment
+
+    @property
+    def comment(self) -> 'Comment':
+        """
+        Return the link that was voted on
+        :return: link
+        """
+        from news.models.comment import Comment
+        if 'comment' not in self._relations:
+            self._relations['comment'] = Comment.by_id(self.link_id)
+        return self._relations['comment']
 
     def __repr__(self):
         return "<CommentVote {}:{} {}>".format(self.user_id, self.comment_id, self.vote_type)
@@ -231,21 +244,12 @@ class CommentVote(Vote):
         return Comment.by_id(self.comment_id)
 
     @classmethod
-    def _set_key(cls, comment_id):
-        return 'cv:{}'.format(comment_id)
+    def _set_key(cls, user_id, vote_type):
+        return 'cuv:{}'.format(user_id) if vote_type == UPVOTE else 'cdv:{}'.format(user_id)
 
     def commit(self):
         self.apply()
         # change users params (more karma/trust factor or something)
-
-    @classmethod
-    def by_comment_and_user(cls, comment_id, user_id):
-        cache_key = cls._set_key(comment_id)
-        if cache.sismember(cache_key + "+", user_id):
-            return cls(comment_id=comment_id, user_id=user_id, vote_type=UPVOTE)
-        if cache.sismember(cache_key + "-", user_id):
-            return cls(comment_id=comment_id, user_id=user_id, vote_type=DOWNVOTE)
-        return None
 
     def apply(self):
         # find previous vote

@@ -28,7 +28,7 @@
                         {% if not link.archived %}
                             <div class="link-rating wide">
                                 <div class="up">
-                                    {% if link.vote_by(current_user) and link.vote_by(current_user).is_upvote %}
+                                    {% if link.b_id in current_user.link_upvotes %}
                                         <a href="{{ link.route }}/vote/unvote?next={{ request.path|urlencode }}">
                                             <img class="voted" src="/static/images/play-clicked.svg">
                                         </a>
@@ -42,7 +42,7 @@
                                     {{ link.score }}
                                 </div>
                                 <div class="down">
-                                    {% if link.vote_by(current_user) and link.vote_by(current_user).is_downvote %}
+                                    {% if link.b_id in current_user.link_downvotes %}
                                         <a href="{{ link.route }}/vote/unvote?next={{ request.path|urlencode }}">
                                             <img class="voted" src="/static/images/play-clicked.svg">
                                         </a>
@@ -78,7 +78,7 @@
                         <div class="comment" id="c{{ comment.id }}">
                                 <div class="comment-voting">
                                     <div class="up">
-                                        {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_upvote %}
+                                        {% if comment.b_id in current_user.comment_upvotes %}
                                             <a href="{{ comment.route }}/vote/unvote">
                                                 <img src="/static/images/play-light-filled.svg">
                                             </a>
@@ -89,7 +89,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="down">
-                                        {% if comment.vote_by(current_user) and comment.vote_by(current_user).is_downvote %}
+                                        {% if comment.b_id in current_user.comment_downvotes %}
                                             <a href="{{ comment.route }}/vote/unvote">
                                                 <img src="/static/images/play-light-filled.svg">
                                             </a>
