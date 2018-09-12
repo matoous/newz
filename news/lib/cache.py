@@ -1,5 +1,9 @@
+from datetime import datetime
+
 from redis import StrictRedis
 from json import loads, dumps
+
+from news.lib.utils.serialize import json_serial
 
 DEFAULT_CACHE_TTL = 12 * 60 * 60 # 12 hours
 
@@ -58,9 +62,9 @@ class Cache:
         :return:
         """
         if ttl == 0:
-            return self.conn.set(key, val if raw else dumps(val))
+            return self.conn.set(key, val if raw else dumps(val, default=json_serial))
         else:
-            return self.conn.setex(key, ttl, val if raw else dumps(val))
+            return self.conn.setex(key, ttl, val if raw else dumps(val, default=json_serial))
 
     def clear(self):
         return self.conn.flushdb()

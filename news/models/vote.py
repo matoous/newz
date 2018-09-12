@@ -1,7 +1,7 @@
 from orator import Model, accessor, Schema
 from orator.orm import belongs_to
 
-from news.lib.cache import cache
+from news.lib.cache import cache, DEFAULT_CACHE_TTL
 from news.lib.cache_updates import update_link
 from news.lib.comments import update_comment
 from news.lib.db.db import db
@@ -102,7 +102,10 @@ class Vote(Model):
             votes = cls.where('user_id', '=', user_id).where('vote_type', '=', vote_type).get()
             vote_ids = [str(vote.link_id).encode() for vote in votes]
             if vote_ids:
-                cache.sadd(set_key, *vote_ids)
+                pipe = cache.pipeline()
+                pipe.sadd(set_key, *vote_ids)
+                pipe.expire(set_key, DEFAULT_CACHE_TTL)
+                pipe.execute()
         return set(vote_ids)
 
     @classmethod
