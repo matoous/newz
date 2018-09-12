@@ -36,6 +36,12 @@ class Cache:
             return data
         return loads(data) if data else None
 
+    def mget(self, ids: [str], raw: bool = False) -> [object]:
+        data = self.conn.mget(ids)
+        if raw:
+            return data
+        return [loads(x) for x in data] if data else None
+
     def set(self, key: str, val: object, ttl: int = DEFAULT_CACHE_TTL, raw: bool = False):
         if ttl == 0:
             return self.conn.set(key, val if raw else dumps(val))

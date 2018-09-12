@@ -1,4 +1,5 @@
 from datetime import datetime
+from pickle import loads
 from typing import List
 
 import timeago
@@ -187,16 +188,17 @@ class Base(Model):
         :param ids: list of ids of items to get
         :return: items
         """
-        # TODO maybe use MGET cmd
-        pipe = cache.pipeline()
-        for id in ids:
-            pipe.get(id)
-        items = pipe.execute()
+        items = cache.mget([cls._cache_key_from_id(id) for id in ids])
 
         # fetch missing items
         for idx, id in enumerate(ids):
             if items[idx] is None:
                 items[idx] = cls.by_id(id)
+            else:
+                obj = cls()
+                obj.set_raw_attributes(items[idx])
+                obj.set_exists(True)
+                items[idx] = obj
 
         return items
 
