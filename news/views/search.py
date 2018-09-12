@@ -2,7 +2,7 @@ import time
 
 from flask import request, render_template
 
-from news.lib.db.search import link_search
+from news.lib.db.search import link_search, feed_search
 
 
 def search():
@@ -11,7 +11,7 @@ def search():
     start = time.perf_counter()
 
     links = link_search.search(q)
-    feeds = link_search.search(q)
+    feeds = feed_search.search(q)
 
     end = time.perf_counter()
 

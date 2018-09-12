@@ -135,7 +135,7 @@ def importHN():
             pass
 
 
-def loadVotes():
+def load_votes():
     print('Loading CommentVotes to cache...')
     cvotes = CommentVote.get()
     for vote in cvotes:

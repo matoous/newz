@@ -19,7 +19,6 @@ def make_app():
 
     app.logger.setLevel(logging.INFO)
 
-
     # load config
     load_config(app)
 
