@@ -9,7 +9,7 @@ from wtforms.validators import DataRequired, Length, URL
 
 from news.lib.cache import cache
 from news.lib.db.db import db
-from news.lib.db.query import add_to_queries
+from news.lib.db.query import add_to_queries, LinkQuery
 from news.lib.db.sorts import sorts
 from news.lib.sorts import hot
 from news.lib.task_queue import q
@@ -255,6 +255,13 @@ class Link(Base):
         :return:
         """
         return self.user_id == 12345
+
+    def delete(self):
+        for sort in ['trending', 'best', 'new']:  # no need to update 'new' because it doesn't depend on score
+            q = LinkQuery(feed_id=self.feed_id, sort=sort)
+            q.delete([self])
+        super().delete()
+        cache.delete(self._cache_key)
 
 
 class LinkForm(FlaskForm):

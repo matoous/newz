@@ -16,7 +16,6 @@ class AmazonS3():
 
     def upload_to_s3(self, file, filename):
         if isinstance(file, Image):
-            print("is img")
             in_mem_file = io.BytesIO()
             file.save(in_mem_file, format="PNG")
             data = in_mem_file.getvalue()

@@ -90,7 +90,7 @@ class LinkQuery:
             data = cache.get(self._cache_key) or []
             lids = set(x.id for x in links)
 
-            data = filter(lambda x: x[0] not in lids, data)
+            data = [x for x in data if x[0] not in lids]
             self._data = data
             self._fetched = True
             self._save()

@@ -26,7 +26,6 @@ def square_crop(img, size=(256,256)):
     :param size: size
     :return: squared image
     """
-    print(img)
     img.thumbnail(size, Image.ANTIALIAS)
     background = Image.new('RGBA', size, (255, 255, 255, 0))
     background.paste(
