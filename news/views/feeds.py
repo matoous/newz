@@ -55,7 +55,7 @@ def get_feed(feed, sort=None):
         sort = feed.default_sort
 
     ids, has_less, has_more = paginate(LinkQuery(feed_id=feed.id, sort=sort).fetch_ids(), 20)
-    links = Link.by_ids(ids)
+    links = Link.by_ids(ids) if len(ids) > 0 else []
 
     if sort == 'new' and current_user.is_authenticated  :
         links = filter(min_score_filter(current_user.p_min_link_score), links)
