@@ -48,17 +48,6 @@ deleteById = function (id) {
     return false;
 };
 
-generatePreview = function () {
-    const md = document.querySelector('#text').value;
-    document.querySelector('#preview').innerHTML = SnuOwnd.getParser().render(md);
-};
-
-closeModal = function (id) {
-    const reportModal = document.getElementById(id);
-    reportModal.style.display = "none";
-    return false;
-};
-
 setReplyTo = function (id) {
     document.querySelectorAll('.parent_comment_id').forEach(i => {
         i.value = id;
@@ -85,11 +74,6 @@ commentComment = function (id, route) {
 <button class="btn small" type="reset" onclick="return cancelComment('${nowId}')">Cancel</button>
 </form>`;
     return false;
-};
-
-triggerFeedDescription = function () {
-    document.querySelector('.feed').classList.toggle('hidden');
-    document.querySelector('#description-trigger').innerHTML = document.querySelector('#description-trigger').innerHTML.toLowerCase().includes("hide") ? "Display feed details" : "Hide feed details";
 };
 
 if ('serviceWorker' in navigator) {

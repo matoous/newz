@@ -14,7 +14,7 @@
                         {{ link.title }}
                     </a>
                 </h2>
-                {% if link.trimmed_summary %}
+                {% if link.trimmed_summary and current_user.p_show_summaries %}
                     <div class="link-text">
                         {{ link.trimmed_summary }}
                     </div>

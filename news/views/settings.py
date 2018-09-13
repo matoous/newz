@@ -102,5 +102,30 @@ def post_new_password():
 @login_required
 def preferences_setting():
     form = PreferencesForm()
-    return render_template("settings-preferences.html", form=form, active_tab='preferences')
+    form.fill(current_user)
+    return render_template('settings-preferences.html', form=form, active_tab='preferences')
 
+
+@login_required
+def post_preferences_setting():
+    form = PreferencesForm()
+    if form.validate():
+        # check for changes
+        needs_update = False
+        if current_user.subscribed != form.subscribe.data:
+            current_user.subscribed = form.subscribe.data
+            needs_update = True
+        if current_user.p_min_link_score != form.min_link_score.data:
+            current_user.p_min_link_score = form.min_link_score.data
+            needs_update = True
+        if current_user.p_infinite_scrolling != form.infinite_scrolling.data:
+            current_user.p_infinite_scrolling = form.infinite_scrolling.data
+            needs_update = True
+        if current_user.p_show_summaries != form.show_summaries.data:
+            current_user.p_show_summaries = form.show_summaries.data
+            needs_update = True
+
+        # update user
+        if needs_update:
+            current_user.update_with_cache()
+    return render_template('settings-preferences.html', form=form, active_tab='preferences')
