@@ -13,13 +13,13 @@ def send_mail(msg):
     Consumes and send emails from email queue
     :param msg: 
     """
-    debug = bool(os.getenv('DEBUG'))
+    debug = os.getenv('DEBUG') != 'False'
     if debug:
         print(msg)
     else:
         requests.post(
             'https://api.mailgun.net/v3/mail.esourcenews.com/messages',
-            auth=("api", os.getenv('MAILGUN_API_KEY')),
+            auth=('api', os.getenv('MAILGUN_API_KEY')),
             data=msg)
 
 

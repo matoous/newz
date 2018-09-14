@@ -6,7 +6,7 @@ from babel import dates
 
 
 def get_bool(env_name, default):
-    return bool(os.getenv(env_name)) if os.getenv(env_name) else default
+    return os.getenv(env_name) == 'True' if os.getenv(env_name) else default
 
 
 def get_int(env_name, default):
