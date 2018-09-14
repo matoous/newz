@@ -35,7 +35,7 @@ def index():
     else:
         links = trending_links(DEFAULT_FEEDS)
     paginated_ids, has_less, has_more = paginate(links, 20)
-    links = Link.by_ids(paginated_ids)
+    links = Link.by_ids(paginated_ids) if paginated_ids else []
     return render_template('index.html',
                            links=links,
                            show_logo=True,
