@@ -13,7 +13,8 @@ def send_mail(msg):
     Consumes and send emails from email queue
     :param msg: 
     """
-    if os.getenv('DEBUG'):
+    debug = bool(os.getenv('DEBUG'))
+    if debug:
         print(msg)
     else:
         requests.post(
