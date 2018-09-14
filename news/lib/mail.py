@@ -18,7 +18,7 @@ def send_mail(msg):
         print(msg)
     else:
         requests.post(
-            'https://api.mailgun.net/v3/mail.esourcenews.com/messages',
+            '{}/messages'.format(os.getenv('MAILGUN_API_HOST')),
             auth=('api', os.getenv('MAILGUN_API_KEY')),
             data=msg)
 
