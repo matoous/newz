@@ -3,9 +3,32 @@ function mobileMenuTrigger(e) {
     nav.classList.toggle("open");
     e.stopPropagation();
 }
+
 function findClosest(ele, fn) {
     if (!ele) return undefined;
     return fn(ele) ? ele : findClosest(ele.parentElement, fn);
+}
+
+function vote(item, id, direction) {
+    fetch('/api/' + item + '/vote', {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "X-CSRFToken": csrf_token,
+        },
+        body: JSON.stringify({
+            "VoteType": direction,
+            "Id": id,
+        }),
+    }).then(response => response.json())
+        .then(response => {
+            console.log(response)
+        })
+        .catch(err => {
+            console.log(err)
+        });
+    return false;
 }
 
 document.addEventListener("click", function (e) {
@@ -25,11 +48,12 @@ window.addEventListener("resize", function () {
     }
 });
 
-function mobileMenuShowProfile(){
+function mobileMenuShowProfile() {
     let nav = document.querySelector(".mobile-profile");
     nav.classList.toggle("open");
 }
-function mobileMenuShowSubscribed(){
+
+function mobileMenuShowSubscribed() {
     let nav = document.querySelector(".mobile-subscribed");
     nav.classList.toggle("open");
 }

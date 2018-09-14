@@ -60,7 +60,7 @@
                         <img class="disabled" src="/static/images/play-disabled.svg">
                     {% else %}
                         {% if link.b_id in current_user.link_upvotes %}
-                            <a href="{{ link.route }}/vote/unvote?next={{ request.path|urlencode }}">
+                            <a href="{{ link.route }}/vote/unvote?next={{ request.path|urlencode }}" onclick="return vote('link', {{ link.id }}, 'upvote');">
                                 <img class="voted" src="/static/images/play-clicked.svg">
                             </a>
                         {% else %}
