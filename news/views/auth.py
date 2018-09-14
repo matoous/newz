@@ -101,7 +101,7 @@ def post_reset_password():
     :return:
     """
     if current_user.is_authenticated:
-        return redirect("/")
+        return redirect('/')
 
     form = ResetForm()
     if form.validate():

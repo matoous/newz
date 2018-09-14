@@ -82,6 +82,8 @@ def load_config(app):
     app.config['AWS_SECRET_ACCESS_KEY'] = os.getenv('AWS_SECRET_ACCESS_KEY')
     app.config['AWS_ACCESS_KEY_ID'] = os.getenv('AWS_ACCESS_KEY_ID')
 
+    app.config['MAILGUN_API_KEY'] = os.getenv('MAILGUN_API_KEY')
+
 
 def register_functions(app):
     def format_datetime(value, format='medium'):

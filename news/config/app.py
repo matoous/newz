@@ -1,5 +1,4 @@
 import logging
-from logging.handlers import RotatingFileHandler
 
 from flask import Flask
 
@@ -7,10 +6,9 @@ from news.config.config import load_config, register_functions
 from news.config.routes import register_routes
 from news.lib.amazons3 import S3
 from news.lib.cache import cache
-from news.lib.db.db import db
 from news.lib.csrf import csrf
+from news.lib.db.db import db
 from news.lib.login import login_manager
-from news.lib.mail import mail
 from news.lib.sentry import sentry
 
 
@@ -29,8 +27,6 @@ def make_app():
     cache.init_app(app)
 
     login_manager.init_app(app)
-
-    mail.init_app(app)
 
     S3.init_app(app)
 
