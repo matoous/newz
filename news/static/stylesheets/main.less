@@ -10,9 +10,10 @@
 @blue: #0074D9;
 @yellow: #FFDC00;
 
-@custom-sans: Arial, Helvetica, sans-serif;
-@custom-serif: Georgia, serif;
-@custom-small: 'Raleway', sans-serif;
+@custom-sans: 'Muli', sans-serif;
+
+@custom-serif: @custom-sans;
+@custom-small: @custom-sans;
 
 * {
   box-sizing: border-box;
@@ -26,7 +27,8 @@ html, body {
 }
 
 body {
-  font-family: BentonSans, sans-serif;
+  font-family: @custom-sans;
+  font-weight: 400;
   margin: 0;
   font-size: 14px;
 }
@@ -38,9 +40,9 @@ h1, h2, h3 {
 h1 {
   font-family: @custom-small;
   font-weight: 400;
-  font-size: 52px;
+  font-size: 36px;
   @media screen and (max-width: 995px) , screen and (max-height: 700px) {
-    font-size: 36px;
+    font-size: 28px;
   }
 }
 
@@ -85,7 +87,7 @@ section {
 .nav-links {
   padding: 0 20px;
   display: flex;
-  font-family: 'Raleway', sans-serif;
+  font-family: @custom-sans;
   font-weight: 700;
   font-size: 15px;
   max-width: 1024px;
@@ -105,7 +107,7 @@ section {
 .mobile-burger {
   display: none;
   padding: 18px 16px;
-  font-family: 'Raleway', sans-serif;
+  font-family: @custom-sans;
   font-weight: bold;
   cursor: pointer;
   @media screen and (max-width: 820px) {
@@ -137,7 +139,7 @@ body.open {
   display: none;
   width: 100%;
   color: white;
-  font-family: 'Raleway', sans-serif;
+  font-family: @custom-sans;
   font-weight: bold;
   font-size: 1.2rem;
 
@@ -272,8 +274,6 @@ body.open {
   position: relative;
   padding: 6px 6px;
   margin-left: 6px;
-  font-family: @custom-sans;
-  font-weight: normal;
   line-height: 22px;
   > a {
     color: black;
@@ -433,6 +433,7 @@ body.open {
   h1 {
     text-align: center;
     margin: 0;
+    font-weight: 700;
   }
 
 }
@@ -497,9 +498,10 @@ body.open {
   }
   h2 {
     margin: 0 0 2px 0;
+    font-size: 1.1rem;
     a {
       color: #000;
-      font-family: 'Raleway', sans-serif;
+      font-family: @custom-sans;
       font-weight: bold;
     }
     a:visited {
@@ -517,7 +519,6 @@ body.open {
   }
 
   .link-feed {
-    font-family: @custom-small;
     font-size: .8rem;
     margin-bottom: -2px;
   }
@@ -532,7 +533,6 @@ body.open {
 
   .bottom-line {
     font-size: .8rem;
-    font-family: @custom-small;
     color: #777;
 
     div {
@@ -562,7 +562,6 @@ body.open {
   flex-shrink: 0;
   padding-left: 12px;
   font-size: .9rem;
-  font-family: @custom-small;
   text-align: center;
 
   &.wide {
@@ -612,16 +611,14 @@ body.open {
       color: black;
       text-decoration: none;
       font-weight: bold;
-      font-family: @custom-sans;
     }
   }
   .link-summary {
-    font-size: 1.1rem;
     margin: 20px 0 32px;
+    font-size: 1rem;
   }
   .link-info {
     margin: 12px 0;
-    font-family: @custom-small;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap-reverse;
