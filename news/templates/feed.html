@@ -6,8 +6,8 @@
 
 {% block body %}
     {% set subscribed = current_user.is_authenticated and current_user.subscribed_to(feed) %}
-    <div class="feed" >
-      <div class="feed-wrapper">
+    <div class="feed">
+        <div class="feed-wrapper">
             <div class="container">
                 <div class="feed-head">
                     <h1>{{ feed.name }}</h1>
@@ -50,6 +50,14 @@
                 </div>
                 <div class="feed-options">
                     {% if current_user.is_authenticated %}
+                        <div>
+                            <a class="btn" href="{{ feed.route }}/add">Post</a>
+                        </div>
+                        {% if current_user.is_feed_admin(feed) %}
+                            <div>
+                                <a class="btn" href="{{ feed.route }}/admin">Admin</a>
+                            </div>
+                        {% endif %}
                         {% if subscribed %}
                             <div>
                                 <a class="btn grey" href="{{ feed.route }}/unsubscribe">Unsubscribe</a>
@@ -57,14 +65,6 @@
                         {% else %}
                             <div>
                                 <a class="btn" href="{{ feed.route }}/subscribe">Subscribe</a>
-                            </div>
-                        {% endif %}
-                        <div>
-                            <a class="btn" href="{{ feed.route }}/add">Post</a>
-                        </div>
-                        {% if current_user.is_feed_admin(feed) %}
-                            <div>
-                                <a class="btn" href="{{ feed.route }}/admin">Admin</a>
                             </div>
                         {% endif %}
                     {% endif %}
