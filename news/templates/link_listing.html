@@ -21,7 +21,11 @@
                 {% endif %}
                 <div class="bottom-line">
                     <div class="comments">
-                        <a href="{{ link.full_route }}">{{ link.comments_count }} comments</a>
+                        {% if link.comments_count > 1 %}
+                            <a href="{{ link.full_route }}">{{ link.comments_count }} comments</a>
+                        {% else %}
+                            <a href="{{ link.full_route }}">discussion</a>
+                        {% endif %}
                     </div>
                     <div class="date">
                         {{ link.time_ago() }}

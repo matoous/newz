@@ -24,7 +24,8 @@ class Search():
 
         # prepare select statement with highlighting
         highlight_select = [
-            'ts_headline(\'english\', "{}", plainto_tsquery(\'"{}"\')) AS {}_highlight'.format(column, "{q}", column)
+            'ts_headline(\'english\', "{}", plainto_tsquery(\'english\', \'"{}"\'), \'MaxFragments=0, MinWords=5, MaxWords=9\') AS {}_highlight'.format(
+                column, "{q}", column)
             for column in self._cls.__searchable__]
         select_fields = self._cls.__fillable__ + highlight_select + ['count(*) OVER() AS full_count']
         if self._cls.__timestamps__:
@@ -32,7 +33,7 @@ class Search():
         self._select_statement = ", ".join(select_fields)
 
         # create where statement
-        where_clauses = ['textsearchable_{} @@ to_tsquery(\'"{}"\')'.format(column, "{q}") for column in
+        where_clauses = ['textsearchable_{} @@ to_tsquery(\'english\', \'{}\')'.format(column, "{q}") for column in
                          self._cls.__searchable__]
         self._where_statement = " OR ".join(where_clauses)
 
@@ -58,6 +59,8 @@ class Search():
             data = data.order_by_raw(self._sorts[sort])
 
         data = data.limit(30)
+
+        print(data.to_sql())
 
         return data.get()
 

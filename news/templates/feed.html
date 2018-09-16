@@ -27,9 +27,9 @@
         <div class="links">
             <div class="menu">
                 <div class="feed-sort">
-                    <div class="sorting">
+                    <div class="sorting" onclick="displaySortOptions();">
                         <div class="selected-sort">{{ sort }}</div>
-                        <ul>
+                        <ul class="hidden">
                             <li class="{% if sort == 'trending' %}selected{% endif %}">
                                 <a href="{{ feed.route }}/trending">
                                     Trending

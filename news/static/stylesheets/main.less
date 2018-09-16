@@ -433,54 +433,6 @@ body.open {
     margin-bottom: 32px;
     flex-wrap: wrap-reverse;
     justify-content: space-between;
-
-    .sorting {
-      border: 1px solid black;
-      text-align: center;
-      padding: 6px 12px;
-      overflow: visible;
-      position: relative;
-      min-width: 120px;
-
-      .selected-sort {
-        text-transform: capitalize;
-      }
-
-      &:hover {
-        ul {
-          display: block;
-        }
-      }
-
-      ul {
-        display: none;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        position: absolute;
-        z-index: 1;
-        background-color: rgba(240, 240, 248, 0.98);
-        left: -1px;
-        top: 100%;
-        border-top: 1px solid black;
-
-        li {
-          padding: 8px 12px;
-          min-width: 120px;
-
-          a {
-            color: black;
-          }
-
-          &.selected {
-            a {
-              cursor: inherit;
-              text-decoration: none;
-            }
-          }
-        }
-      }
-    }
   }
   h2 {
     margin: 0 0 2px 0;
@@ -491,6 +443,53 @@ body.open {
     }
     a:visited {
       color: #444;
+    }
+  }
+}
+
+.sorting {
+  border: 1px solid black;
+  text-align: center;
+  padding: 6px 12px;
+  overflow: visible;
+  position: relative;
+  min-width: 120px;
+  cursor: pointer;
+
+  .selected-sort {
+    text-transform: capitalize;
+  }
+
+  ul {
+    list-style: none;
+    box-shadow: rgba(28, 28, 28, 0.2) 0px 2px 4px 0px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    z-index: 1;
+    background-color: rgba(240, 240, 248, 0.98);
+    left: -1px;
+    top: 100%;
+    border-top: 1px solid black;
+
+    &.hidden {
+      display: none;
+    }
+    li {
+      padding: 8px 12px;
+      min-width: 120px;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      a {
+        color: black;
+        text-decoration: none;
+      }
+
+      &.selected {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
     }
   }
 }
@@ -573,15 +572,15 @@ body.open {
 }
 
 .link-card {
+  padding-top: 12px;
+  font-size: 16px;
+
   .link-head {
     margin-bottom: 32px;
   }
   .link-feed {
-    margin-bottom: 8px;
-    border-left: 2px solid #555;
-    line-height: 1;
     a {
-      margin: 0 8px;
+      font-size: 18px;
       color: #555555;
     }
   }
@@ -598,7 +597,7 @@ body.open {
     }
   }
   .link-summary {
-    margin: 20px 0 32px;
+    margin: 20px 0;
     font-size: 16px;
   }
   .link-info {
@@ -725,7 +724,6 @@ body.open {
   flex-direction: row;
   font-size: 13px;
   flex-wrap: wrap;
-  min-width: 320px;
 
   @media screen and (max-width: 640px) {
     width: 100%;

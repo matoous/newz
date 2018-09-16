@@ -16,6 +16,13 @@ document.addEventListener("click", function (e) {
     if (!target && nav.classList.contains("open")) {
         nav.classList.remove("open");
     }
+    let ele = document.querySelector(".sorting ul");
+    target = findClosest(e.target, function (el) {
+        return el.classList.contains("sorting")
+    });
+    if (!target && !ele.classList.contains("hidden")) {
+        ele.classList.add("hidden");
+    }
 });
 
 window.addEventListener("resize", function () {
@@ -96,4 +103,9 @@ if ('serviceWorker' in navigator) {
     // navigator.serviceWorker
     //          .register('./static/scripts/service-worker.js')
     //          .then(function() { console.log('Service Worker Registered'); });
+}
+
+function displaySortOptions() {
+    let ele = document.querySelector(".sorting ul");
+    ele.classList.toggle('hidden');
 }

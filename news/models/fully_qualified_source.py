@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 
 import feedparser
-from orator import Schema, accessor, mutator
+from orator import accessor, mutator
 
-from news.lib.db.db import db
 from news.lib.utils.slugify import make_slug, remove_html_tags
 from news.models.base import Base
 
@@ -81,6 +80,7 @@ class FullyQualifiedSource(Base):
                     for e in entry['content']:
                         if 'value' in e and len(e['value']) < 300:
                             text = remove_html_tags(e['value'])
+
             # if the text is still longer trim by sentences to 300 characters max
             if len(text) > 300:
                 idx = text.rfind('. ', 0, 300)
