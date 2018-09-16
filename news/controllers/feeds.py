@@ -15,7 +15,6 @@ from news.lib.ratelimit import rate_limit
 from news.lib.rss import rss_page
 from news.lib.utils.file_type import imagefile
 from news.lib.utils.redirect import redirect_back
-from news.lib.utils.resize import create_feed_images
 from news.lib.utils.time_utils import convert_to_timedelta
 from news.models.ban import BanForm, Ban
 from news.models.feed import FeedForm, EditFeedForm

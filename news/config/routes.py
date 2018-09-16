@@ -1,12 +1,12 @@
-from news.views.admin import admin, add_testing_data
-from news.views.web import *
-from news.views.auth import *
-from news.views.search import *
-from news.views.settings import *
-from news.views.user import *
-from news.views.comments import *
-from news.views.feeds import *
-from news.views.links import *
+from news.controllers.admin import admin, add_testing_data
+from news.controllers.auth import *
+from news.controllers.comments import *
+from news.controllers.feeds import *
+from news.controllers.links import *
+from news.controllers.search import *
+from news.controllers.settings import *
+from news.controllers.user import *
+from news.controllers.web import *
 
 
 class Route:

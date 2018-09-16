@@ -11,17 +11,17 @@ def rss_entries(links, feed=None):
         fe.summary("Post by {} in {}.".format(link.user.name, feed.name if feed else link.feed.name))
         fe.link(href=link.url)
         fe.published(link.created_at)
-        fe.comments('http://localhost:5000/f/{}/{}'.format(feed.slug if feed else link.feed.slug, link.slug))
+        fe.comments(link.url)
         fe.author(name=link.user.name)
         entries.append(fe)
     return entries
 
 def rss_feed_builder(feed):
     fg = FeedGenerator()
-    fg.id(feed.url)
+    fg.id(feed.route)
     fg.title(feed.name)
-    fg.link(href="http://localhost:5000" + feed.url, rel='self')
-    fg.description(feed.description or "Hello, there is some description.")
+    fg.link(feed.route, rel='self')
+    fg.description(feed.description or "")
     fg.language(feed.lang)
     return fg
 
