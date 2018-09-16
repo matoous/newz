@@ -20,6 +20,11 @@
                 {{ form.img.label }}
                 {{ form.img }}
             </div>
+            <div class="f-row">
+                {% if current_user.profile_pic %}
+                    <a href="/remove-avatar">Remove avatar</a>
+                {% endif %}
+            </div>
             {{ form.csrf_token }}
             <button type="submit" class="btn">Save</button>
         </fieldset>

@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from news.lib.amazons3 import S3
 from news.lib.ratelimit import rate_limit
 from news.lib.utils.file_type import imagefile
+from news.lib.utils.redirect import redirect_back
 from news.lib.utils.resize import square_crop
 from news.models.user import PreferencesForm, ProfileForm, PasswordForm, EmailForm, DeactivateForm, User
 
@@ -104,3 +105,9 @@ def preferences_setting():
     form = PreferencesForm()
     return render_template("settings-preferences.html", form=form, active_tab='preferences')
 
+
+@login_required
+def remove_avatar():
+    current_user.profile_pic = None
+    current_user.update_with_cache()
+    return redirect(redirect_back(current_user.route))
