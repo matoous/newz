@@ -164,6 +164,7 @@ def register_routes(app):
         Route('/metrics', metrics),
         Route('/admin', admin),
         Route('/add-testing-data', add_testing_data),
+        Route('/clear-cache', clear_cache),
     ]
 
     for route in routes:

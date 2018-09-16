@@ -1,4 +1,4 @@
-def add_new_comment(link, comment):
+def add_new_comment(link_id, comment):
     """
     Adds new comment to given link
     Increment comment count
@@ -9,8 +9,9 @@ def add_new_comment(link, comment):
     """
     comment.link.incr('comments_count', 1)
     from news.models.comment import CommentTree, SortedComments
-    CommentTree.add(link, comment)
-    SortedComments.update(link, comment)
+    # insert new comment into the comment tree of given link
+    CommentTree(link_id).add([comment])
+    SortedComments(link_id, comment.parent_id).update([comment])
 
 
 def update_comment(comment):
@@ -19,4 +20,4 @@ def update_comment(comment):
     :param comment:
     """
     from news.models.comment import SortedComments
-    SortedComments.update(comment.link, comment)
+    SortedComments(comment.link_id, comment.parent_id).update([comment])

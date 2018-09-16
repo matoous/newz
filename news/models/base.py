@@ -1,11 +1,9 @@
+import base64
 from datetime import datetime
-from pickle import loads
 from typing import List
 
-import dateutil
 import timeago
 from orator import Model
-from pendulum import pendulum
 from redis_lock import Lock
 
 from news.lib.cache import cache
@@ -26,6 +24,10 @@ class Base(Model):
     @property
     def b_id(self):
         return str(self.id).encode()
+
+    @property
+    def id64(self):
+        return self.__class__._cache_prefix() + base64.b64encode(self.id)
 
     @classmethod
     def _cache_prefix(cls) -> str:

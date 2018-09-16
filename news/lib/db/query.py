@@ -1,14 +1,13 @@
-from pickle import dumps, loads
-
 from redis_lock import Lock
 from rq.decorators import job
 
 from news.lib.cache import cache
 from news.lib.db.sorts import sorts
 from news.lib.metrics import CACHE_MISSES, CACHE_HITS
-from news.lib.task_queue import redis_conn
 from news.lib.sorts import sort_tuples
+from news.lib.task_queue import redis_conn
 from news.lib.utils.time_utils import epoch_seconds
+from news.models.comment import CommentTree
 
 PRECOMPUTE_LIMIT = 1000
 
@@ -103,7 +102,8 @@ class LinkQuery:
         """
         # read - write - modify
         with Lock(cache.conn, self._lock_key):
-            data = cache.get(self._cache_key) or []
+            self.fetch()
+            data = self._data
             item_tuples = [self._tupler(link) for link in links] or []
 
             existing_fnames = {item[0] for item in data}
@@ -159,7 +159,7 @@ class LinkQuery:
 
         return self._data
 
-    def fetch_ids(self):
+    def fetch_ids(self) -> [str]:
         """
         Fetch data from cache but return only ids of things
         :return: sorted and filtered list of ids
@@ -174,7 +174,8 @@ def add_to_queries(link):
     :param link: link to add/update
     :return: nothing
     """
-    for sort in ['trending', 'best', 'new']:  # no need to update 'new' because it doesn't depend on score
+    for sort in ['trending', 'best', 'new']:
         q = LinkQuery(feed_id=link.feed_id, sort=sort)
         q.insert([link])
+    CommentTree(link.id).create()
     return None

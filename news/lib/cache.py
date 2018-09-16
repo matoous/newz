@@ -1,9 +1,6 @@
-from datetime import datetime
+from pickle import loads, dumps
 
 from redis import StrictRedis
-from json import loads, dumps
-
-from news.lib.utils.serialize import json_serial
 
 DEFAULT_CACHE_TTL = 12 * 60 * 60 # 12 hours
 
@@ -62,9 +59,9 @@ class Cache:
         :return:
         """
         if ttl == 0:
-            return self.conn.set(key, val if raw else dumps(val, default=json_serial))
+            return self.conn.set(key, val if raw else dumps(val))
         else:
-            return self.conn.setex(key, ttl, val if raw else dumps(val, default=json_serial))
+            return self.conn.setex(key, ttl, val if raw else dumps(val))
 
     def clear(self):
         return self.conn.flushdb()

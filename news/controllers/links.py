@@ -5,7 +5,7 @@ from werkzeug.utils import redirect
 from news.lib.ratelimit import rate_limit
 from news.lib.utils.redirect import redirect_back
 from news.models.ban import Ban
-from news.models.comment import SortedComments, Comment, CommentForm
+from news.models.comment import SortedComments, CommentForm
 from news.models.link import SavedLink
 from news.models.report import ReportForm, Report
 from news.models.vote import vote_type_from_string, LinkVote
@@ -21,10 +21,9 @@ def get_link(link, link_slug=''):
         abort(403)
 
     # Currently supports only one type of sorting for comments
-    sorted_comments = SortedComments(link).get_full_tree()
+    sorted_comments = SortedComments(link.id).get_full_tree()
 
-    return render_template('link.html', link=link, feed=link.feed, comment_form=CommentForm(), comments=sorted_comments,
-                           get_comment=Comment.by_id)
+    return render_template('link.html', link=link, feed=link.feed, comment_form=CommentForm(), comments=sorted_comments)
 
 
 @login_required

@@ -2,6 +2,8 @@ from flask import render_template
 from flask_login import current_user
 from werkzeug.utils import redirect
 
+from news.lib.cache import cache
+
 
 def admin():
     if not current_user.is_authenticated:
@@ -31,4 +33,9 @@ def trigget_update_fqs():
     from news.scripts.import_fqs import import_fqs
     import_fqs()
 
+    return redirect('/admin')
+
+
+def clear_cache():
+    cache.clear()
     return redirect('/admin')

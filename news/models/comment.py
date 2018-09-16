@@ -9,7 +9,6 @@ from wtforms.validators import DataRequired, Optional, Length
 from news.lib.cache import cache
 from news.lib.comments import add_new_comment
 from news.lib.db.db import db
-from news.lib.metrics import CACHE_MISSES, CACHE_HITS
 from news.lib.task_queue import q
 from news.lib.utils.confidence import confidence
 from news.models.base import Base
@@ -130,7 +129,7 @@ class Comment(Base):
         """
         self.save()
         self.ups = self.downs = 0
-        q.enqueue(add_new_comment, self.link, self, result_ttl=0)
+        q.enqueue(add_new_comment, self.link.id, self, result_ttl=0)
 
     @property
     def route(self):
@@ -141,6 +140,7 @@ class Comment(Base):
         Soft remove of the comment from Link
         Changes the text of the comment to <removed>
         """
+        # TODO REMOVE FROM CACHE
         self.text = escape('<removed>')
         self.update_with_cache()
 
@@ -149,122 +149,91 @@ class TreeNotBuildException(Exception):
     pass
 
 
-class CommentTreeCache:
+class CommentTree:
     """
-    Caching class for comment tree for link
+    CommentTree is interface to unordered comment tree for given link
     """
 
-    def __init__(self, link_id, tree):
+    def __init__(self, link_id):
         self.link_id = link_id
-        self.tree = tree
+        self._tree = None
 
-    @classmethod
-    def _cache_key(cls, link):
-        return 'ct:{}'.format(link.id)
+    @property
+    def _cache_key(self):
+        return 'ct:{}'.format(self.link_id)
 
-    @classmethod
-    def _write_tree(cls, link, tree):
-        """
-        Writes tree to redis
-        :param link: link
-        :param tree: tree
-        """
-        key = cls._cache_key(link)
-        cache.set(key, tree)
-
-    @classmethod
-    def _lock_key(cls, link):
+    @property
+    def _lock_key(self):
         """
         Gets lock key for read/modify/write operations
         :param link: link
         :return: redis key
         """
-        return 'c_lock:{}'.format(link.id)
+        return 'c_lock:{}'.format(self.link_id)
 
-    @classmethod
-    def add(cls, link, comment):
+    def create(self):
+        cache.set(self._cache_key, {})
+
+    def add(self, comments):
         """
         Adds comment to comment tree for given link
         :param link: link
         :param comment: comment
         """
-        with Lock(cache.conn, cls._lock_key(link)):
-            tree = cls.load_tree(link)
-            if not tree:
-                raise TreeNotBuildException
-            tree.setdefault(comment.parent_id, []).append(comment.id)
-            cache.set(cls._cache_key(link), tree)
+        with Lock(cache.conn, self._lock_key):
+            tree = self.load_tree()
+            for comment in comments:
+                tree.setdefault(comment.parent_id, []).append(comment.id)
+            cache.set(self._cache_key, tree)
 
-    @classmethod
-    def rebuild(cls, link, comments):
-        """
-        Rebuilds comment tree for link from passed comments
-        :param link: link
-        :param comments: comments
-        :return:
-        """
-        with Lock(cache.conn, cls._lock_key(
-                link)):  # todo lock in CommentTree not here, so we dont fetch all comments more times on miss
+    def remove(self, comments):
+        with Lock(cache.conn, self._lock_key):
+            tree = self.load_tree()
+            for comment in comments:
+                tree[comment.parent_id] = [id for id in tree[comment.parent_id] if id != comment.id]
+            cache.set(self._cache_key, tree)
+
+    def load_tree(self):
+        tree = cache.get(self._cache_key)
+        if not tree:
+            comments = Comment.where('link_id', self.link_id).select('parent_id', 'id').get() or []
             tree = {}
             for comment in comments:
                 tree.setdefault(comment.parent_id, []).append(comment.id)
+            cache.set(self._cache_key, tree)
+        self._tree = tree
+        return tree
 
-            cls._write_tree(link, tree)  # save tree to redis
-            return cls(link.id, tree)
-
-    @classmethod
-    def load_tree(cls, link):
-        return cache.get(cls._cache_key(link))
-
-
-class CommentTree:
-    """
-    CommentTree is interface to unordered comment tree for given link
-
-    CommentTree uses CommentTreeCache od background to access and modify comments for given link
-    """
-
-    def __init__(self, link, tree):
-        self.link = link
-        self.tree = tree
-
-    @classmethod
-    def add(cls, link, comment):
-        """
-        Adds comment to comment tree
-        :param link: link
-        :param comment: comment to insert
-        """
-        try:
-            CommentTreeCache.add(link, comment)
-        except TreeNotBuildException:
-            CommentTree._rebuild(link)
+    def ids(self):
+        if not self._tree:
+            self.load_tree()
+        x = set()
+        for parent_id, children_ids in self._tree.items():
+            x.add(parent_id)
+            for children_id in children_ids:
+                x.add(children_id)
+        x.remove(None)
+        return list(x)
 
     @classmethod
     def by_link(cls, link):
+        return cls.by_link_id(link.id)
+
+    @property
+    def tree(self):
+        return self.load_tree()
+
+    def keys(self):
+        return self.tree.keys()
+
+    @classmethod
+    def by_link_id(cls, link_id):
         """
         Get comment tree by link
         :param link: link
         :return: comment tree
         """
-        tree = CommentTreeCache.load_tree(link)
-        if tree is None:
-            CACHE_MISSES.inc(1)
-            tree = cls._rebuild(link)
-        else:
-            CACHE_HITS.inc(1)
-        return cls(link, tree)
-
-    @classmethod
-    def _rebuild(cls, link):
-        """
-        Rebuild the comment tree from database
-        :param link: link
-        :return: comment tree
-        """
-        comments = Comment.where('link_id', link.id).select('parent_id', 'id').get() or []
-        res = CommentTreeCache.rebuild(link, comments)
-        return res.tree
+        return CommentTree(link_id)
 
 
 class SortedComments:
@@ -277,46 +246,46 @@ class SortedComments:
     To get the tree we recursively traverse the tree a fetch children comments
     """
 
-    def __init__(self, link):
-        self.link = link
-        self._tree = CommentTree.by_link(link).tree
+    def __init__(self, link_id, parent_id=None, sort=''):
+        self._link_id = link_id
+        self._parent_id = parent_id
+        self._sort = sort
+        self._tree = CommentTree.by_link_id(link_id)
 
-    @classmethod
-    def _cache_key(cls, link, parent_id):
-        return 'scm:{}.{}'.format(link.id, parent_id) if parent_id else 'scm:{}'.format(link.id)
+    def _cache_key(self, parent_id):
+        return 'scm:{}.{}'.format(self._link_id, parent_id or 0)
 
-    @classmethod
-    def _lock_key(cls, link, parent_id):
-        return 'lock:scm:{}.{}'.format(link.id, parent_id) if parent_id else 'lock:scm:{}'.format(link.id)
+    def _lock_key(self, parent_id):
+        return 'lock:scm:{}.{}'.format(self._link_id, parent_id or 0)
 
-    @classmethod
-    def update(cls, link, comment):
+    def update(self, comments):
         """
         Update sorted comments in cache
         This should be called on votes (maybe not all of them) and on new comments
-        :param link: link
+        :param link_id: link id
         :param comment: comment
         """
-        cache_key = cls._cache_key(link, comment.parent_id)
-        # update comment under read - write - modify lock
-        with Lock(cache.conn, cls._lock_key(link, comment.parent_id)):
-            comments = cache.get(cache_key) or []
-            added = False
+        for comment in comments:
+            cache_key = self._cache_key(comment.parent_id)
+            lock_key = self._lock_key(comment.parent_id)
 
-            # update comment
-            for i in range(len(comments)):
-                if comments[i][0] == comment.id:
-                    comments[i] = (comment.id, confidence(comment.ups, comment.downs))
-                    added = True
-                    break
+            # update comment under read - write - modify lock
+            with Lock(cache.conn, lock_key):
+                # maybe check against the comment tree to see if it is missing or it just is not initialized yet
+                comments = cache.get(cache_key) or []  # so maybe load comments instead of []
 
-            # add comment
-            if not added:
-                comments.append((comment.id, confidence(comment.ups, comment.downs)))
+                # update comment
+                for i in range(len(comments)):
+                    if comments[i][0] == comment.id:
+                        comments[i] = [comment.id, confidence(comment.ups, comment.downs)]
+                        break
+                else:
+                    # add comment
+                    comments.append([comment.id, confidence(comment.ups, comment.downs)])
 
-            # sort and save
-            comments = sorted(comments, key=lambda x: x[1:], reverse=True)
-            cache.set(cache_key, comments)
+                # sort and save
+                comments = sorted(comments, key=lambda x: x[1:], reverse=True)
+                cache.set(cache_key, comments)
 
     def build_tree(self, comment_id=None):
         """
@@ -325,19 +294,28 @@ class SortedComments:
         :param comment_id: comment_id for comment, None for link
         :return: (comment_id, [sorted subtrees])
         """
-        # get from cache
-        children_tuples = cache.get(self._cache_key(self.link, comment_id))
+        comments = Comment.by_ids(self._tree.ids())
+        full_comments = {comment.id: comment for comment in comments}
 
-        # cache miss, update
-        if children_tuples is None:
-            CACHE_MISSES.inc(1)
-            children = Comment.where('parent_id', comment_id).where('link_id', self.link.id).get()
-            children_tuples = [(x.id, confidence(x.ups, x.downs)) for x in children]
-            cache.set(self._cache_key(self.link, comment_id), children_tuples)
-        else:
-            CACHE_HITS.inc(1)
+        def build_subtree(parent_id, sorted_tree):
+            return [full_comments[parent_id],
+                    [build_subtree(children_id, builder) for children_id, _ in
+                     sorted_tree[parent_id]] if parent_id in sorted_tree else []]
 
-        return comment_id, [self.build_tree(children_id) for children_id, _ in children_tuples]
+        ids = self._tree.keys()
+        children_tuples = cache.mget([self._cache_key(id) for id in ids])
+        for idx, parent_id in enumerate(ids):
+            # fill in missing children
+            if children_tuples[idx] is None:
+                children = Comment.where('parent_id', parent_id).where('link_id', self._link_id).get()
+                tuples = [[x.id, confidence(x.ups, x.downs)] for x in children]
+                children_tuples[idx] = sorted(tuples, key=lambda x: x[1:], reverse=True)
+                cache.set(self._cache_key(parent_id), children_tuples[idx])
+
+        builder = dict(zip(ids, children_tuples))
+        res = [None, [build_subtree(children_id, builder) for children_id, _ in builder[None]]]
+        return res
+
 
     def get_full_tree(self):
         """

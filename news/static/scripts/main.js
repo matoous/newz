@@ -13,14 +13,14 @@ document.addEventListener("click", function (e) {
     let target = findClosest(e.target, function (el) {
         return el.classList.contains("mobile-nav")
     });
-    if (!target && nav.classList.contains("open")) {
+    if (!target && nav && nav.classList.contains("open")) {
         nav.classList.remove("open");
     }
     let ele = document.querySelector(".sorting ul");
     target = findClosest(e.target, function (el) {
         return el.classList.contains("sorting")
     });
-    if (!target && !ele.classList.contains("hidden")) {
+    if (!target && ele && !ele.classList.contains("hidden")) {
         ele.classList.add("hidden");
     }
 });

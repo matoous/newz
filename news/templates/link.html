@@ -73,8 +73,7 @@
                     </div>
                 {% endif %}
                 <div class="link-comments">
-                    {% for comment_id, subcomments in comments recursive %}
-                        {% set comment = get_comment(comment_id) %}
+                    {% for comment, subcomments in comments recursive %}
                         <div class="comment" id="c{{ comment.id }}">
                                 <div class="comment-voting">
                                     <div class="up">
@@ -119,10 +118,12 @@
                                 {% if not link.archived %}
                                     <div class="comment-comment"></div>
                                     <div class="comment-options">
+                                        {% if current_user.is_authenticated %}
                                         <a href="#"
                                            onclick="return commentComment('{{ comment.id }}', '{{ link.route }}')">reply</a>
                                         <a href="{{ comment.route }}/report"
                                            onclick="return reportComment({{ comment.id }})">report</a>
+                                        {% endif %}
                                         {% if current_user.is_authenticated and current_user.is_feed_admin(link.feed) %}
                                             <div class="admin-options">
                                             <span>
