@@ -154,8 +154,9 @@ class CommentTree:
     CommentTree is interface to unordered comment tree for given link
     """
 
-    def __init__(self, link_id):
+    def __init__(self, link_id, subtree_root_id=None):
         self.link_id = link_id
+        self.subtree_root_id = subtree_root_id
         self._tree = None
 
     @property
@@ -322,8 +323,8 @@ class SortedComments:
         Gets full comment tree for given Link
         :return: Sorted Comments tree
         """
-        tree = self.build_tree()
-        return tree[1]
+        _, tree = self.build_tree()
+        return tree
 
 
 class CommentForm(BaseForm):

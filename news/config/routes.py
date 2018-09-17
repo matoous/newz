@@ -1,4 +1,4 @@
-from news.controllers.admin import admin, add_testing_data
+from news.controllers.admin import *
 from news.controllers.auth import *
 from news.controllers.comments import *
 from news.controllers.feeds import *
