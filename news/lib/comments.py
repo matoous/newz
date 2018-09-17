@@ -11,7 +11,7 @@ def add_new_comment(link_id, comment):
     from news.models.comment import CommentTree, SortedComments
     # insert new comment into the comment tree of given link
     CommentTree(link_id).add([comment])
-    SortedComments(link_id, comment.parent_id).update([comment])
+    SortedComments(link_id).update([comment])
 
 
 def update_comment(comment):
@@ -20,4 +20,4 @@ def update_comment(comment):
     :param comment:
     """
     from news.models.comment import SortedComments
-    SortedComments(comment.link_id, comment.parent_id).update([comment])
+    SortedComments(comment.link_id).update([comment])

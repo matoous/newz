@@ -78,22 +78,22 @@
                                 <div class="comment-voting">
                                     <div class="up">
                                         {% if comment.b_id in current_user.comment_upvotes %}
-                                            <a href="{{ comment.route }}/vote/unvote">
+                                            <a href="{{ comment.route }}/vote/unvote?next={{ link.route }}">
                                                 <img src="/static/images/play-light-filled.svg">
                                             </a>
                                         {% else %}
-                                            <a href="{{ comment.route }}/vote/upvote">
+                                            <a href="{{ comment.route }}/vote/upvote?next={{ link.route }}">
                                                 <img src="/static/images/play-light.svg">
                                             </a>
                                         {% endif %}
                                     </div>
                                     <div class="down">
                                         {% if comment.b_id in current_user.comment_downvotes %}
-                                            <a href="{{ comment.route }}/vote/unvote">
+                                            <a href="{{ comment.route }}/vote/unvote?next={{ link.route }}">
                                                 <img src="/static/images/play-light-filled.svg">
                                             </a>
                                         {% else %}
-                                            <a href="{{ comment.route }}/vote/downvote">
+                                            <a href="{{ comment.route }}/vote/downvote?next={{ link.route }}">
                                                 <img src="/static/images/play-light.svg">
                                             </a>
                                         {% endif %}

@@ -154,9 +154,8 @@ class CommentTree:
     CommentTree is interface to unordered comment tree for given link
     """
 
-    def __init__(self, link_id, subtree_root_id=None):
+    def __init__(self, link_id):
         self.link_id = link_id
-        self.subtree_root_id = subtree_root_id
         self._tree = None
 
     @property
@@ -175,7 +174,7 @@ class CommentTree:
     def create(self):
         cache.set(self._cache_key, {})
 
-    def add(self, comments):
+    def add(self, comments: ['Comment']):
         """
         Adds comment to comment tree for given link
         :param link: link
@@ -187,14 +186,22 @@ class CommentTree:
                 tree.setdefault(comment.parent_id, []).append(comment.id)
             cache.set(self._cache_key, tree)
 
-    def remove(self, comments):
+    def remove(self, comments: ['Comment']):
+        """
+        Remove comments from comment tree
+        :param comments: comments
+        """
         with Lock(cache.conn, self._lock_key):
             tree = self.load_tree()
             for comment in comments:
                 tree[comment.parent_id] = [id for id in tree[comment.parent_id] if id != comment.id]
             cache.set(self._cache_key, tree)
 
-    def load_tree(self):
+    def load_tree(self) -> dict:
+        """
+        Load the tree
+        :return: tree
+        """
         tree = cache.get(self._cache_key)
         if not tree:
             comments = Comment.where('link_id', self.link_id).select('parent_id', 'id').get() or []
@@ -205,7 +212,7 @@ class CommentTree:
         self._tree = tree
         return tree
 
-    def ids(self):
+    def ids(self) -> [str]:
         if not self._tree:
             self.load_tree()
         x = set()
@@ -213,7 +220,8 @@ class CommentTree:
             x.add(parent_id)
             for children_id in children_ids:
                 x.add(children_id)
-        x.remove(None)
+        if None in x:
+            x.remove(None)
         return list(x)
 
     @classmethod
@@ -247,10 +255,8 @@ class SortedComments:
     To get the tree we recursively traverse the tree a fetch children comments
     """
 
-    def __init__(self, link_id, parent_id=None, sort=''):
+    def __init__(self, link_id):
         self._link_id = link_id
-        self._parent_id = parent_id
-        self._sort = sort
         self._tree = CommentTree.by_link_id(link_id)
 
     def _cache_key(self, parent_id):
@@ -259,7 +265,7 @@ class SortedComments:
     def _lock_key(self, parent_id):
         return 'lock:scm:{}.{}'.format(self._link_id, parent_id or 0)
 
-    def update(self, comments):
+    def update(self, comments: ['Comment']):
         """
         Update sorted comments in cache
         This should be called on votes (maybe not all of them) and on new comments
@@ -288,23 +294,20 @@ class SortedComments:
                 comments = sorted(comments, key=lambda x: x[1:], reverse=True)
                 cache.set(cache_key, comments)
 
-    def build_tree(self, comment_id=None):
+    def build_tree(self):
         """
         Build sorted tree of comments for given comment_id
         If comment_id is None, tree for whole link is build
         :param comment_id: comment_id for comment, None for link
         :return: (comment_id, [sorted subtrees])
         """
-        comments = Comment.by_ids(self._tree.ids())
-        full_comments = {comment.id: comment for comment in comments}
-
-        def build_subtree(parent_id, sorted_tree):
-            return [full_comments[parent_id],
-                    [build_subtree(children_id, builder) for children_id, _ in
-                     sorted_tree[parent_id]] if parent_id in sorted_tree else []]
+        # load all comments that will be needed
+        comment_ids = self._tree.ids()
+        comments = {comment.id: comment for comment in Comment.by_ids(comment_ids)} if comment_ids else {}
+        comments.setdefault(None)
 
         ids = self._tree.keys()
-        children_tuples = cache.mget([self._cache_key(id) for id in ids])
+        children_tuples = cache.mget([self._cache_key(id) for id in ids]) if ids else []
         for idx, parent_id in enumerate(ids):
             # fill in missing children
             if children_tuples[idx] is None:
@@ -313,9 +316,15 @@ class SortedComments:
                 children_tuples[idx] = sorted(tuples, key=lambda x: x[1:], reverse=True)
                 cache.set(self._cache_key(parent_id), children_tuples[idx])
 
+
         builder = dict(zip(ids, children_tuples))
-        res = [None, [build_subtree(children_id, builder) for children_id, _ in builder[None]]]
-        return res
+
+        # subtree builder
+        def build_subtree(parent):
+            return [comments[parent],
+                    [build_subtree(children_id) for children_id, _ in builder[parent]] if parent in builder else []]
+
+        return build_subtree(None)
 
 
     def get_full_tree(self):
