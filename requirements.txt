@@ -25,3 +25,4 @@ bcrypt==3.1.4
 gunicorn==19.9.0
 newrelic
 python-dateutil==2.7.3
+APScheduler==3.0.0

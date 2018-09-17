@@ -22,7 +22,11 @@ def import_fqs():
         # Check FQS
         for source in sources:
             print('Source {}'.format(source.url))
-            articles = source.get_links()
+            try:
+                articles = source.get_links()
+            except Exception as e:
+                print("couldn't get links for FQS {}, error: {}".format(source.url, e))
+                articles = []
             for article in articles:
                 # skip if article already posted
                 if Link.by_slug(article['slug']) is not None:

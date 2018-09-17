@@ -10,7 +10,7 @@
                     </div>
                 {% endif %}
                 <h2>
-                    <a href="{{ link.url }}">
+                    <a href="{% if link.url %}{{ link.url }}{% else %}{{ link.route }}{% endif %}">
                         {{ link.title }}
                     </a>
                 </h2>

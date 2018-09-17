@@ -14,7 +14,7 @@
                     </div>
                     <div class="link-title">
                         <h1>
-                            <a href="{{ link.url }}">
+                            <a href="{% if link.url %}{{ link.url }}{% else %}{{ link.route }}{% endif %}">
                                 {{ link.title }}
                             </a>
                         </h1>

@@ -10,7 +10,7 @@ from news.lib.pagination import paginate
 from news.lib.rss import rss_entries
 from news.models.link import Link
 
-DEFAULT_FEEDS = [3, 4, 5, 7, 78, 79, 80, 81, 2, 82, 6, 83, 1, 84, 85, 86, 87, 88, 89, 90]
+DEFAULT_FEEDS = range(100)
 
 
 class LinksListing(View):

@@ -5,7 +5,7 @@ from orator import Model, accessor, Schema
 from orator.exceptions.query import QueryException
 from orator.orm import morph_many
 from wtforms import StringField, TextAreaField
-from wtforms.validators import DataRequired, Length, URL
+from wtforms.validators import DataRequired, Length
 
 from news.lib.cache import cache
 from news.lib.db.db import db
@@ -267,7 +267,7 @@ class Link(Base):
 class LinkForm(FlaskForm):
     title = StringField('Title', [DataRequired(), Length(max=128, min=6)],
                         render_kw={'placeholder': 'Title', 'autocomplete': 'off'})
-    url = StringField('Url', [DataRequired(), URL(), Length(max=256)],
+    url = StringField('Url', [Length(max=256)],
                       render_kw={'placeholder': 'URL', 'oninput': 'handleUrlChange()', 'autocomplete': 'off'})
     text = TextAreaField('Summary', [Length(max=8192)],
                          render_kw={'placeholder': 'Summary or text', 'rows': 6, 'autocomplete': 'off'})
