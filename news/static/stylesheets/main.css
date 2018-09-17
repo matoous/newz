@@ -59,7 +59,6 @@ form textarea {
     margin: 64px auto 74px auto;
     max-width: 420px;
 }
-
 .one-page-form input,
 .one-page-form button,
 .one-page-form .btn {
@@ -71,7 +70,6 @@ form textarea {
 .one-page-form.wide input {
     max-width: 420px;
 }
-
 .one-page-form.wide input,
 .one-page-form.wide button,
 .one-page-form.wide .btn {
