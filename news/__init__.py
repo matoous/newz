@@ -7,13 +7,10 @@ from rq import Queue
 from news.config.app import real_make_app
 from news.lib.tasks.tasks import import_feeds_fqs
 
-
-def make_app():
-    return real_make_app()
+app = real_make_app()
 
 
 def make_scheduler():
-    app = real_make_app()
     sched = BlockingScheduler()
 
     redis_conn = StrictRedis.from_url(os.getenv('REDIS_URL'))
