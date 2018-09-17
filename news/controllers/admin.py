@@ -3,6 +3,8 @@ from flask_login import current_user
 from werkzeug.utils import redirect
 
 from news.lib.cache import cache
+from news.lib.task_queue import q
+from news.lib.tasks.tasks import JOB_import_feed_fqs
 
 
 def admin():
@@ -38,4 +40,9 @@ def trigget_update_fqs():
 
 def clear_cache():
     cache.clear()
+    return redirect('/admin')
+
+
+def trigger_fqs_update():
+    q.enqueue(JOB_import_feed_fqs, ttl=0)
     return redirect('/admin')

@@ -17,6 +17,6 @@ def update_link(updated_link):
     return None
 
 
-@job('medium', connection=redis_conn)
-def import_feeds_fqs():
+@job('low', connection=redis_conn)
+def JOB_import_feed_fqs():
     import_fqs()

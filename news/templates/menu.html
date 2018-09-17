@@ -108,22 +108,25 @@
             <li>
                 <a href="/">Home</a>
             </li>
-            <li onclick="mobileMenuShowSubscribed();" class="mobile-subscribed">
+            {% if current_user.is_authenticated and current_user.subscribed_feeds %}
+                <li onclick="mobileMenuShowSubscribed();" class="mobile-subscribed">
                 <span>
                     Subscribed feeds
                     <span class="plus">+</span>
                     <span class="minus">-</span>
                 </span>
-                <ul>
-                    {% for feed in current_user.subscribed_feeds %}
-                        <li>
-                            <a href="/f/{{ feed.slug }}">
-                                {{ feed.name }}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
+                    <ul>
+                        {% for feed in current_user.subscribed_feeds %}
+                            <li>
+                                <a href="/f/{{ feed.slug }}">
+                                    {{ feed.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+
             <li>
                 <a href="/trending">Trending</a>
             </li>

@@ -165,6 +165,7 @@ def register_routes(app):
         Route('/admin', admin),
         Route('/add-testing-data', add_testing_data),
         Route('/clear-cache', clear_cache),
+        Route('/trigger-fqs-update', trigger_fqs_update),
     ]
 
     for route in routes:

@@ -60,8 +60,6 @@ class Search():
 
         data = data.limit(30)
 
-        print(data.to_sql())
-
         return data.get()
 
 
