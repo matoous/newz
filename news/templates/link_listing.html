@@ -4,7 +4,7 @@
             <div class="link-text">
                 {% if not single_feed %}
                     <div class="link-feed">
-                        <a href="{{ link.feed.route }}">
+                        <a href="{{ link.feed.route }}" title="Go to {{ link.feed.name }} feed">
                             {{ link.feed.name }}
                         </a>
                     </div>
@@ -22,9 +22,10 @@
                 <div class="bottom-line">
                     <div class="comments">
                         {% if link.comments_count > 1 %}
-                            <a href="{{ link.full_route }}">{{ link.comments_count }} comments</a>
+                            <a href="{{ link.full_route }}"
+                               title="Go to comment section of this link">{{ link.comments_count }} comments</a>
                         {% else %}
-                            <a href="{{ link.full_route }}">discussion</a>
+                            <a href="{{ link.full_route }}" title="Go to comment section of this link">discussion</a>
                         {% endif %}
                     </div>
                     <div class="date">

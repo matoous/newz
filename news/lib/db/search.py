@@ -24,10 +24,10 @@ class Search():
 
         # prepare select statement with highlighting
         highlight_select = [
-            'ts_headline(\'english\', "{}", plainto_tsquery(\'english\', \'"{}"\'), \'MaxFragments=0, MinWords=5, MaxWords=9\') AS {}_highlight'.format(
+            'ts_headline(\'english\', "{}", plainto_tsquery(\'english\', \'"{}"\')) AS {}_highlight'.format(
                 column, "{q}", column)
             for column in self._cls.__searchable__]
-        select_fields = self._cls.__fillable__ + highlight_select + ['count(*) OVER() AS full_count']
+        select_fields = ['*'] + highlight_select + ['count(*) OVER() AS full_count']
         if self._cls.__timestamps__:
             select_fields += ['created_at', 'updated_at']
         self._select_statement = ", ".join(select_fields)

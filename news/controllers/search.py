@@ -18,7 +18,7 @@ def search():
     hits = sum([x[0].full_count if len(x) > 0 else 0 for x in [links, feeds]])
 
     search_info = {
-        'elapsed': "{0:.2f}".format(end - start),
+        'elapsed': "{0:.3f}".format(end - start),
         'hits': hits,
     }
 

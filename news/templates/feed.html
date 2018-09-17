@@ -31,16 +31,16 @@
                         <div class="selected-sort">{{ sort }}</div>
                         <ul class="hidden">
                             <li class="{% if sort == 'trending' %}selected{% endif %}">
-                                <a href="{{ feed.route }}/trending">
+                                <a href="{{ feed.route }}/trending" title="Show links sorted by trending">
                                     Trending
                                 </a>
                             </li>
-                            <li class="{% if sort == 'new' %}selected{% endif %}">
+                            <li class="{% if sort == 'new' %}selected{% endif %}" title="Show links sorted be newest">
                                 <a href="{{ feed.route }}/new">
                                     New
                                 </a>
                             </li>
-                            <li class="{% if sort == 'best' %}selected{% endif %}">
+                            <li class="{% if sort == 'best' %}selected{% endif %}" title="Show links sorted by score">
                                 <a href="{{ feed.route }}/best">
                                     Best
                                 </a>
@@ -51,20 +51,22 @@
                 <div class="feed-options">
                     {% if current_user.is_authenticated %}
                         <div>
-                            <a class="btn" href="{{ feed.route }}/add">Post</a>
+                            <a class="btn" href="{{ feed.route }}/add" title="Post new link to {{ feed.name }}">Post</a>
                         </div>
                         {% if current_user.is_feed_admin(feed) %}
                             <div>
-                                <a class="btn" href="{{ feed.route }}/admin">Admin</a>
+                                <a class="btn" href="{{ feed.route }}/admin"
+                                   title="Go to Admin tools for {{ feed.name }}">Admin</a>
                             </div>
                         {% endif %}
                         {% if subscribed %}
                             <div>
-                                <a class="btn grey" href="{{ feed.route }}/unsubscribe">Unsubscribe</a>
+                                <a class="btn grey" href="{{ feed.route }}/unsubscribe"
+                                   title="Unscubscribe from {{ feed.name }}">Unsubscribe</a>
                             </div>
                         {% else %}
                             <div>
-                                <a class="btn" href="{{ feed.route }}/subscribe">Subscribe</a>
+                                <a class="btn" href="{{ feed.route }}/subscribe" title="Subscribe to {{ feed.name }}">Subscribe</a>
                             </div>
                         {% endif %}
                     {% endif %}
@@ -76,15 +78,15 @@
                     {% include 'link_listing.html' %}
                 {% endwith %}
             {% endfor %}
-            <div class="">
+            <div class="page-navigation">
                 {% if less_links !=  None %}
-                    <a href="?count={{ less_links }}">
+                    <a href="?count={{ less_links }}" title="Show next page">
                         Previous
                     </a>
                 {% endif %}
                 {% if more_links != None %}
-                    <a href="?count={{ more_links }}">
-                        Next
+                    <a href="?count={{ more_links }}" title="Back to previous page">
+                        More
                     </a>
                 {% endif %}
             </div>

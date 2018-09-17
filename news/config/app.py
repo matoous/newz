@@ -12,7 +12,7 @@ from news.lib.login import login_manager
 from news.lib.sentry import sentry
 
 
-def make_app():
+def real_make_app():
     app = Flask(__name__, static_url_path='/static', static_folder='../static', template_folder='../templates')
 
     app.logger.setLevel(logging.INFO)

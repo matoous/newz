@@ -1,6 +1,6 @@
 import unittest
 
-from news import make_app
+from news import real_make_app
 
 TEST_DB = 'test.db'
 
@@ -8,7 +8,7 @@ TEST_DB = 'test.db'
 class BasicTests(unittest.TestCase):
 
     def setUp(self):
-        app = make_app()
+        app = real_make_app()
         app.config['TESTING'] = True
         app.config['DEBUG'] = False
 

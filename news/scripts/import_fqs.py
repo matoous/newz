@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 
-from news.models.fully_qualified_source import FullyQualifiedSource
-from news.models.link import Link
 
 BATCH_SIZE = 100
 AUTOPOSTER_ID = 12345
 
 
 def import_fqs():
+    from news.models.link import Link
+    from news.models.fully_qualified_source import FullyQualifiedSource
     print('Importing Fully Qualified Sources')
     while True:
         # Get batch of FQS
