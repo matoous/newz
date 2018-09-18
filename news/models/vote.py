@@ -100,7 +100,7 @@ class Vote(Model):
         if not vote_ids:
             # need timestamps to add .where('created_at', '<', 'NOW() - INTERVAL \'30 days\'')
             votes = cls.where('user_id', '=', user_id).where('vote_type', '=', vote_type).get()
-            vote_ids = [str(vote.link_id).encode() for vote in votes]
+            vote_ids = [str(vote._thing_id).encode() for vote in votes]
             if vote_ids:
                 pipe = cache.pipeline()
                 pipe.sadd(set_key, *vote_ids)
