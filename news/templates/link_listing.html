@@ -14,7 +14,7 @@
                         {{ link.title }}
                     </a>
                 </h2>
-                {% if link.trimmed_summary and current_user.p_show_summaries %}
+                {% if link.trimmed_summary and (current_user.p_show_summaries or not current_user.is_authenticated) %}
                     <div class="link-text">
                         {{ link.trimmed_summary }}
                     </div>
