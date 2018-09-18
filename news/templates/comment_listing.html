@@ -14,24 +14,24 @@
         <div class="comment-voting">
             <div class="up">
                 {% if comment.b_id in current_user.comment_upvotes %}
-                <a href="{{ comment.route }}/vote/unvote">
-                    <img src="/static/images/play-light.svg">
-                </a>
+                    <a href="{{ comment.route }}/vote/unvote?next={{ request.full_path|urlencode }}">
+                        <img src="/static/images/play-light.svg">
+                    </a>
                 {% else %}
-                <a href="{{ comment.route }}/vote/upvote">
-                    <img src="/static/images/play-light.svg">
-                </a>
+                    <a href="{{ comment.route }}/vote/upvote?next={{ request.full_path|urlencode }}">
+                        <img src="/static/images/play-light.svg">
+                    </a>
                 {% endif %}
             </div>
             <div class="down">
                 {% if comment.b_id in current_user.comment_downvotes %}
-                <a href="{{ comment.route }}/vote/unvote">
-                    <img src="/static/images/play-light.svg">
-                </a>
+                    <a href="{{ comment.route }}/vote/unvote?next={{ request.full_path|urlencode }}">
+                        <img src="/static/images/play-light.svg">
+                    </a>
                 {% else %}
-                <a href="{{ comment.route }}/vote/downvote">
-                    <img src="/static/images/play-light.svg">
-                </a>
+                    <a href="{{ comment.route }}/vote/downvote?next={{ request.full_path|urlencode }}">
+                        <img src="/static/images/play-light.svg">
+                    </a>
                 {% endif %}
             </div>
         </div>

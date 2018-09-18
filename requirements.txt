@@ -25,4 +25,3 @@ bcrypt==3.1.4
 gunicorn==19.9.0
 newrelic
 python-dateutil==2.7.3
-rq-scheduler==0.8.3

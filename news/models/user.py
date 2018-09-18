@@ -24,6 +24,7 @@ from news.models.ban import Ban
 from news.models.base import Base
 from news.models.disposable_token import DisposableToken
 from news.models.feed_admin import FeedAdmin
+from news.models.vote import LinkVote, UPVOTE, DOWNVOTE, CommentVote
 
 MAX_SUBSCRIPTIONS_FREE = 50
 
@@ -130,6 +131,10 @@ class User(Base):
         cache.set(session_key, self.id, ttl=0 if remember_me else 60 * 60 * 2, raw=True)
         login_user(self, remember=remember_me)
 
+        LinkVote.by_user_and_vote_type(self.id, UPVOTE)
+        LinkVote.by_user_and_vote_type(self.id, DOWNVOTE)
+        CommentVote.by_user_and_vote_type(self.id, UPVOTE)
+        CommentVote.by_user_and_vote_type(self.id, DOWNVOTE)
         # Ip.from_request()
 
     def logout(self):

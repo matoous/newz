@@ -32,6 +32,20 @@ window.addEventListener("resize", function () {
     }
 });
 
+function saveScroll() {
+    let key = "scroll" + window.location.href;
+    localStorage.setItem(key, document.documentElement.scrollTop || document.body.scrollTop)
+}
+
+window.addEventListener("load", function () {
+    let key = "scroll" + window.location.href;
+    let savedScroll = localStorage.getItem(key);
+    if (savedScroll) {
+        window.scrollTo(0, savedScroll);
+        localStorage.removeItem(key);
+    }
+});
+
 function mobileMenuShowProfile(){
     let nav = document.querySelector(".mobile-profile");
     nav.classList.toggle("open");

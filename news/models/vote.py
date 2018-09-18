@@ -7,7 +7,6 @@ from news.lib.db.db import db
 from news.lib.task_queue import q
 from news.lib.tasks.tasks import update_link
 from news.models.comment import Comment
-from news.models.user import User
 
 UPVOTE = 1
 UNVOTE = 0
@@ -99,6 +98,7 @@ class Vote(Model):
         set_key = cls._set_key(user_id, vote_type)
         vote_ids = cache.smembers(set_key)
         if not vote_ids:
+            # need timestamps to add .where('created_at', '<', 'NOW() - INTERVAL \'30 days\'')
             votes = cls.where('user_id', '=', user_id).where('vote_type', '=', vote_type).get()
             vote_ids = [str(vote.link_id).encode() for vote in votes]
             if vote_ids:
@@ -235,6 +235,7 @@ class CommentVote(Vote):
 
     @accessor
     def user(self):
+        from news.models.user import User
         return User.by_id(self.user_id)
 
     @classmethod
