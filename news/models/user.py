@@ -465,8 +465,8 @@ class PreferencesForm(FlaskForm):
     def fill(self, user):
         self.subscribe.data = user.subscribed
         self.min_link_score.data = user.p_min_link_score
-        self.infinite_scrolling.data = user.p_infinite_scrolling
-        self.show_summaries.data = user.p_show_summaries
+        self.infinite_scrolling.data = user.p_infinite_scrolling or True
+        self.show_summaries.data = user.p_show_summaries or True
 
 
 class PasswordForm(FlaskForm):
