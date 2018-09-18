@@ -7,10 +7,11 @@ class AddUserPreferences(Migration):
         """
         Run the migrations.
         """
-        with self.schema.table('users') as table:
-            if not table.has_column('p_infinite_scrolling'):
+        if not self.schema.has_column('users', 'p_infinite_scrolling'):
+            with self.schema.table('users') as table:
                 table.boolean('p_infinite_scrolling').default(True)
-            if not table.has_column('p_show_summaries'):
+        if not self.schema.has_column('users', 'p_show_summaries'):
+            with self.schema.table('users') as table:
                 table.boolean('p_show_summaries').default(True)
 
     def down(self):
