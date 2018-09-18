@@ -155,6 +155,7 @@ def register_routes(app):
         Route('/settings/profile', profile_settings, methods=['GET', 'POST']),
         Route('/settings/account', account_settings),
         Route('/settings/preferences', preferences_setting),
+        Route('/settings/preferences', post_preferences_setting, methods=['POST']),
         Route('/settings/password', post_new_password, methods=['POST']),
         Route('/settings/deactivate', post_deactivate, methods=['POST']),
         Route('/settings/email', post_change_email, methods=['POST']),

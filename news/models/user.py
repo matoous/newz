@@ -33,7 +33,7 @@ class User(Base):
     __table__ = 'users'
     __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified',
                     'subscribed', 'preferred_sort', 'bio', 'url', 'profile_pic', 'email_public', 'feed_subs',
-                    'p_show_images', 'p_min_link_score']
+                    'p_infinite_scrolling', 'p_show_summaries', 'p_min_link_score']
     __hidden__ = ['password', 'feeds', 'links', 'comments', 'age', 'ld', 'lu', 'cd', 'cu']
     __append__ = ['session_token']
 
@@ -455,9 +455,17 @@ class LoginForm(FlaskForm):
 
 class PreferencesForm(FlaskForm):
     subscribe = BooleanField('Subscribe to newsletter')
-    send_digest = BooleanField('Subscribe to best articles of week')
-    show_images = SelectField('Show Images', choices=[('y', 'Always'), ('m', 'Homepage only'), ('n', 'Never')])
     min_link_score = IntegerField('Minimal link score')
+    infinite_scrolling = BooleanField('Load new links upon reaching bottom of the feed')
+    show_summaries = BooleanField('Show link summaries')
+    #send_digest = BooleanField('Subscribe to best articles of week')
+    #show_images = SelectField('Show Images', choices=[('y', 'Always'), ('m', 'Homepage only'), ('n', 'Never')])
+
+    def fill(self, user):
+        self.subscribe.data = user.subscribed
+        self.min_link_score.data = user.p_min_link_score
+        self.infinite_scrolling.data = user.p_infinite_scrolling
+        self.show_summaries.data = user.p_show_summaries
 
 
 class PasswordForm(FlaskForm):

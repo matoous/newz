@@ -1,25 +1,29 @@
 {% extends "settings.html" %}
 
 {% block settings_content %}
-                <form action="/settings" method="POST">
-                <h2>Preferences Settings</h2>
-                    <fieldset>
-                        <div class="f-row">
-                            {{ form.subscribe.label }}
-                            {{ form.subscribe }}
-                        </div>
-                    </fieldset>
-                    <fieldset>
-                    <div class="f-row">
-                        {{ form.show_images.label }}
-                        {{ form.show_images }}
-                    </div>
-                    <div class="f-row">
-                        {{ form.min_link_score.label }}
-                        {{ form.min_link_score }}
-                    </div>
-                    {{ form.csrf_token }}
-                        <button type="submit" class="btn">Save</button>
-                </fieldset>
-                </form>
+    <form action="/settings/preferences" method="POST">
+        <h2>Preferences Settings</h2>
+        <fieldset>
+            <div class="f-row">
+                {{ form.subscribe.label }}
+                {{ form.subscribe }}
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="f-row">
+                {{ form.infinite_scrolling.label }}
+                {{ form.infinite_scrolling }}
+            </div>
+            <div class="f-row">
+                {{ form.show_summaries.label }}
+                {{ form.show_summaries }}
+            </div>
+            <div class="f-row">
+                {{ form.min_link_score.label }}
+                {{ form.min_link_score }}
+            </div>
+            {{ form.csrf_token }}
+            <button type="submit" class="btn">Save</button>
+        </fieldset>
+    </form>
 {% endblock %}
