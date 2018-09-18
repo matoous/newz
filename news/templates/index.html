@@ -5,8 +5,36 @@
 {% endblock %}
 
 {% block body %}
-<section>
+    <section>
         <div class="links container">
+            {% if sort %}
+                <div class="menu index-menu">
+                    <div class="feed-sort">
+                        <div class="sorting" onclick="displaySortOptions();">
+                            <div class="selected-sort">{{ sort }}</div>
+                            <ul class="hidden">
+                                <li class="{% if sort == 'trending' %}selected{% endif %}">
+                                    <a href="?sort=trending">
+                                        Trending
+                                    </a>
+                                </li>
+                                <li class="{% if sort == 'new' %}selected{% endif %}"
+                                    title="Show links sorted be newest">
+                                    <a href="?sort=new">
+                                        New
+                                    </a>
+                                </li>
+                                <li class="{% if sort == 'best' %}selected{% endif %}"
+                                    title="Show links sorted by score">
+                                    <a href="?sort=best">
+                                        Best
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             {% for link in links %}
                 {% with link=link %}
                     {% include 'link_listing.html' %}
@@ -14,16 +42,16 @@
             {% endfor %}
             <div class="page-navigation">
                 {% if less_links !=  None %}
-                    <a href="?count={{ less_links }}">
+                    <a href="?count={{ less_links }}{% if sort %}&sort={{ sort|lower }}{% endif %}">
                         Previous
                     </a>
                 {% endif %}
                 {% if more_links != None %}
-                    <a href="?count={{ more_links }}">
+                    <a href="?count={{ more_links }}{% if sort %}&sort={{ sort|lower }}{% endif %}">
                         More
                     </a>
                 {% endif %}
             </div>
-            </div>
-</section>
+        </div>
+    </section>
 {% endblock %}

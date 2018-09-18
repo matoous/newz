@@ -1,5 +1,5 @@
 from feedgen.feed import FeedGenerator
-from flask import render_template, request
+from flask import render_template, request, current_app
 from flask.views import View
 from flask_login import current_user
 from prometheus_client import core
@@ -10,15 +10,14 @@ from news.lib.pagination import paginate
 from news.lib.rss import rss_entries
 from news.models.link import Link
 
-DEFAULT_FEEDS = range(100)
-
 
 class LinksListing(View):
     def dispatch_request(self):
         pass
 
     def feed_ids(self):
-        return current_user.subscribed_feed_ids if current_user.is_authenticated else DEFAULT_FEEDS
+        return current_user.subscribed_feed_ids if current_user.is_authenticated else current_app.config[
+            'DEFAULT_FEEDS']
 
     def get(self):
         pass
@@ -26,14 +25,25 @@ class LinksListing(View):
 
 class CommonListing(LinksListing):
     def feed_ids(self):
-        return DEFAULT_FEEDS
+        return current_app.config['DEFAULT_FEEDS']
 
 
 def index():
+    sort = None
     if current_user.is_authenticated:
-        links = trending_links(current_user.subscribed_feed_ids)
+        s = request.args.get('sort', 'trending')
+        if s == 'trending':
+            links = trending_links(current_user.subscribed_feed_ids)
+            sort = 'Trending'
+        elif s == 'new':
+            links = new_links(current_user.subscribed_feed_ids)
+            sort = 'New'
+        else:
+            links = best_links(current_user.subscribed_feed_ids, 'all')
+            sort = 'Best'
     else:
-        links = trending_links(DEFAULT_FEEDS)
+        links = trending_links(current_app.config['DEFAULT_FEEDS'])
+    count = request.args.get('count', default=None, type=int)
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids) if paginated_ids else []
     return render_template('index.html',
@@ -41,14 +51,16 @@ def index():
                            show_logo=True,
                            less_links=has_less,
                            more_links=has_more,
-                           title="eSource news")
+                           title='eSource News',
+                           sort=sort,
+                           count=count)
 
 
 def index_rss():
     if current_user.is_authenticated:
         links = trending_links(current_user.subscribed_feed_ids)
     else:
-        links = trending_links(DEFAULT_FEEDS)
+        links = trending_links(current_app.config['DEFAULT_FEEDS'])
     paginated_ids, _, _ = paginate(links, 30)
     links = Link.by_ids(paginated_ids)
 
@@ -67,20 +79,20 @@ def index_rss():
 
 
 def new():
-    links = new_links(DEFAULT_FEEDS)
+    links = new_links(current_app.config['DEFAULT_FEEDS'])
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
 
-    return render_template("index.html",
+    return render_template('index.html',
                            links=links,
                            less_links=has_less,
                            more_links=has_more,
-                           title="eSource news - new")
+                           title='eSource News - New')
 
 
 def best():
     time = request.args.get('time')
-    links = best_links(DEFAULT_FEEDS, time_limit=time if time else 'all')
+    links = best_links(current_app.config['DEFAULT_FEEDS'], time_limit=time if time else 'all')
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
 
@@ -88,11 +100,11 @@ def best():
                            links=links,
                            less_links=has_less,
                            more_links=has_more,
-                           title="eSource news - best")
+                           title='eSource News - Best')
 
 
 def trending():
-    links = trending_links(DEFAULT_FEEDS)
+    links = trending_links(current_app.config['DEFAULT_FEEDS'])
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
 
@@ -100,7 +112,7 @@ def trending():
                            links=links,
                            less_links=has_less,
                            more_links=has_more,
-                           title="eSource news - trending")
+                           title='eSource News - Trending')
 
 
 def how_it_works():

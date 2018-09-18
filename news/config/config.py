@@ -71,7 +71,9 @@ def load_config(app):
     # REDIS CONFIG
     app.config['REDIS_URL'] = get_string('REDIS_URL', 'redis://localhost:6379/10')
 
-    app.config['DEFAULT_FEEDS'] = json.loads(os.getenv('DEFAULT_FEEDS')) if os.getenv('DEFAULT_FEEDS') else []
+    app.config['DEFAULT_FEEDS'] = json.loads(os.getenv('DEFAULT_FEEDS')) if os.getenv('DEFAULT_FEEDS') else range(100)
+    app.config['DEFAULT_SUBSCRIBED_FEEDS'] = json.loads(os.getenv('DEFAULT_SUBSCRIBED_FEEDS')) if os.getenv(
+        'DEFAULT_FEEDS') else []
 
     app.config['S3_BUCKET'] = get_string('S3_BUCKET', 'newspublic')
     app.config['AWS_SECRET_ACCESS_KEY'] = os.getenv('AWS_SECRET_ACCESS_KEY')

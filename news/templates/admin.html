@@ -16,4 +16,32 @@
             <a href="/archive-old-links">Archive old links</a>
         </li>
     </ul>
+    <table>
+        <thead>
+        <tr>
+            <td>
+                Id
+            </td>
+            <td>
+                Feed name
+            </td>
+            <td>
+                Subscribers
+            </td>
+        </tr>
+        </thead>
+        {% for feed in all_feeds %}
+            <tr>
+                <td>
+                    {{ feed.id }}
+                </td>
+                <td>
+                    {{ feed.name }}
+                </td>
+                <td>
+                    {{ feed.subscribers_count }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}

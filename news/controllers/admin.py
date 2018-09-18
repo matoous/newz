@@ -5,6 +5,7 @@ from werkzeug.utils import redirect
 from news.lib.cache import cache
 from news.lib.task_queue import q
 from news.lib.tasks.tasks import JOB_import_feed_fqs
+from news.models.feed import Feed
 
 
 def admin():
@@ -14,7 +15,8 @@ def admin():
     if not current_user.is_god:
         return redirect('/')
 
-    return render_template("admin.html")
+    all_feeds = Feed.get()
+    return render_template('admin.html', all_feeds=all_feeds)
 
 
 def add_testing_data():
