@@ -7,6 +7,7 @@
 {% block body %}
     <section>
         <div class="container">
+            {% if links|length > 0 %}
             <h2>Saved Links</h2>
             <div class="links">
                 {% for saved_link in links %}
@@ -27,6 +28,9 @@
                     </a>
                 {% endif %}
             </div>
+            {% else %}
+                <h2>You don't have any saved links yet</h2>
+            {% endif %}
         </div>
     </section>
 {% endblock %}

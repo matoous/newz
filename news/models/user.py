@@ -8,10 +8,10 @@ from flask_wtf import FlaskForm
 from orator import accessor, Schema
 from passlib.hash import bcrypt
 from rq.decorators import job
-from wtforms import StringField, PasswordField, SelectField, IntegerField, TextAreaField, HiddenField, BooleanField, \
+from wtforms import StringField, PasswordField, IntegerField, TextAreaField, HiddenField, BooleanField, \
     FileField
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.validators import DataRequired, URL, Length
+from wtforms.validators import DataRequired, URL, Length, NumberRange
 
 from news.lib.cache import cache
 from news.lib.db.db import db
@@ -455,7 +455,8 @@ class LoginForm(FlaskForm):
 
 class PreferencesForm(FlaskForm):
     subscribe = BooleanField('Subscribe to newsletter')
-    min_link_score = IntegerField('Minimal link score')
+    min_link_score = IntegerField('Minimal link score', [DataRequired('Minimal link score must not be empty'),
+                                                         NumberRange(min=-100, max=100)])
     infinite_scrolling = BooleanField('Load new links upon reaching bottom of the feed')
     show_summaries = BooleanField('Show link summaries')
     #send_digest = BooleanField('Subscribe to best articles of week')
