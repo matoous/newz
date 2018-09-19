@@ -16,7 +16,7 @@ from wtforms.validators import DataRequired, URL, Length, NumberRange
 from news.lib.cache import cache
 from news.lib.db.db import db
 from news.lib.login import login_manager
-from news.lib.mail import reset_email, send_mail
+from news.lib.mail import reset_email, JOB_send_mail
 from news.lib.task_queue import q, redis_conn
 from news.lib.validators import UniqueUsername, UniqueEmail
 from news.lib.verifications import EmailVerification
@@ -601,7 +601,7 @@ class PasswordReset:
 
         # send email with verification link
         msg = reset_email(self.user, self._url)
-        q.enqueue(send_mail, msg, result_ttl=0)
+        q.enqueue(JOB_send_mail, msg, result_ttl=0)
 
     def delete(self):
         cache.delete(self._cache_key)

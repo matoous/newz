@@ -5,7 +5,7 @@ from news.lib.cache import cache, DEFAULT_CACHE_TTL
 from news.lib.comments import update_comment
 from news.lib.db.db import db
 from news.lib.task_queue import q
-from news.lib.tasks.tasks import update_link
+from news.lib.tasks.tasks import JOB_update_link
 from news.models.comment import Comment
 
 UPVOTE = 1
@@ -192,7 +192,7 @@ class LinkVote(Vote):
             LinkVote.where('user_id', self.user_id).where('link_id', self.link_id).update({'vote_type': self.vote_type})
 
         if self.link.num_votes < 20 or self.link.num_votes % 8 == 0:
-            q.enqueue(update_link, self.link, result_ttl=0)
+            q.enqueue(JOB_update_link, self.link, result_ttl=0)
 
 
 class CommentVote(Vote):

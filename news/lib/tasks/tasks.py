@@ -6,7 +6,7 @@ from news.scripts.import_fqs import import_fqs
 
 
 @job('medium', connection=redis_conn)
-def update_link(updated_link):
+def JOB_update_link(updated_link):
     """
     Update link score
     :param updated_link: link to update

@@ -110,11 +110,11 @@ def register_routes(app):
         Route('/f/<feed:feed>/unsubscribe', unsubscribe),
 
         # FEED ADMIN
-        Route('/f/<feed:feed>/admin', feed_admin),
-        Route('/f/<feed:feed>/admin', post_feed_admin, methods=['POST']),
+        Route('/f/<feed:feed>/admin', GET_feed_admin),
+        Route('/f/<feed:feed>/admin', POST_feed_admin, methods=['POST']),
         Route('/f/<feed:feed>/add_admin', add_admin, methods=['POST']),
         Route('/f/<feed:feed>/admins', feed_admins),
-        Route('/f/<feed:feed>/bans', feed_bans),
+        Route('/f/<feed:feed>/bans', GET_feed_bans),
         Route('/f/<feed:feed>/ban/<username>', ban_user),
         Route('/f/<feed:feed>/ban/<username>', post_ban_user, methods=['POST']),
         Route('/f/<feed:feed>/reports', feed_reports),

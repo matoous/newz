@@ -46,5 +46,5 @@ def clear_cache():
 
 
 def trigger_fqs_update():
-    q.enqueue(JOB_import_feed_fqs, ttl=0)
+    q.enqueue(JOB_import_feed_fqs, result_ttl=0)
     return redirect('/admin')

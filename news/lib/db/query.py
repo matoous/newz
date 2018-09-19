@@ -168,7 +168,7 @@ class LinkQuery:
 
 
 @job('medium', connection=redis_conn)
-def add_to_queries(link):
+def JOB_add_to_queries(link):
     """
     Consumes add_to_queries queue
     :param link: link to add/update

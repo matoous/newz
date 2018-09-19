@@ -9,7 +9,7 @@ from wtforms.validators import DataRequired, Length
 
 from news.lib.cache import cache
 from news.lib.db.db import db
-from news.lib.db.query import add_to_queries, LinkQuery
+from news.lib.db.query import JOB_add_to_queries, LinkQuery
 from news.lib.db.sorts import sorts
 from news.lib.sorts import hot
 from news.lib.task_queue import q
@@ -202,7 +202,7 @@ class Link(Base):
 
     def commit(self):
         self.save()
-        q.enqueue(add_to_queries, self, result_ttl=0)
+        q.enqueue(JOB_add_to_queries, self, result_ttl=0)
 
     @property
     def full_route(self) -> str:

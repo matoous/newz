@@ -2,7 +2,7 @@ import io
 from datetime import datetime, timedelta
 
 from PIL import Image
-from flask import redirect, render_template, request, abort, flash
+from flask import redirect, render_template, request, abort, flash, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
@@ -48,19 +48,19 @@ def get_feed(feed, sort=None):
     :param sort: sort
     :return:
     """
-    if (sort is None or sort not in ['trending', 'new', 'best']) and current_user.is_authenticated:
-        sort = current_user.preferred_sort
+    # if (sort is None or sort not in ['trending', 'new', 'best']) and current_user.is_authenticated:
+    #    sort = current_user.preferred_sort
     if sort is None:
         sort = feed.default_sort
 
     ids, has_less, has_more = paginate(LinkQuery(feed_id=feed.id, sort=sort).fetch_ids(), 20)
     links = Link.by_ids(ids) if len(ids) > 0 else []
 
-    if sort == 'new' and current_user.is_authenticated  :
+    if sort == 'new' and current_user.is_authenticated:
         links = filter(min_score_filter(current_user.p_min_link_score), links)
 
     feed.links = links
-    return render_template("feed.html",
+    return render_template('feed.html',
                            feed=feed,
                            less_links=has_less,
                            more_links=has_more,
@@ -87,6 +87,7 @@ def add_link(feed):
         link.user_id = current_user.id
         link.feed_id = feed.id
         link.commit()
+        current_app.logger.info('new link {} ({})'.format(link.title, link.id))
         flash('Link successfully posted', 'success')
         return redirect(feed.route)
     return render_template("new_link.html", form=form, feed=feed, md_parser=True)
@@ -136,6 +137,11 @@ def unsubscribe(feed):
 
 @feed_admin_required
 def add_admin(feed):
+    """
+    Add feed admin
+    :param feed: feed
+    :return:
+    """
     #get new admin username
     username = request.form.get('username')
     if not username or username == '':
@@ -165,7 +171,7 @@ def feed_admins(feed):
 
 
 @feed_admin_required
-def feed_admin(feed):
+def GET_feed_admin(feed):
     """
     Get administration page
     User can change rules/description here etc
@@ -178,7 +184,7 @@ def feed_admin(feed):
 
 
 @feed_admin_required
-def post_feed_admin(feed):
+def POST_feed_admin(feed):
     """
     Handle feed info change
     :param feed: feed
@@ -217,7 +223,7 @@ def post_feed_admin(feed):
 
 
 @feed_admin_required
-def feed_bans(feed):
+def GET_feed_bans(feed):
     """
     Get bans on given feed
     :param feed: feed

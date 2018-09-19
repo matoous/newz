@@ -1,4 +1,4 @@
-from flask import render_template, redirect, abort, flash, request
+from flask import render_template, redirect, abort, flash, request, current_app
 from flask_login import login_required, current_user
 
 from news.lib.ratelimit import rate_limit
@@ -13,12 +13,12 @@ def signup():
     :return:
     """
     if current_user.is_authenticated:
-        return redirect("/")
+        return redirect('/')
 
-    return render_template("signup.html", form=SignUpForm(), show_logo=True, hide_menues=True)
+    return render_template('signup.html', form=SignUpForm(), show_logo=True, hide_menues=True)
 
 
-@rate_limit('join', 100, 60 * 60, limit_user=False, limit_ip=True)
+@rate_limit('join', 10, 3600, limit_user=False, limit_ip=True)
 def post_signup():
     """
     Sign Up new user
@@ -31,10 +31,11 @@ def post_signup():
     if form.validate():
         user = form.result()
         user.register()
+        current_app.logger.info('new user registered: {} ({})'.format(user.username, user.id))
         user.login(remember_me=True)
         return redirect('/')
 
-    return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
+    return render_template('signup.html', form=form, show_logo=True, hide_menues=True)
 
 def login():
     """
@@ -42,9 +43,10 @@ def login():
     :return:
     """
     if current_user.is_authenticated:
-        return redirect("/")
+        return redirect('/')
 
-    return render_template("login.html", form=LoginForm(), show_logo=True, hide_menues=True, next=request.args.get('next'))
+    return render_template('login.html', form=LoginForm(), show_logo=True, hide_menues=True,
+                           next=request.args.get('next'))
 
 
 @rate_limit('login', 10, 300, limit_user=False, limit_ip=True)
@@ -94,7 +96,7 @@ def reset_password():
     return render_template('reset.html', form=form)
 
 
-@rate_limit('mail-action', 5, 60 * 60, limit_user=False, limit_ip=True)
+@rate_limit('mail-action', 3, 3600, limit_user=False, limit_ip=True)
 def post_reset_password():
     """
     Request password reset
@@ -140,7 +142,7 @@ def set_password(token):
     return render_template('reset_password.html', form=form, token=token)
 
 
-@rate_limit('mail-action', 5, 60 * 60, limit_user=True, limit_ip=True)
+@rate_limit('mail-action', 3, 3600, limit_user=True, limit_ip=True)
 def resend_verify():
     # create and send verification
     verification = EmailVerification(current_user)

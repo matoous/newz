@@ -8,7 +8,7 @@ from news.lib.task_queue import redis_conn
 
 
 @job('medium', connection=redis_conn)
-def send_mail(msg):
+def JOB_send_mail(msg):
     """
     Consumes and send emails from email queue
     :param msg: 
