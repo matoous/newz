@@ -330,7 +330,8 @@ def update_fqs(_, fqs_id):
 @feed_admin_required
 def remove_fqs(_, fqs_id):
     source = FullyQualifiedSource.by_id(fqs_id)
+    back = source.feed.route
     if source:
         source.delete()
 
-    return redirect(redirect_back(source.feed.route))
+    return redirect(redirect_back(back))
