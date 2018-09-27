@@ -57,7 +57,7 @@ def remove_comment(comment):
 
     comment.remove()
 
-    return redirect(redirect_back(comment.route))
+    return redirect(comment.route)
 
 
 @login_required

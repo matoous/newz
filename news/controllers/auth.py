@@ -150,7 +150,7 @@ def resend_verify():
 
     flash('We have send you email with verification link.', 'info')
 
-    return redirect(redirect_back('/settings/account'))
+    return redirect('/settings/account')
 
 def verify(token):
     """

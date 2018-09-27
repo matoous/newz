@@ -119,7 +119,7 @@ def subscribe(feed):
     :return:
     """
     current_user.subscribe(feed)
-    return redirect(redirect_back(feed.route))
+    return redirect(feed.route)
 
 
 @login_required
@@ -132,7 +132,7 @@ def unsubscribe(feed):
     :return:
     """
     current_user.unsubscribe(feed)
-    return redirect(redirect_back(feed.route))
+    return redirect(feed.route)
 
 
 @feed_admin_required
