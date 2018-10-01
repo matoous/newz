@@ -265,7 +265,7 @@ class Link(Base):
 
 
 class LinkForm(FlaskForm):
-    title = StringField('Title', [DataRequired(), Length(max=128, min=6)],
+    title = StringField('Title', [DataRequired(), Length(max=128, min=4)],
                         render_kw={'placeholder': 'Title', 'autocomplete': 'off'})
     url = StringField('Url', [Length(max=256)],
                       render_kw={'placeholder': 'URL', 'oninput': 'handleUrlChange()', 'autocomplete': 'off'})
