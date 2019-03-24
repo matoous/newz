@@ -8,8 +8,15 @@ from flask_wtf import FlaskForm
 from orator import accessor, Schema
 from passlib.hash import bcrypt
 from rq.decorators import job
-from wtforms import StringField, PasswordField, IntegerField, TextAreaField, HiddenField, BooleanField, \
-    FileField
+from wtforms import (
+    StringField,
+    PasswordField,
+    IntegerField,
+    TextAreaField,
+    HiddenField,
+    BooleanField,
+    FileField,
+)
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import DataRequired, URL, Length, NumberRange
 
@@ -30,46 +37,73 @@ MAX_SUBSCRIPTIONS_FREE = 50
 
 
 class User(Base):
-    __table__ = 'users'
-    __fillable__ = ['id', 'password', 'reported', 'spammer', 'username', 'full_name', 'email', 'email_verified',
-                    'subscribed', 'preferred_sort', 'bio', 'url', 'profile_pic', 'email_public', 'feed_subs',
-                    'p_infinite_scrolling', 'p_show_summaries', 'p_min_link_score']
-    __hidden__ = ['password', 'feeds', 'links', 'comments', 'age', 'ld', 'lu', 'cd', 'cu']
-    __append__ = ['session_token']
+    __table__ = "users"
+    __fillable__ = [
+        "id",
+        "password",
+        "reported",
+        "spammer",
+        "username",
+        "full_name",
+        "email",
+        "email_verified",
+        "subscribed",
+        "preferred_sort",
+        "bio",
+        "url",
+        "profile_pic",
+        "email_public",
+        "feed_subs",
+        "p_infinite_scrolling",
+        "p_show_summaries",
+        "p_min_link_score",
+    ]
+    __hidden__ = [
+        "password",
+        "feeds",
+        "links",
+        "comments",
+        "age",
+        "ld",
+        "lu",
+        "cd",
+        "cu",
+    ]
+    __append__ = ["session_token"]
 
     @classmethod
     def create_table(cls, database):
         schema = Schema(database)
-        schema.drop_if_exists('users')
-        with schema.create('users') as table:
-            table.increments('id').unsigned()
-            table.string('username', 32).unique()
-            table.string('full_name', 64).nullable()
-            table.string('email', 128).unique()
-            table.boolean('email_verified').default(False)
-            table.boolean('subscribed').default(False)
-            table.boolean('email_public').default(False)
-            table.string('password', 128)
-            table.integer('reported').default(0)
-            table.boolean('spammer').default(False)
-            table.datetime('created_at')
-            table.datetime('updated_at')
-            table.string('preferred_sort', 10).default('trending')
-            table.text('bio').nullable()
-            table.text('url').nullable()
-            table.text('profile_pic').nullable()
-            table.integer('feed_subs').default(0)
+        schema.drop_if_exists("users")
+        with schema.create("users") as table:
+            table.increments("id").unsigned()
+            table.string("username", 32).unique()
+            table.string("full_name", 64).nullable()
+            table.string("email", 128).unique()
+            table.boolean("email_verified").default(False)
+            table.boolean("subscribed").default(False)
+            table.boolean("email_public").default(False)
+            table.string("password", 128)
+            table.integer("reported").default(0)
+            table.boolean("spammer").default(False)
+            table.datetime("created_at")
+            table.datetime("updated_at")
+            table.string("preferred_sort", 10).default("trending")
+            table.text("bio").nullable()
+            table.text("url").nullable()
+            table.text("profile_pic").nullable()
+            table.integer("feed_subs").default(0)
 
             # preferences
-            table.string('p_show_images', 1).default('y')
-            table.integer('p_min_link_score').default(-3)
+            table.string("p_show_images", 1).default("y")
+            table.integer("p_min_link_score").default(-3)
 
             # indexes
-            table.index('username')
-            table.index('email')
+            table.index("username")
+            table.index("email")
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return "<User %r>" % self.username
 
     def __eq__(self, other):
         if not isinstance(other, User):
@@ -102,7 +136,7 @@ class User(Base):
         Set users password
         :param password: new password
         """
-        self.set_attribute('password', bcrypt.hash(password))
+        self.set_attribute("password", bcrypt.hash(password))
 
     def check_password(self, password: str) -> bool:
         """
@@ -113,11 +147,11 @@ class User(Base):
         return bcrypt.verify(password, self.password)
 
     def get_id(self) -> str:
-        return self.session_token or ''
+        return self.session_token or ""
 
     @accessor
     def session_token(self) -> str:
-        return self._accessor_cache['session_token']
+        return self._accessor_cache["session_token"]
 
     def login(self, remember_me: bool = False):
         """
@@ -126,8 +160,8 @@ class User(Base):
         :param remember_me:
         """
         token = DisposableToken.get()
-        self._accessor_cache['session_token'] = token.id
-        session_key = 'us:{}'.format(self.session_token)
+        self._accessor_cache["session_token"] = token.id
+        session_key = "us:{}".format(self.session_token)
         cache.set(session_key, self.id, ttl=0 if remember_me else 60 * 60 * 2, raw=True)
         login_user(self, remember=remember_me)
 
@@ -141,7 +175,7 @@ class User(Base):
         """
         Logout the user
         """
-        cache.delete('us:{}'.format(self.session_token))
+        cache.delete("us:{}".format(self.session_token))
         logout_user()
 
     def register(self):
@@ -177,7 +211,7 @@ class User(Base):
 
     @staticmethod
     @login_manager.user_loader
-    def load_user(session_id: str) -> Optional['User']:
+    def load_user(session_id: str) -> Optional["User"]:
         """
         Load user by session id
 
@@ -186,7 +220,7 @@ class User(Base):
         :param session_id: session id
         :return: maybe user
         """
-        user_id = cache.get('us:{}'.format(session_id), raw=True)
+        user_id = cache.get("us:{}".format(session_id), raw=True)
 
         if not user_id:
             return None
@@ -199,7 +233,7 @@ class User(Base):
         return u
 
     @classmethod
-    def by_id(cls, id: int) -> Optional['User']:
+    def by_id(cls, id: int) -> Optional["User"]:
         """
         Get user by id
         :param id:
@@ -208,7 +242,7 @@ class User(Base):
         u = cls.load_from_cache(id)
         if u is not None:
             return u
-        u = User.where('id', id).first()
+        u = User.where("id", id).first()
         if u is not None:
             u.write_to_cache()
         return u
@@ -232,7 +266,8 @@ class User(Base):
         :return: links
         """
         from news.models.link import Link
-        return Link.where('user_id', self.id).get()
+
+        return Link.where("user_id", self.id).get()
 
     @property
     def comments(self):
@@ -241,7 +276,8 @@ class User(Base):
         :return: comments
         """
         from news.models.comment import Comment
-        return Comment.where('user_id', self.id).get()
+
+        return Comment.where("user_id", self.id).get()
 
     @property
     def feeds(self):
@@ -249,8 +285,12 @@ class User(Base):
         Users subscribed feeds
         :return: feeds
         """
-        return db.table('feeds').join('feeds_users', 'feeds.id', '=', 'feeds_users.feed_id').where(
-            'feeds_users.user_id', self.id).get()
+        return (
+            db.table("feeds")
+            .join("feeds_users", "feeds.id", "=", "feeds_users.feed_id")
+            .where("feeds_users.user_id", self.id)
+            .get()
+        )
 
     @accessor
     def subscribed_feed_ids(self) -> List[str]:
@@ -258,7 +298,7 @@ class User(Base):
         Get users subscribed feed ids
         :return: list of ids
         """
-        key = 'subs:{}'.format(self.id)
+        key = "subs:{}".format(self.id)
         ids = cache.get(key)
         if ids is None:
             ids = [feed.id for feed in self.feeds]
@@ -266,11 +306,12 @@ class User(Base):
         return ids
 
     @accessor
-    def subscribed_feeds(self) -> List['Feed']:
+    def subscribed_feeds(self) -> List["Feed"]:
         from news.models.feed import Feed
+
         return [Feed.by_id(x) for x in self.subscribed_feed_ids]
 
-    def subscribed_to(self, feed: 'Feed') -> bool:
+    def subscribed_to(self, feed: "Feed") -> bool:
         """
         Check if user is subscribed to given feed
         :param feed: feed
@@ -278,7 +319,7 @@ class User(Base):
         """
         return feed.id in self.subscribed_feed_ids
 
-    def subscribe(self, feed: 'Feed'):
+    def subscribe(self, feed: "Feed"):
         """
         Subscribe user to given feed
         :param feed: feed to subscribe
@@ -292,26 +333,28 @@ class User(Base):
             return False
 
         # save subscription
-        db.table('feeds_users').insert(user_id=self.id, feed_id=feed.id)
-        key = 'subs:{}'.format(self.id)
+        db.table("feeds_users").insert(user_id=self.id, feed_id=feed.id)
+        key = "subs:{}".format(self.id)
         ids = cache.get(key) or []
         ids.append(feed.id)
         cache.set(key, ids)
 
-        self.incr('feed_subs', 1)
+        self.incr("feed_subs", 1)
         self.update_with_cache()
 
         # TODO DO IN QUEUE
-        feed.incr('subscribers_count', 1)
+        feed.incr("subscribers_count", 1)
         return True
 
-    def unsubscribe(self, feed: 'Feed'):
-        db.table('feeds_users').where('user_id', '=', self.id).where('feed_id', '=', feed.id).delete()
-        self.decr('feed_subs', 1)
+    def unsubscribe(self, feed: "Feed"):
+        db.table("feeds_users").where("user_id", "=", self.id).where(
+            "feed_id", "=", feed.id
+        ).delete()
+        self.decr("feed_subs", 1)
 
         # TODO DO IN QUEUE
-        feed.decr('subscribers_count', 1)
-        key = 'subs:{}'.format(self.id)
+        feed.decr("subscribers_count", 1)
+        key = "subs:{}".format(self.id)
         ids = cache.get(key)
         if ids is not None:
             ids = [id for id in ids if id != feed.id]
@@ -319,13 +362,13 @@ class User(Base):
         return True
 
     @classmethod
-    def by_username(cls, username: str) -> Optional['User']:
+    def by_username(cls, username: str) -> Optional["User"]:
         """
         Get user by username
         :param username: username
         :return:
         """
-        cache_key = 'uname:{}'.format(username)
+        cache_key = "uname:{}".format(username)
 
         # check username cache
         in_cache = cache.get(cache_key, raw=True)
@@ -336,7 +379,7 @@ class User(Base):
             return User.by_id(uid)
 
         # try to load user from DB on failure
-        u = User.where('username', username).first()
+        u = User.where("username", username).first()
 
         # cache the result
         if u is not None:
@@ -346,20 +389,20 @@ class User(Base):
         return u
 
     def is_god(self) -> bool:
-        return self.is_authenticated and self.username in current_app.config['GODS']
+        return self.is_authenticated and self.username in current_app.config["GODS"]
 
-    def is_feed_admin(self, feed: 'Feed') -> bool:
+    def is_feed_admin(self, feed: "Feed") -> bool:
         if not self.is_authenticated:
             return False
         return FeedAdmin.by_user_and_feed_id(self.id, feed.id) is not None
 
-    def is_feed_god(self, feed: 'Feed') -> bool:
+    def is_feed_god(self, feed: "Feed") -> bool:
         if not self.is_authenticated:
             return False
         feed_admin = FeedAdmin.by_user_and_feed_id(self.id, feed.id)
         return feed_admin.god if feed_admin is not None else False
 
-    def is_baned_from(self, feed: 'Feed') -> bool:
+    def is_baned_from(self, feed: "Feed") -> bool:
         return Ban.by_user_and_feed(self, feed) is not None
 
     @property
@@ -369,46 +412,63 @@ class User(Base):
     @property
     def link_upvotes(self):
         from news.models.vote import LinkVote
-        if 'lu' not in self._relations:
-            self._relations['lu'] = LinkVote.upvotes_by_user(self)
-        return self._relations['lu']
+
+        if "lu" not in self._relations:
+            self._relations["lu"] = LinkVote.upvotes_by_user(self)
+        return self._relations["lu"]
 
     @property
     def link_downvotes(self):
         from news.models.vote import LinkVote
-        if 'ld' not in self._relations:
-            self._relations['ld'] = LinkVote.downvotes_by_user(self)
-        return self._relations['ld']
+
+        if "ld" not in self._relations:
+            self._relations["ld"] = LinkVote.downvotes_by_user(self)
+        return self._relations["ld"]
 
     @property
     def comment_upvotes(self):
         from news.models.vote import LinkVote
-        if 'cu' not in self._relations:
-            self._relations['cu'] = LinkVote.upvotes_by_user(self)
-        return self._relations['cu']
+
+        if "cu" not in self._relations:
+            self._relations["cu"] = LinkVote.upvotes_by_user(self)
+        return self._relations["cu"]
 
     @property
     def comment_downvotes(self):
         from news.models.vote import LinkVote
-        if 'cd' not in self._relations:
-            self._relations['cd'] = LinkVote.downvotes_by_user(self)
-        return self._relations['cd']
+
+        if "cd" not in self._relations:
+            self._relations["cd"] = LinkVote.downvotes_by_user(self)
+        return self._relations["cd"]
 
 
 class SignUpForm(FlaskForm):
-    username = StringField('Username',
-                           [DataRequired(message='You have to select username'),
-                            Length(min=3, max=20, message='Username must be between 3 and 20 characters long'),
-                            UniqueUsername(message='This username is already taken')],
-                           render_kw={'placeholder': 'Username'})
-    email = EmailField('Email',
-                       [DataRequired('You have to enter your email'),
-                        UniqueEmail()],
-                       render_kw={'placeholder': 'Email'})
-    password = PasswordField('Password',
-                             [DataRequired('You have to choose password'),
-                              Length(min=6, message='Password must be at least 6 characters long')],
-                             render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
+    username = StringField(
+        "Username",
+        [
+            DataRequired(message="You have to select username"),
+            Length(
+                min=3,
+                max=20,
+                message="Username must be between 3 and 20 characters long",
+            ),
+            UniqueUsername(message="This username is already taken"),
+        ],
+        render_kw={"placeholder": "Username"},
+    )
+    email = EmailField(
+        "Email",
+        [DataRequired("You have to enter your email"), UniqueEmail()],
+        render_kw={"placeholder": "Email"},
+    )
+    password = PasswordField(
+        "Password",
+        [
+            DataRequired("You have to choose password"),
+            Length(min=6, message="Password must be at least 6 characters long"),
+        ],
+        render_kw={"placeholder": "Password", "autocomplete": "new-password"},
+    )
 
     def result(self):
         user = User(username=self.username.data, email=self.email.data)
@@ -417,34 +477,38 @@ class SignUpForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    username_or_email = StringField('Username or email',
-                                    [DataRequired(message='Enter you email or username')],
-                                    render_kw={'placeholder': 'Username or email'})
-    password = PasswordField('Password',
-                             [DataRequired(message='Incorrect username or password')],
-                             render_kw={'placeholder': 'Password'})
-    remember_me = BooleanField('Remember me')
+    username_or_email = StringField(
+        "Username or email",
+        [DataRequired(message="Enter you email or username")],
+        render_kw={"placeholder": "Username or email"},
+    )
+    password = PasswordField(
+        "Password",
+        [DataRequired(message="Incorrect username or password")],
+        render_kw={"placeholder": "Password"},
+    )
+    remember_me = BooleanField("Remember me")
 
     def validate(self):
         rv = FlaskForm.validate(self)
         if not rv:
-            self.errors['general'] = 'Invalid username or password'
+            self.errors["general"] = "Invalid username or password"
             return False
 
         # try to find user, from DB explicitly
-        if '@' in self.username_or_email.data:
-            self._user = User.where('email', self.username_or_email.data).first()
+        if "@" in self.username_or_email.data:
+            self._user = User.where("email", self.username_or_email.data).first()
         else:
-            self._user = User.where('username', self.username_or_email.data).first()
+            self._user = User.where("username", self.username_or_email.data).first()
 
         # no user found
         if self._user is None:
-            self.errors['general'] = 'Invalid username or password'
+            self.errors["general"] = "Invalid username or password"
             return False
 
         # wrong password
         if not self._user.check_password(self.password.data):
-            self.errors['general'] = 'Invalid username or password'
+            self.errors["general"] = "Invalid username or password"
             return False
 
         return True
@@ -454,13 +518,18 @@ class LoginForm(FlaskForm):
 
 
 class PreferencesForm(FlaskForm):
-    subscribe = BooleanField('Subscribe to newsletter')
-    min_link_score = IntegerField('Minimal link score', [DataRequired('Minimal link score must not be empty'),
-                                                         NumberRange(min=-100, max=100)])
-    infinite_scrolling = BooleanField('Load new links upon reaching bottom of the feed')
-    show_summaries = BooleanField('Show link summaries')
-    #send_digest = BooleanField('Subscribe to best articles of week')
-    #show_images = SelectField('Show Images', choices=[('y', 'Always'), ('m', 'Homepage only'), ('n', 'Never')])
+    subscribe = BooleanField("Subscribe to newsletter")
+    min_link_score = IntegerField(
+        "Minimal link score",
+        [
+            DataRequired("Minimal link score must not be empty"),
+            NumberRange(min=-100, max=100),
+        ],
+    )
+    infinite_scrolling = BooleanField("Load new links upon reaching bottom of the feed")
+    show_summaries = BooleanField("Show link summaries")
+    # send_digest = BooleanField('Subscribe to best articles of week')
+    # show_images = SelectField('Show Images', choices=[('y', 'Always'), ('m', 'Homepage only'), ('n', 'Never')])
 
     def fill(self, user):
         self.subscribe.data = user.subscribed
@@ -470,15 +539,23 @@ class PreferencesForm(FlaskForm):
 
 
 class PasswordForm(FlaskForm):
-    new_password = PasswordField('New password',
-                                 [DataRequired('You have to choose password'),
-                                  Length(min=6, message='Password must be at least 6 characters long')],
-                                 render_kw={'placeholder': 'New password', 'autocomplete': "new-password"})
-    new_password_again = PasswordField('New password again',
-                                       [DataRequired('You have to choose password'),
-                                        Length(min=6, message='Password must be at least 6 characters long')],
-                                       render_kw={'placeholder': 'Password', 'autocomplete': "new-password"})
-    old_password = PasswordField('Old password', render_kw={'autocomplete': 'off'})
+    new_password = PasswordField(
+        "New password",
+        [
+            DataRequired("You have to choose password"),
+            Length(min=6, message="Password must be at least 6 characters long"),
+        ],
+        render_kw={"placeholder": "New password", "autocomplete": "new-password"},
+    )
+    new_password_again = PasswordField(
+        "New password again",
+        [
+            DataRequired("You have to choose password"),
+            Length(min=6, message="Password must be at least 6 characters long"),
+        ],
+        render_kw={"placeholder": "Password", "autocomplete": "new-password"},
+    )
+    old_password = PasswordField("Old password", render_kw={"autocomplete": "off"})
 
     def validate(self):
         if not current_user.is_authenticated:
@@ -486,19 +563,19 @@ class PasswordForm(FlaskForm):
 
         user = User.by_id_slow(current_user.id)
         if not user.check_password(self.old_password.data):
-            self.errors['password'] = 'Invalid password'
+            self.errors["password"] = "Invalid password"
             return False
 
         if not self.new_password.data == self.new_password_again.data:
-            self.errors['passwords'] = 'Passwords don\'t match'
+            self.errors["passwords"] = "Passwords don't match"
             return False
 
         return True
 
 
 class EmailForm(FlaskForm):
-    email = EmailField('Email', [DataRequired(), UniqueEmail()])
-    public = BooleanField('Email public')
+    email = EmailField("Email", [DataRequired(), UniqueEmail()])
+    public = BooleanField("Email public")
 
     def fill(self, user):
         self.email.data = user.email
@@ -506,8 +583,14 @@ class EmailForm(FlaskForm):
 
 
 class DeactivateForm(FlaskForm):
-    username = StringField('Your username', [], render_kw={'autocomplete': 'off', 'placeholder': 'Your username'})
-    password = PasswordField('Your password', [], render_kw={'placeholder': 'Your password'})
+    username = StringField(
+        "Your username",
+        [],
+        render_kw={"autocomplete": "off", "placeholder": "Your username"},
+    )
+    password = PasswordField(
+        "Your password", [], render_kw={"placeholder": "Your password"}
+    )
 
     def validate(self, u):
         user = User.by_id_slow(current_user.id)
@@ -519,26 +602,36 @@ class DeactivateForm(FlaskForm):
 
 
 class ProfileForm(FlaskForm):
-    full_name = StringField('Full name', )
-    bio = TextAreaField('Bio', [Length(max=8192)], render_kw={'rows': 6, 'autocomplete': 'off'})
+    full_name = StringField("Full name")
+    bio = TextAreaField(
+        "Bio", [Length(max=8192)], render_kw={"rows": 6, "autocomplete": "off"}
+    )
     url = URLField(validators=[URL()])
-    img = FileField('Avatar')
+    img = FileField("Avatar")
 
     def validate(self):
         return True
 
 
 class ResetForm(FlaskForm):
-    email = EmailField('Email', [DataRequired()], render_kw={'placeholder': 'Email'})
+    email = EmailField("Email", [DataRequired()], render_kw={"placeholder": "Email"})
 
     def validate(self):
         return True
 
 
 class SetPasswordForm(FlaskForm):
-    password = PasswordField('Password', [DataRequired(), Length(min=6)], render_kw={'placeholder': 'New password'})
-    password_again = PasswordField('Password again', [DataRequired()], render_kw={'placeholder': 'New password again'})
-    user_id = HiddenField('username')
+    password = PasswordField(
+        "Password",
+        [DataRequired(), Length(min=6)],
+        render_kw={"placeholder": "New password"},
+    )
+    password_again = PasswordField(
+        "Password again",
+        [DataRequired()],
+        render_kw={"placeholder": "New password again"},
+    )
+    user_id = HiddenField("username")
 
     def validate(self):
         return self.password.data == self.password_again.data
@@ -552,7 +645,7 @@ class PasswordReset:
     Email Verification handles email verifications
     """
 
-    def __init__(self, user=None, token=''):
+    def __init__(self, user=None, token=""):
         self.user = user
         self.token = token
 
@@ -577,7 +670,7 @@ class PasswordReset:
         Cache key for email verification
         :return: cache key
         """
-        return 'p_reset:{}'.format(self.token)
+        return "p_reset:{}".format(self.token)
 
     @property
     def _url(self):
@@ -585,7 +678,7 @@ class PasswordReset:
         Formatted URL with verification link
         :return:
         """
-        return "{}/reset_password/{}".format(current_app.config['URL'], self.token)
+        return "{}/reset_password/{}".format(current_app.config["URL"], self.token)
 
     def create(self):
         """
@@ -607,6 +700,6 @@ class PasswordReset:
         cache.delete(self._cache_key)
 
 
-@job('medium', connection=redis_conn)
+@job("medium", connection=redis_conn)
 def make_new_avatar(file_name):
     pass

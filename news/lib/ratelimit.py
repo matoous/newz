@@ -19,16 +19,19 @@ def rate_limit(prefix, limit, seconds, limit_user=True, limit_ip=True, key_func=
     :param key_func: custom key func
     :return: wrapped function with ratelimiting
     """
+
     def decorator(f):
         def rate_limited(*args, **kwargs):
             # construct keys
             to_limit = []
             if limit_ip:
-                to_limit.append('rl:{}@{}'.format(prefix, request.remote_addr or '127.0.0.1'))
+                to_limit.append(
+                    "rl:{}@{}".format(prefix, request.remote_addr or "127.0.0.1")
+                )
             if limit_user and current_user.is_authenticated:
-                to_limit.append('rl:{}.{}'.format(prefix, current_user.username))
+                to_limit.append("rl:{}.{}".format(prefix, current_user.username))
             if key_func is not None:
-                to_limit.append('rl:{}_{}'.format(prefix, key_func))
+                to_limit.append("rl:{}_{}".format(prefix, key_func))
 
             # check limits
             for limit_key in to_limit:
@@ -44,18 +47,23 @@ def rate_limit(prefix, limit, seconds, limit_user=True, limit_ip=True, key_func=
                     abort(429)
 
             return f(*args, **kwargs)
+
         return update_wrapper(rate_limited, f)
+
     return decorator
 
-def rate_limit_ok(prefix, limit, seconds, limit_user=True, limit_ip=True, key_func=None):
+
+def rate_limit_ok(
+    prefix, limit, seconds, limit_user=True, limit_ip=True, key_func=None
+):
     # construct keys
     to_limit = []
     if limit_ip:
-        to_limit.append('rl:{}@{}'.format(prefix, request.remote_addr or '127.0.0.1'))
+        to_limit.append("rl:{}@{}".format(prefix, request.remote_addr or "127.0.0.1"))
     if limit_user and current_user.is_authenticated:
-        to_limit.append('rl:{}.{}'.format(prefix, current_user.username))
+        to_limit.append("rl:{}.{}".format(prefix, current_user.username))
     if key_func is not None:
-        to_limit.append('rl:{}_{}'.format(prefix, key_func))
+        to_limit.append("rl:{}_{}".format(prefix, key_func))
 
     # check limits
     for limit_key in to_limit:

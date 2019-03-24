@@ -23,35 +23,49 @@ MAX_IN_CACHE = 1000
 
 
 class Link(Base):
-    __table__ = 'links'
-    __fillable__ = ['title', 'slug', 'text', 'user_id', 'url', 'feed_id', 'id', 'image',
-                    'reported', 'spam', 'archived', 'ups', 'downs', 'comments_count']
-    __searchable__ = ['title', 'text']
-    __hidden__ = ['user', 'feed']
+    __table__ = "links"
+    __fillable__ = [
+        "title",
+        "slug",
+        "text",
+        "user_id",
+        "url",
+        "feed_id",
+        "id",
+        "image",
+        "reported",
+        "spam",
+        "archived",
+        "ups",
+        "downs",
+        "comments_count",
+    ]
+    __searchable__ = ["title", "text"]
+    __hidden__ = ["user", "feed"]
 
     @classmethod
     def create_table(cls):
         schema = Schema(db)
-        schema.drop_if_exists('links')
-        with schema.create('links') as table:
-            table.big_increments('id').unsigned()
-            table.string('title', 128)
-            table.string('slug', 150)
-            table.text('text').nullable()
-            table.text('image').nullable()
-            table.text('url')
-            table.integer('user_id').unsigned()
-            table.datetime('created_at')
-            table.datetime('updated_at')
-            table.foreign('user_id').references('id').on('users')
-            table.integer('feed_id').unsigned()
-            table.foreign('feed_id').references('id').on('feeds').ondelete('cascade')
-            table.integer('ups').default(0)
-            table.integer('downs').default(0)
-            table.integer('comments_count').default(0)
-            table.boolean('archived').default(False)
-            table.integer('reported').default(0)
-            table.boolean('spam').default(False)
+        schema.drop_if_exists("links")
+        with schema.create("links") as table:
+            table.big_increments("id").unsigned()
+            table.string("title", 128)
+            table.string("slug", 150)
+            table.text("text").nullable()
+            table.text("image").nullable()
+            table.text("url")
+            table.integer("user_id").unsigned()
+            table.datetime("created_at")
+            table.datetime("updated_at")
+            table.foreign("user_id").references("id").on("users")
+            table.integer("feed_id").unsigned()
+            table.foreign("feed_id").references("id").on("feeds").ondelete("cascade")
+            table.integer("ups").default(0)
+            table.integer("downs").default(0)
+            table.integer("comments_count").default(0)
+            table.boolean("archived").default(False)
+            table.integer("reported").default(0)
+            table.boolean("spam").default(False)
 
     def __init__(self, **attributes):
         super().__init__(**attributes)
@@ -67,7 +81,7 @@ class Link(Base):
         return other.id == self.id
 
     def __repr__(self):
-        return '<Link {}>'.format(self.id)
+        return "<Link {}>".format(self.id)
 
     @accessor
     def hot(self) -> float:
@@ -78,18 +92,19 @@ class Link(Base):
         return hot(self.score, self.created_at)
 
     @property
-    def feed(self) -> 'Feed':
+    def feed(self) -> "Feed":
         """
         Feed where the lin was posted
         :return: feed
         """
         from news.models.feed import Feed
-        if 'feed' not in self._relations:
-            self._relations['feed'] = Feed.by_id(self.feed_id)
-        return self._relations['feed']
+
+        if "feed" not in self._relations:
+            self._relations["feed"] = Feed.by_id(self.feed_id)
+        return self._relations["feed"]
 
     @classmethod
-    def by_slug(cls, slug) -> Optional['Link']:
+    def by_slug(cls, slug) -> Optional["Link"]:
         """
         Get link by slug
         :param slug: slug
@@ -98,7 +113,7 @@ class Link(Base):
         cache_key = "lslug:{}".format(slug)
         id = cache.get(cache_key)
         if id is None:
-            link = Link.where('slug', slug).first()
+            link = Link.where("slug", slug).first()
             if link is not None:
                 id = link.id
                 cache.set(cache_key, id)
@@ -106,15 +121,16 @@ class Link(Base):
         return Link.by_id(id) if id else None
 
     @property
-    def user(self) -> 'User':
+    def user(self) -> "User":
         """
         Get user who posted the link
         :return:
         """
         from news.models.user import User
-        if 'user' not in self._relations:
-            self._relations['user'] = User.by_id(self.user_id)
-        return self._relations['user']
+
+        if "user" not in self._relations:
+            self._relations["user"] = User.by_id(self.user_id)
+        return self._relations["user"]
 
     @property
     def trimmed_summary(self):
@@ -122,7 +138,7 @@ class Link(Base):
         Get link summary trimmed to 300 chars max for displaying on feeds
         :return:
         """
-        return self.text[:max(300, len(self.text))] if self.text else ''
+        return self.text[: max(300, len(self.text))] if self.text else ""
 
     @accessor
     def votes(self):
@@ -131,22 +147,24 @@ class Link(Base):
         :return:
         """
         from news.models.vote import LinkVote
-        return LinkVote.where('link_id', self.id).get()
 
-    def vote_by(self, user: 'User') -> Optional['LinkVote']:
+        return LinkVote.where("link_id", self.id).get()
+
+    def vote_by(self, user: "User") -> Optional["LinkVote"]:
         """
         Get link vote by user
         :param user: user
         :return: vote
         """
         from news.models.vote import LinkVote
+
         if user.is_anonymous:
             return None
         return LinkVote.by_link_and_user(self.id, user.id)
 
     def report(self, report):
         self.reports().save(report)
-        self.incr('reported', 1)
+        self.incr("reported", 1)
 
     @property
     def num_votes(self) -> int:
@@ -156,12 +174,12 @@ class Link(Base):
         """
         return self.ups + self.downs
 
-    @morph_many('reportable')
+    @morph_many("reportable")
     def reports(self):
         return Report
 
     @classmethod
-    def by_feed(cls, feed: 'Feed', sort: str) -> ['Link']:
+    def by_feed(cls, feed: "Feed", sort: str) -> ["Link"]:
         """
         Get links by feed and sort
         :param feed: feed
@@ -171,20 +189,20 @@ class Link(Base):
         return Link.get_by_feed_id(feed.id, sort)
 
     @classmethod
-    def get_by_feed_id(cls, feed_id: int, sort: str) -> ['Link']:
+    def get_by_feed_id(cls, feed_id: int, sort: str) -> ["Link"]:
         """
         Get links by feed id and sort
         :param feed_id:
         :param sort:
         :return:
         """
-        cache_key = 'fs:{}.{}'.format(feed_id, sort)
+        cache_key = "fs:{}.{}".format(feed_id, sort)
 
         r = cache.get(cache_key)
         if r is not None:
             return r
 
-        q = Link.where('feed_id', feed_id).order_by_raw(sorts[sort])
+        q = Link.where("feed_id", feed_id).order_by_raw(sorts[sort])
 
         # cache needs array of objects, not a orator collection
         res = [f for f in q.limit(1000).get()]
@@ -228,20 +246,22 @@ class Link(Base):
         """
 
         # delete link votes from DB
-        LinkVote.where('link_id', self.id).delete()
+        LinkVote.where("link_id", self.id).delete()
         # delete cached link votes
         link_upvotes_key, link_downvotes_key = LinkVote.set_keys(self.id)
         cache.delete(link_upvotes_key)
         cache.delete(link_downvotes_key)
 
         # delete comment votes
-        for comment in Comment.where('link_id', self.id):
+        for comment in Comment.where("link_id", self.id):
             # delete cached comment votes
-            comment_upvotes_key, comment_downvotes_key = CommentVote.set_keys(comment.id)
+            comment_upvotes_key, comment_downvotes_key = CommentVote.set_keys(
+                comment.id
+            )
             cache.delete(comment_upvotes_key)
             cache.delete(comment_downvotes_key)
             # delete comment votes from DB
-            CommentVote.where('comment_id', comment.id).delete()
+            CommentVote.where("comment_id", comment.id).delete()
 
         # update self
         with self.get_read_modify_write_lock():
@@ -257,7 +277,11 @@ class Link(Base):
         return self.user_id == 12345
 
     def delete(self):
-        for sort in ['trending', 'best', 'new']:  # no need to update 'new' because it doesn't depend on score
+        for sort in [
+            "trending",
+            "best",
+            "new",
+        ]:  # no need to update 'new' because it doesn't depend on score
             q = LinkQuery(feed_id=self.feed_id, sort=sort)
             q.delete([self])
         super().delete()
@@ -265,44 +289,60 @@ class Link(Base):
 
 
 class LinkForm(FlaskForm):
-    title = StringField('Title', [DataRequired(), Length(max=128, min=4)],
-                        render_kw={'placeholder': 'Title', 'autocomplete': 'off'})
-    url = StringField('Url', [Length(max=256)],
-                      render_kw={'placeholder': 'URL', 'oninput': 'handleUrlChange()', 'autocomplete': 'off'})
-    text = TextAreaField('Summary', [Length(max=8192)],
-                         render_kw={'placeholder': 'Summary or text', 'rows': 6, 'autocomplete': 'off'})
+    title = StringField(
+        "Title",
+        [DataRequired(), Length(max=128, min=4)],
+        render_kw={"placeholder": "Title", "autocomplete": "off"},
+    )
+    url = StringField(
+        "Url",
+        [Length(max=256)],
+        render_kw={
+            "placeholder": "URL",
+            "oninput": "handleUrlChange()",
+            "autocomplete": "off",
+        },
+    )
+    text = TextAreaField(
+        "Summary",
+        [Length(max=8192)],
+        render_kw={"placeholder": "Summary or text", "rows": 6, "autocomplete": "off"},
+    )
 
     def result(self):
-        return Link(title=self.title.data,
-                    slug=make_slug(self.title.data),
-                    text=self.text.data,
-                    url=self.url.data)
+        return Link(
+            title=self.title.data,
+            slug=make_slug(self.title.data),
+            text=self.text.data,
+            url=self.url.data,
+        )
 
 
 class SavedLink(Model):
-    __table__ = 'saved_links'
-    __fillable__ = ['user_id', 'link_id']
+    __table__ = "saved_links"
+    __fillable__ = ["user_id", "link_id"]
     __incrementing__ = False
 
     @classmethod
     def create_table(cls):
         schema = Schema(db)
-        schema.drop_if_exists('saved_links')
-        with schema.create('saved_links') as table:
-            table.big_integer('link_id').unsigned()
-            table.integer('user_id').unsigned()
-            table.datetime('created_at')
-            table.datetime('updated_at')
-            table.index('link_id')
-            table.index('user_id')
-            table.primary(['link_id', 'user_id'])
+        schema.drop_if_exists("saved_links")
+        with schema.create("saved_links") as table:
+            table.big_integer("link_id").unsigned()
+            table.integer("user_id").unsigned()
+            table.datetime("created_at")
+            table.datetime("updated_at")
+            table.index("link_id")
+            table.index("user_id")
+            table.primary(["link_id", "user_id"])
 
     def __repr__(self):
-        return '<SavedLink l:{} u:{}>'.format(self.link_id, self.user_id)
+        return "<SavedLink l:{} u:{}>".format(self.link_id, self.user_id)
 
     @property
     def user(self):
         from news.models.user import User
+
         return User.by_id(self.user_id)
 
     @property
@@ -315,7 +355,7 @@ class SavedLink(Model):
 
     @classmethod
     def by_user(cls, user):
-        return cls.where('user_id', user.id).order_by('created_at', 'desc').get()
+        return cls.where("user_id", user.id).order_by("created_at", "desc").get()
 
     def commit(self):
         try:

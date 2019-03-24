@@ -11,23 +11,32 @@ from news.models.report import ReportForm, Report
 from news.models.vote import vote_type_from_string, LinkVote
 
 
-def get_link(link, link_slug=''):
+def get_link(link, link_slug=""):
     """
     Default view page for link
     :param link_slug: link slug
     :return:
     """
-    if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
+    if (
+        current_user.is_authenticated
+        and Ban.by_user_and_feed(current_user, link.feed) is not None
+    ):
         abort(403)
 
     # Currently supports only one type of sorting for comments
     sorted_comments = SortedComments(link.id).get_full_tree()
 
-    return render_template('link.html', link=link, feed=link.feed, comment_form=CommentForm(), comments=sorted_comments)
+    return render_template(
+        "link.html",
+        link=link,
+        feed=link.feed,
+        comment_form=CommentForm(),
+        comments=sorted_comments,
+    )
 
 
 @login_required
-@rate_limit('vote', 20, 100, limit_user=True, limit_ip=False)
+@rate_limit("vote", 20, 100, limit_user=True, limit_ip=False)
 def do_vote(link, vote_str=None):
     """
     Vote on link
@@ -36,7 +45,10 @@ def do_vote(link, vote_str=None):
     :param vote_str:  vote type
     :return:
     """
-    if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
+    if (
+        current_user.is_authenticated
+        and Ban.by_user_and_feed(current_user, link.feed) is not None
+    ):
         abort(403)
 
     if link.archived:
@@ -57,13 +69,18 @@ def link_report(link):
     :param link_slug: link slug
     :return:
     """
-    if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
+    if (
+        current_user.is_authenticated
+        and Ban.by_user_and_feed(current_user, link.feed) is not None
+    ):
         abort(403)
 
     if link.archived:
         abort(405)
 
-    return render_template('report.html', thing=link, feed=link.feed, report_form=ReportForm())
+    return render_template(
+        "report.html", thing=link, feed=link.feed, report_form=ReportForm()
+    )
 
 
 @login_required
@@ -77,7 +94,10 @@ def post_link_report(link):
     :param link_slug: link slug
     :return:
     """
-    if current_user.is_authenticated and Ban.by_user_and_feed(current_user, link.feed) is not None:
+    if (
+        current_user.is_authenticated
+        and Ban.by_user_and_feed(current_user, link.feed) is not None
+    ):
         abort(403)
 
     if link.archived:
@@ -86,15 +106,23 @@ def post_link_report(link):
     report_form = ReportForm()
 
     if report_form.validate():
-        report = Report(reason=report_form.reason.data, comment=report_form.comment.data, user_id=current_user.id,
-                        feed_id=link.feed.id)
+        report = Report(
+            reason=report_form.reason.data,
+            comment=report_form.comment.data,
+            user_id=current_user.id,
+            feed_id=link.feed.id,
+        )
 
         link.report(report)
 
-        flash('Thanks for your feedback!')
-        return redirect(link.route) # todo safe users origin through the form to redirect him back
+        flash("Thanks for your feedback!")
+        return redirect(
+            link.route
+        )  # todo safe users origin through the form to redirect him back
 
-    return render_template('report.html', thing=link, feed=link.feed, report_form=report_form)
+    return render_template(
+        "report.html", thing=link, feed=link.feed, report_form=report_form
+    )
 
 
 @login_required
@@ -137,6 +165,7 @@ def save_link(link):
     saved_link.commit()
 
     return redirect(redirect_back(link.route))
+
 
 @login_required
 def remove_link(link):

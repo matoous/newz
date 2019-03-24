@@ -13,7 +13,12 @@ from news.lib.sentry import sentry
 
 
 def real_make_app():
-    app = Flask(__name__, static_url_path='/static', static_folder='../static', template_folder='../templates')
+    app = Flask(
+        __name__,
+        static_url_path="/static",
+        static_folder="../static",
+        template_folder="../templates",
+    )
 
     app.logger.setLevel(logging.INFO)
 
@@ -31,8 +36,8 @@ def real_make_app():
     S3.init_app(app)
 
     # init sentry only if not in DEBUG mode
-    if not app.config['DEBUG']:
-        sentry.init_app(app, dsn=app.config['DSN'])
+    if not app.config["DEBUG"]:
+        sentry.init_app(app, dsn=app.config["DSN"])
 
     # register view function and other utilities for templates
     register_functions(app)
@@ -40,6 +45,8 @@ def real_make_app():
     # register all routes
     register_routes(app)
 
-    app.logger.info(f"eSource news: running on URL: {app.config['NAME']}, DB: {app.config['ORATOR_DATABASES'][app.config['ORATOR_DATABASES']['default']]['host']}, redis: {app.config['REDIS_URL']}")
+    app.logger.info(
+        f"eSource news: running on URL: {app.config['NAME']}, DB: {app.config['ORATOR_DATABASES'][app.config['ORATOR_DATABASES']['default']]['host']}, redis: {app.config['REDIS_URL']}"
+    )
 
     return app

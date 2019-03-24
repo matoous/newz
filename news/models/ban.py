@@ -14,8 +14,9 @@ class Ban(Base):
     Bans are issued per user per feed
     Bans are permanently cached in redis, so they need to do be loaded in case of cache failure
     """
-    __table__ = 'bans'
-    __fillable__ = ['reason', 'feed_id', 'user_id', 'until']
+
+    __table__ = "bans"
+    __fillable__ = ["reason", "feed_id", "user_id", "until"]
     __incrementing__ = False
 
     @classmethod
@@ -24,17 +25,17 @@ class Ban(Base):
         Create table for bans
         """
         schema = Schema(db)
-        schema.drop_if_exists('bans')
-        with schema.create('bans') as table:
-            table.string('reason')
-            table.integer('user_id').unsigned()
-            table.foreign('user_id').references('id').on('users').on_delete('cascade')
-            table.integer('feed_id').unsigned()
-            table.foreign('feed_id').references('id').on('feeds').on_delete('cascade')
-            table.datetime('created_at')
-            table.datetime('updated_at')
-            table.datetime('until')
-            table.primary(['feed_id', 'user_id'])
+        schema.drop_if_exists("bans")
+        with schema.create("bans") as table:
+            table.string("reason")
+            table.integer("user_id").unsigned()
+            table.foreign("user_id").references("id").on("users").on_delete("cascade")
+            table.integer("feed_id").unsigned()
+            table.foreign("feed_id").references("id").on("feeds").on_delete("cascade")
+            table.datetime("created_at")
+            table.datetime("updated_at")
+            table.datetime("until")
+            table.primary(["feed_id", "user_id"])
 
     @classmethod
     def _cache_prefix(cls):
@@ -42,7 +43,7 @@ class Ban(Base):
         Bans cache prefix
         :return: 'ban'
         """
-        return 'ban:'
+        return "ban:"
 
     @property
     def id(self) -> str:
@@ -53,26 +54,28 @@ class Ban(Base):
         return "{feed}:{user}".format(feed=self.feed_id, user=self.user_id)
 
     @property
-    def user(self) -> 'User':
+    def user(self) -> "User":
         """
         Get user which received the ban
         :return: user
         """
         from news.models.user import User
-        if 'user' not in self._relations:
-            self._relations['user'] = User.by_id(self.user_id)
-        return self._relations['user']
+
+        if "user" not in self._relations:
+            self._relations["user"] = User.by_id(self.user_id)
+        return self._relations["user"]
 
     @property
-    def feed(self) -> 'Feed':
+    def feed(self) -> "Feed":
         """
         Get feed for which the ban applies
         :return: feed
         """
         from news.models.feed import Feed
-        if 'feed' not in self._relations:
-            self._relations['feed'] = Feed.by_id(self.feed_id)
-        return self._relations['feed']
+
+        if "feed" not in self._relations:
+            self._relations["feed"] = Feed.by_id(self.feed_id)
+        return self._relations["feed"]
 
     @classmethod
     def cache_key(cls, user_id, feed_id) -> str:
@@ -87,10 +90,12 @@ class Ban(Base):
     def apply(self, user=None, feed=None):
         if user is None:
             from news.models.user import User
+
             user = User.by_id(self.user_id)
 
         if feed is None:
             from news.models.feed import Feed
+
             feed = Feed.by_id(self.feed_id)
 
         # can't ban admin
@@ -106,7 +111,7 @@ class Ban(Base):
         """
         Write self to cache
         """
-        cache.set(self.id, 'y')
+        cache.set(self.id, "y")
 
     @classmethod
     def by_user_and_feed(cls, user, feed):
@@ -119,7 +124,7 @@ class Ban(Base):
         return cls.by_user_and_feed_id(user.id, feed.id)
 
     @classmethod
-    def by_user_and_feed_id(cls, user_id, feed_id) -> 'Ban':
+    def by_user_and_feed_id(cls, user_id, feed_id) -> "Ban":
         """
         Get ban by user id and feed id
         :param user_id: user id
@@ -129,7 +134,7 @@ class Ban(Base):
         return cache.get(cls.cache_key(user_id, feed_id))
 
     @classmethod
-    def by_user(cls, user) -> 'Ban':
+    def by_user(cls, user) -> "Ban":
         """
         Get bans by user
         :param user: user
@@ -138,16 +143,16 @@ class Ban(Base):
         return cls.by_user_id(user.id)
 
     @classmethod
-    def by_user_id(cls, user_id) -> 'Ban':
+    def by_user_id(cls, user_id) -> "Ban":
         """
         Get bans by user id
         :param user_id: user id
         :return: bans
         """
-        return cls.where('user_id', user_id).get()
+        return cls.where("user_id", user_id).get()
 
     @classmethod
-    def by_feed(cls, feed) -> 'Ban':
+    def by_feed(cls, feed) -> "Ban":
         """
         Get bans by feed
         :param feed: feed
@@ -156,34 +161,39 @@ class Ban(Base):
         return cls.by_user_id(feed.id)
 
     @classmethod
-    def by_feed_id(cls, feed_id) -> 'Ban':
+    def by_feed_id(cls, feed_id) -> "Ban":
         """
         Get bans by feed id
         :param feed_id: feed id
         :return: bans
         """
-        return cls.where('user_id', feed_id).get()
+        return cls.where("user_id", feed_id).get()
 
 
 class BanForm(BaseForm):
-    user_id = HiddenField('User Id', [DataRequired()])
-    reason = TextAreaField('Reason', [DataRequired()])
+    user_id = HiddenField("User Id", [DataRequired()])
+    reason = TextAreaField("Reason", [DataRequired()])
     duration = SelectField(
-        'Duration',
-        choices=[('week', 'Week'), ('month', 'Month'), ('3months', '3 months'), ('6months', '6 months'),
-                 ('year', 'Year')]
+        "Duration",
+        choices=[
+            ("week", "Week"),
+            ("month", "Month"),
+            ("3months", "3 months"),
+            ("6months", "6 months"),
+            ("year", "Year"),
+        ],
     )
 
     def get_duration(self):
-        if self.duration.data == 'week':
+        if self.duration.data == "week":
             return 7 * 24 * 60 * 60
-        elif self.duration.data == 'month':
+        elif self.duration.data == "month":
             return 24 * 60 * 60 * 31
-        elif self.duration.data == '3months':
+        elif self.duration.data == "3months":
             return 24 * 60 * 60 * 31 * 3
-        elif self.duration.data == '6months':
+        elif self.duration.data == "6months":
             return 24 * 60 * 60 * 31 * 6
-        elif self.duration.data == 'year':
+        elif self.duration.data == "year":
             return 24 * 60 * 60 * 365
         else:
             return 24 * 60 * 60
@@ -191,5 +201,9 @@ class BanForm(BaseForm):
     def fill(self, user):
         self.user_id.data = user.id
 
-    def result(self) -> 'Ban':
-        return Ban(user_id=self.user_id.data, reason=self.reason.data, duration=self.get_duration())
+    def result(self) -> "Ban":
+        return Ban(
+            user_id=self.user_id.data,
+            reason=self.reason.data,
+            duration=self.get_duration(),
+        )

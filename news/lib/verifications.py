@@ -6,7 +6,7 @@ from news.lib.cache import cache
 from news.lib.mail import registration_email, JOB_send_mail
 from news.lib.task_queue import q
 
-EMAIL_VERIFICATION_EXPIRE = 60*60* 48  # 48 hours
+EMAIL_VERIFICATION_EXPIRE = 60 * 60 * 48  # 48 hours
 
 
 class EmailVerification:
@@ -14,7 +14,7 @@ class EmailVerification:
     Email Verification handles email verifications
     """
 
-    def __init__(self, user=None, token=''):
+    def __init__(self, user=None, token=""):
         self.user = user
         self.token = token
 
@@ -39,7 +39,7 @@ class EmailVerification:
         Cache key for email verification
         :return: cache key
         """
-        return 'e_verify:{}'.format(self.token)
+        return "e_verify:{}".format(self.token)
 
     @property
     def _url(self):
@@ -47,7 +47,7 @@ class EmailVerification:
         Formatted URL with verification link
         :return:
         """
-        return "{}/verify/{}".format(current_app.config['URL'], self.token)
+        return "{}/verify/{}".format(current_app.config["URL"], self.token)
 
     def create(self):
         """
@@ -59,7 +59,9 @@ class EmailVerification:
         self.token = token_urlsafe(16)
 
         # save token to redis for limited time
-        cache.set(self._cache_key, self.user.id, ttl=EMAIL_VERIFICATION_EXPIRE, raw=True)
+        cache.set(
+            self._cache_key, self.user.id, ttl=EMAIL_VERIFICATION_EXPIRE, raw=True
+        )
 
         # send email with verification link
         msg = registration_email(self.user, self._url)

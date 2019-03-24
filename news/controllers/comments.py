@@ -15,7 +15,9 @@ def comment_report(comment):
     :param comment: comment to report
     :return:
     """
-    return render_template('report.html', thing=comment, feed=comment.link.feed, report_form=ReportForm())
+    return render_template(
+        "report.html", thing=comment, feed=comment.link.feed, report_form=ReportForm()
+    )
 
 
 @login_required
@@ -35,12 +37,14 @@ def post_comment_report(comment):
         report.feed_id = comment.link.feed.id
 
         comment.reports().save(report)
-        comment.incr('reported', 1)
+        comment.incr("reported", 1)
 
-        flash('Thanks for your feedback!')
+        flash("Thanks for your feedback!")
         return redirect(comment.link.route)
 
-    return render_template('report.html', thing=comment, feed=comment.link.feed, report_form=report_form)
+    return render_template(
+        "report.html", thing=comment, feed=comment.link.feed, report_form=report_form
+    )
 
 
 def remove_comment(comment):

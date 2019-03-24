@@ -36,7 +36,7 @@ class Base(Model):
         :rtype: str
         :return: cache prefix
         """
-        return cls.__name__ + '_'
+        return cls.__name__ + "_"
 
     @property
     def _cache_key(self) -> str:
@@ -122,7 +122,7 @@ class Base(Model):
             self.update_from_cache()
             new_val = getattr(self, attr) + amp
             self.set_attribute(attr, new_val)
-            self.__class__.where('id', self.id).increment(attr, amp)
+            self.__class__.where("id", self.id).increment(attr, amp)
             self.write_to_cache()
 
     def decr(self, attr: str, amp: int = 1):
@@ -136,7 +136,7 @@ class Base(Model):
             self.update_from_cache()
             new_val = getattr(self, attr) - amp
             self.set_attribute(attr, new_val)
-            self.__class__.where('id', self.id).decrement(attr, amp)
+            self.__class__.where("id", self.id).decrement(attr, amp)
             self.write_to_cache()
 
     def set(self, attr: str, val: object):
@@ -178,7 +178,7 @@ class Base(Model):
 
         CACHE_MISSES.inc(1)
         # check db on fail
-        item = cls.where('id', int(id)).first()
+        item = cls.where("id", int(id)).first()
         if item is not None:
             item.write_to_cache()
 
@@ -186,7 +186,7 @@ class Base(Model):
 
     @classmethod
     def by_id_slow(cls, id: str) -> object:
-        return cls.where('id', id).first()
+        return cls.where("id", id).first()
 
     @classmethod
     def by_ids(cls, ids: List[str]) -> List[object]:

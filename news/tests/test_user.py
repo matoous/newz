@@ -2,7 +2,7 @@ import unittest
 
 from news import real_make_app
 
-TEST_DB = 'test.db'
+TEST_DB = "test.db"
 
 
 class BasicTests(unittest.TestCase):
@@ -14,8 +14,8 @@ class BasicTests(unittest.TestCase):
     # executed prior to each test
     def setUp(self):
         app = real_make_app()
-        app.config['TESTING'] = True
-        app.config['DEBUG'] = False
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
 
         self.app = app.test_client()
 
@@ -28,7 +28,7 @@ class BasicTests(unittest.TestCase):
     ###############
 
     def test_main_page(self):
-        response = self.app.get('/', follow_redirects=True)
+        response = self.app.get("/", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
 
 

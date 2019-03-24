@@ -20,11 +20,11 @@ def tuple_maker(sort):
     :param sort:
     :return:
     """
-    if sort == 'new':
+    if sort == "new":
         return lambda x: [x.id, epoch_seconds(x.created_at)]
-    if sort == 'best':
+    if sort == "best":
         return lambda x: [x.id, x.score, epoch_seconds(x.created_at)]
-    return lambda x: [x.id, x.hot] # default to trending
+    return lambda x: [x.id, x.hot]  # default to trending
 
 
 class LinkQuery:
@@ -33,7 +33,8 @@ class LinkQuery:
 
     Should be handled as source of truth, uses redis as store
     """
-    def __init__(self, feed_id, sort, time='all', filters=()):
+
+    def __init__(self, feed_id, sort, time="all", filters=()):
         self.feed_id = feed_id
         self.sort = sort
         self.time = time
@@ -49,7 +50,7 @@ class LinkQuery:
             yield x[0]
 
     def __repr__(self):
-        return '<CachedQuery %s %s>' % (self.feed_id, self.sort)
+        return "<CachedQuery %s %s>" % (self.feed_id, self.sort)
 
     @property
     def _cache_key(self):
@@ -71,7 +72,12 @@ class LinkQuery:
         Rebuild link query from database
         """
         from news.models.link import Link
-        q = Link.where('feed_id', self.feed_id).order_by_raw(sorts[self.sort]).limit(1000)
+
+        q = (
+            Link.where("feed_id", self.feed_id)
+            .order_by_raw(sorts[self.sort])
+            .limit(1000)
+        )
 
         # cache needs array of objects, not a orator collection
         res = [self._tupler(l) for l in q.get()]
@@ -117,9 +123,11 @@ class LinkQuery:
                 # out of storage
                 # item structure is (name, sortval1[, sortval2, ...])
                 smallest = data[-1]
-                item_tuples = [item for item in item_tuples
-                               if (item[0] in existing_fnames or
-                                   item[1:] >= smallest[1:])]
+                item_tuples = [
+                    item
+                    for item in item_tuples
+                    if (item[0] in existing_fnames or item[1:] >= smallest[1:])
+                ]
 
             if not item_tuples:
                 # nothing changes
@@ -167,14 +175,14 @@ class LinkQuery:
         return [r[0] for r in self.fetch()]
 
 
-@job('medium', connection=redis_conn)
+@job("medium", connection=redis_conn)
 def JOB_add_to_queries(link):
     """
     Consumes add_to_queries queue
     :param link: link to add/update
     :return: nothing
     """
-    for sort in ['trending', 'best', 'new']:
+    for sort in ["trending", "best", "new"]:
         q = LinkQuery(feed_id=link.feed_id, sort=sort)
         q.insert([link])
     CommentTree(link.id).create()

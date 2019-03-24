@@ -18,10 +18,10 @@ def sort_tuples(data):
 
 
 def default_sorts(data, sort):
-    if sort == 'trending':
+    if sort == "trending":
         return sorted(data, key=lambda x: hot(x.score, x.created_at), reverse=True)
-    if sort == 'new':
+    if sort == "new":
         return sorted(data, key=lambda x: x.created_at, reverse=True)
-    if sort == 'best':
+    if sort == "best":
         return sorted(data, key=lambda x: x.score, reverse=True)
     return data

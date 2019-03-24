@@ -18,47 +18,59 @@ from news.models.link import Link
 
 
 class Feed(Base):
-    __table__ = 'feeds'
-    __fillable__ = ['id', 'name', 'img', 'slug', 'description', 'default_sort', 'rules', 'lang', 'over_18', 'logo',
-                    'reported', 'subscribers_count']
-    __searchable__ = ['name', 'description']
-    __hidden__ = ['users']
+    __table__ = "feeds"
+    __fillable__ = [
+        "id",
+        "name",
+        "img",
+        "slug",
+        "description",
+        "default_sort",
+        "rules",
+        "lang",
+        "over_18",
+        "logo",
+        "reported",
+        "subscribers_count",
+    ]
+    __searchable__ = ["name", "description"]
+    __hidden__ = ["users"]
 
     @classmethod
     def create_table(cls):
         schema = Schema(db)
         schema.drop_if_exists(cls.__table__)
         with schema.create(cls.__table__) as table:
-            table.increments('id').unsigned()
-            table.string('name', 64)
-            table.string('slug', 80).unique()
-            table.text('description').nullable()
-            table.text('rules').nullable()
-            table.text('img').nullable()
-            table.integer('subscribers_count').default(0)
-            table.string('default_sort', 12).default('trending')
-            table.datetime('created_at')
-            table.datetime('updated_at')
-            table.string('lang', 12).default('en')
-            table.boolean('over_18').default(False)
-            table.string('logo', 128).nullable()
-            table.boolean('reported').default(False)
-            table.index('slug')
+            table.increments("id").unsigned()
+            table.string("name", 64)
+            table.string("slug", 80).unique()
+            table.text("description").nullable()
+            table.text("rules").nullable()
+            table.text("img").nullable()
+            table.integer("subscribers_count").default(0)
+            table.string("default_sort", 12).default("trending")
+            table.datetime("created_at")
+            table.datetime("updated_at")
+            table.string("lang", 12).default("en")
+            table.boolean("over_18").default(False)
+            table.string("logo", 128).nullable()
+            table.boolean("reported").default(False)
+            table.index("slug")
 
     def __init__(self, **attributes):
-        super().__init__(**attributes, over_18=False, lang='en')
+        super().__init__(**attributes, over_18=False, lang="en")
 
-    def links_query(self, sort: str = 'trending') -> [Link]:
+    def links_query(self, sort: str = "trending") -> [Link]:
         return Link.by_feed(self, sort)
 
     @classmethod
-    def by_slug(cls, slug: str) -> Optional['Feed']:
+    def by_slug(cls, slug: str) -> Optional["Feed"]:
         """
         Get feed by slug
         :param username: slug
         :return:
         """
-        cache_key = 'fslug:{}'.format(slug)
+        cache_key = "fslug:{}".format(slug)
 
         # check feed slug cache
         in_cache = cache.get(cache_key, raw=True)
@@ -69,7 +81,7 @@ class Feed(Base):
             return Feed.by_id(uid)
 
         # try to load user from DB on failure
-        feed = Feed.where('slug', slug).first()
+        feed = Feed.where("slug", slug).first()
 
         # cache the result
         if feed is not None:
@@ -79,7 +91,7 @@ class Feed(Base):
         return feed
 
     @classmethod
-    def by_id(cls, id: str) -> 'Feed':
+    def by_id(cls, id: str) -> "Feed":
         """
         Find feed by id
         :param id: id
@@ -92,7 +104,7 @@ class Feed(Base):
             return f
 
         # try to find feed in DB
-        f = Feed.where('id', id).first()
+        f = Feed.where("id", id).first()
 
         # cache the result
         if f is not None:
@@ -116,20 +128,21 @@ class Feed(Base):
     def _cache_prefix(cls):
         return "f:"
 
-    @belongs_to_many('feeds_users')
-    def users(self) -> ['User']:
+    @belongs_to_many("feeds_users")
+    def users(self) -> ["User"]:
         """
         Subscribed users
         :return: users
         """
         from news.models.user import User
+
         return User
 
     @mutator
     def rules(self, value):
         rules = markdown(value, safe_mode="escape")
         cache.set(self.rules_cache_key, rules)
-        self.set_raw_attribute('rules', value)
+        self.set_raw_attribute("rules", value)
 
     @property
     def rules_cache_key(self):
@@ -149,11 +162,17 @@ class Feed(Base):
 
 
 class FeedForm(BaseForm):
-    name = StringField('Name', [DataRequired(), Length(max=128, min=3)])
-    description = TextAreaField('Description', [Length(max=256)],
-                                render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
-    rules = TextAreaField('Rules', [DataRequired(), Length(max=8192)],
-                          render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
+    name = StringField("Name", [DataRequired(), Length(max=128, min=3)])
+    description = TextAreaField(
+        "Description",
+        [Length(max=256)],
+        render_kw={"placeholder": "Feed description", "rows": 6, "autocomplete": "off"},
+    )
+    rules = TextAreaField(
+        "Rules",
+        [DataRequired(), Length(max=8192)],
+        render_kw={"placeholder": "Feed rules", "rows": 6, "autocomplete": "off"},
+    )
 
     def fill(self, feed: Feed):
         self.name.data = feed.name
@@ -161,21 +180,31 @@ class FeedForm(BaseForm):
         self.rules.data = feed.rules
 
     def result(self) -> Feed:
-        return Feed(name=self.name.data, description=self.description.data, slug=make_slug(self.name.data))
+        return Feed(
+            name=self.name.data,
+            description=self.description.data,
+            slug=make_slug(self.name.data),
+        )
 
 
 class EditFeedForm(FlaskForm):
-    description = TextAreaField('Description', [DataRequired(), Length(max=8192)],
-                                render_kw={'placeholder': 'Feed description', 'rows': 6, 'autocomplete': 'off'})
-    rules = TextAreaField('Rules', [Length(max=8192)],
-                          render_kw={'placeholder': 'Feed rules', 'rows': 6, 'autocomplete': 'off'})
-    img = FileField('Logo')
+    description = TextAreaField(
+        "Description",
+        [DataRequired(), Length(max=8192)],
+        render_kw={"placeholder": "Feed description", "rows": 6, "autocomplete": "off"},
+    )
+    rules = TextAreaField(
+        "Rules",
+        [Length(max=8192)],
+        render_kw={"placeholder": "Feed rules", "rows": 6, "autocomplete": "off"},
+    )
+    img = FileField("Logo")
 
     def fill(self, feed):
         self.description.data = feed.description
         self.rules.data = feed.rules
 
 
-@job('medium', connection=redis_conn)
+@job("medium", connection=redis_conn)
 def handle_new_feed(feed):
     return None

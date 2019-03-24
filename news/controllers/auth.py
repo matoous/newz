@@ -4,7 +4,14 @@ from flask_login import login_required, current_user
 from news.lib.ratelimit import rate_limit
 from news.lib.utils.redirect import redirect_back
 from news.lib.verifications import EmailVerification
-from news.models.user import SignUpForm, LoginForm, User, ResetForm, PasswordReset, SetPasswordForm
+from news.models.user import (
+    SignUpForm,
+    LoginForm,
+    User,
+    ResetForm,
+    PasswordReset,
+    SetPasswordForm,
+)
 
 
 def signup():
@@ -13,12 +20,14 @@ def signup():
     :return:
     """
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect("/")
 
-    return render_template('signup.html', form=SignUpForm(), show_logo=True, hide_menues=True)
+    return render_template(
+        "signup.html", form=SignUpForm(), show_logo=True, hide_menues=True
+    )
 
 
-@rate_limit('join', 10, 3600, limit_user=False, limit_ip=True)
+@rate_limit("join", 10, 3600, limit_user=False, limit_ip=True)
 def post_signup():
     """
     Sign Up new user
@@ -31,11 +40,14 @@ def post_signup():
     if form.validate():
         user = form.result()
         user.register()
-        current_app.logger.info('new user registered: {} ({})'.format(user.username, user.id))
+        current_app.logger.info(
+            "new user registered: {} ({})".format(user.username, user.id)
+        )
         user.login(remember_me=True)
-        return redirect('/')
+        return redirect("/")
 
-    return render_template('signup.html', form=form, show_logo=True, hide_menues=True)
+    return render_template("signup.html", form=form, show_logo=True, hide_menues=True)
+
 
 def login():
     """
@@ -43,26 +55,31 @@ def login():
     :return:
     """
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect("/")
 
-    return render_template('login.html', form=LoginForm(), show_logo=True, hide_menues=True,
-                           next=request.args.get('next'))
+    return render_template(
+        "login.html",
+        form=LoginForm(),
+        show_logo=True,
+        hide_menues=True,
+        next=request.args.get("next"),
+    )
 
 
-@rate_limit('login', 10, 300, limit_user=False, limit_ip=True)
+@rate_limit("login", 10, 300, limit_user=False, limit_ip=True)
 def post_login():
     """
     Login existing user
     :return:
     """
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect("/")
 
     form = LoginForm()
     if form.validate():
         user = form.user()
         user.login(form.remember_me.data)
-        return redirect(redirect_back('/'))
+        return redirect(redirect_back("/"))
 
     return render_template("login.html", form=form, show_logo=True, hide_menues=True)
 
@@ -74,7 +91,7 @@ def logout():
     :return:
     """
     current_user.logout()
-    return redirect('/')
+    return redirect("/")
 
 
 def reset_password():
@@ -87,33 +104,33 @@ def reset_password():
 
     form = ResetForm()
     if form.validate_on_submit():
-        user = User.where('email', form.email.data).first()
+        user = User.where("email", form.email.data).first()
         if user is None:
             abort(404)
         pr = PasswordReset(user=user)
         pr.create()
-        return render_template('reset_confirm.html')
-    return render_template('reset.html', form=form)
+        return render_template("reset_confirm.html")
+    return render_template("reset.html", form=form)
 
 
-@rate_limit('mail-action', 3, 3600, limit_user=False, limit_ip=True)
+@rate_limit("mail-action", 3, 3600, limit_user=False, limit_ip=True)
 def post_reset_password():
     """
     Request password reset
     :return:
     """
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect("/")
 
     form = ResetForm()
     if form.validate():
-        user = User.where('email', form.email.data).first()
+        user = User.where("email", form.email.data).first()
         if user is None:
             abort(404)
         pr = PasswordReset(user=user)
         pr.create()
-        return render_template('reset_confirm.html')
-    return render_template('reset.html', form=form)
+        return render_template("reset_confirm.html")
+    return render_template("reset.html", form=form)
 
 
 def set_password(token):
@@ -139,18 +156,19 @@ def set_password(token):
             pr.delete()
             return redirect("/login")
 
-    return render_template('reset_password.html', form=form, token=token)
+    return render_template("reset_password.html", form=form, token=token)
 
 
-@rate_limit('mail-action', 3, 3600, limit_user=True, limit_ip=True)
+@rate_limit("mail-action", 3, 3600, limit_user=True, limit_ip=True)
 def resend_verify():
     # create and send verification
     verification = EmailVerification(current_user)
     verification.create()
 
-    flash('We have send you email with verification link.', 'info')
+    flash("We have send you email with verification link.", "info")
 
-    return redirect('/settings/account')
+    return redirect("/settings/account")
+
 
 def verify(token):
     """
@@ -158,7 +176,7 @@ def verify(token):
     :param token: verification token
     :return:
     """
-    if token == '':
+    if token == "":
         abort(404)
     verification = EmailVerification(token=token)
 
@@ -170,8 +188,8 @@ def verify(token):
         user.email_verified = True
         user.update_with_cache()
 
-        flash('Email successfully verified!', 'info')
+        flash("Email successfully verified!", "info")
 
-        return redirect('/')
+        return redirect("/")
 
     abort(404)

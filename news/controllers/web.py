@@ -16,8 +16,11 @@ class LinksListing(View):
         pass
 
     def feed_ids(self):
-        return current_user.subscribed_feed_ids if current_user.is_authenticated else current_app.config[
-            'DEFAULT_FEEDS']
+        return (
+            current_user.subscribed_feed_ids
+            if current_user.is_authenticated
+            else current_app.config["DEFAULT_FEEDS"]
+        )
 
     def get(self):
         pass
@@ -25,42 +28,44 @@ class LinksListing(View):
 
 class CommonListing(LinksListing):
     def feed_ids(self):
-        return current_app.config['DEFAULT_FEEDS']
+        return current_app.config["DEFAULT_FEEDS"]
 
 
 def index():
     sort = None
     if current_user.is_authenticated:
-        s = request.args.get('sort', 'trending')
-        if s == 'trending':
+        s = request.args.get("sort", "trending")
+        if s == "trending":
             links = trending_links(current_user.subscribed_feed_ids)
-            sort = 'Trending'
-        elif s == 'new':
+            sort = "Trending"
+        elif s == "new":
             links = new_links(current_user.subscribed_feed_ids)
-            sort = 'New'
+            sort = "New"
         else:
-            links = best_links(current_user.subscribed_feed_ids, 'all')
-            sort = 'Best'
+            links = best_links(current_user.subscribed_feed_ids, "all")
+            sort = "Best"
     else:
-        links = trending_links(current_app.config['DEFAULT_FEEDS'])
-    count = request.args.get('count', default=None, type=int)
+        links = trending_links(current_app.config["DEFAULT_FEEDS"])
+    count = request.args.get("count", default=None, type=int)
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids) if paginated_ids else []
-    return render_template('index.html',
-                           links=links,
-                           show_logo=True,
-                           less_links=has_less,
-                           more_links=has_more,
-                           title='eSource News',
-                           sort=sort,
-                           count=count)
+    return render_template(
+        "index.html",
+        links=links,
+        show_logo=True,
+        less_links=has_less,
+        more_links=has_more,
+        title="eSource News",
+        sort=sort,
+        count=count,
+    )
 
 
 def index_rss():
     if current_user.is_authenticated:
         links = trending_links(current_user.subscribed_feed_ids)
     else:
-        links = trending_links(current_app.config['DEFAULT_FEEDS'])
+        links = trending_links(current_app.config["DEFAULT_FEEDS"])
     paginated_ids, _, _ = paginate(links, 30)
     links = Link.by_ids(paginated_ids)
 
@@ -68,7 +73,7 @@ def index_rss():
     fg = FeedGenerator()
     fg.id("https://localhost:5000/")
     fg.title("Newsfeed")
-    fg.link(href="http://localhost:5000/", rel='self')
+    fg.link(href="http://localhost:5000/", rel="self")
     fg.description("Global news agrregator!")
     fg.language("en")
 
@@ -79,40 +84,48 @@ def index_rss():
 
 
 def new():
-    links = new_links(current_app.config['DEFAULT_FEEDS'])
+    links = new_links(current_app.config["DEFAULT_FEEDS"])
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
 
-    return render_template('index.html',
-                           links=links,
-                           less_links=has_less,
-                           more_links=has_more,
-                           title='eSource News - New')
+    return render_template(
+        "index.html",
+        links=links,
+        less_links=has_less,
+        more_links=has_more,
+        title="eSource News - New",
+    )
 
 
 def best():
-    time = request.args.get('time')
-    links = best_links(current_app.config['DEFAULT_FEEDS'], time_limit=time if time else 'all')
+    time = request.args.get("time")
+    links = best_links(
+        current_app.config["DEFAULT_FEEDS"], time_limit=time if time else "all"
+    )
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
 
-    return render_template("index.html",
-                           links=links,
-                           less_links=has_less,
-                           more_links=has_more,
-                           title='eSource News - Best')
+    return render_template(
+        "index.html",
+        links=links,
+        less_links=has_less,
+        more_links=has_more,
+        title="eSource News - Best",
+    )
 
 
 def trending():
-    links = trending_links(current_app.config['DEFAULT_FEEDS'])
+    links = trending_links(current_app.config["DEFAULT_FEEDS"])
     paginated_ids, has_less, has_more = paginate(links, 20)
     links = Link.by_ids(paginated_ids)
 
-    return render_template("index.html",
-                           links=links,
-                           less_links=has_less,
-                           more_links=has_more,
-                           title='eSource News - Trending')
+    return render_template(
+        "index.html",
+        links=links,
+        less_links=has_less,
+        more_links=has_more,
+        title="eSource News - Trending",
+    )
 
 
 def how_it_works():
@@ -150,4 +163,4 @@ def suggest_feed():
 def metrics():
     registry = core.REGISTRY
     output = generate_latest(registry)
-    return (output)
+    return output

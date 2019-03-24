@@ -2,13 +2,14 @@ from pickle import loads, dumps
 
 from redis import StrictRedis
 
-DEFAULT_CACHE_TTL = 12 * 60 * 60 # 12 hours
+DEFAULT_CACHE_TTL = 12 * 60 * 60  # 12 hours
 
 
 class Cache:
     """
     Cache serves as universal object for access to Redis
     """
+
     def __init__(self, app=None):
         self.conn = None
         self._url = None
@@ -21,10 +22,10 @@ class Cache:
         Init Redis Cache and add config
         :param app: application
         """
-        if 'REDIS_URL' not in app.config:
+        if "REDIS_URL" not in app.config:
             raise RuntimeError('Missing "REDIS_URL" configuration')
 
-        self._url = app.config['REDIS_URL']
+        self._url = app.config["REDIS_URL"]
         self.conn = StrictRedis.from_url(self._url)
 
     def get(self, key: str, raw: bool = False) -> object:
@@ -49,7 +50,9 @@ class Cache:
             return data
         return [loads(x) if x else None for x in data] if data else None
 
-    def set(self, key: str, val: object, ttl: int = DEFAULT_CACHE_TTL, raw: bool = False):
+    def set(
+        self, key: str, val: object, ttl: int = DEFAULT_CACHE_TTL, raw: bool = False
+    ):
         """
         Put key-value pair into the cache
         :param key: key

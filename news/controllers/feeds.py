@@ -32,10 +32,10 @@ def new_feed():
     :return:
     """
     form = FeedForm()
-    if request.method == 'POST' and form.validate():
+    if request.method == "POST" and form.validate():
         feed = form.result()
         feed.commit()
-        return redirect('/f/{feed}'.format(feed=feed.slug))
+        return redirect("/f/{feed}".format(feed=feed.slug))
     return render_template("new_feed.html", form=form)
 
 
@@ -53,18 +53,19 @@ def get_feed(feed, sort=None):
     if sort is None:
         sort = feed.default_sort
 
-    ids, has_less, has_more = paginate(LinkQuery(feed_id=feed.id, sort=sort).fetch_ids(), 20)
+    ids, has_less, has_more = paginate(
+        LinkQuery(feed_id=feed.id, sort=sort).fetch_ids(), 20
+    )
     links = Link.by_ids(ids) if len(ids) > 0 else []
 
-    if sort == 'new' and current_user.is_authenticated:
+    if sort == "new" and current_user.is_authenticated:
         links = filter(min_score_filter(current_user.p_min_link_score), links)
 
     feed.links = links
-    return render_template('feed.html',
-                           feed=feed,
-                           less_links=has_less,
-                           more_links=has_more,
-                           sort=sort)
+    return render_template(
+        "feed.html", feed=feed, less_links=has_less, more_links=has_more, sort=sort
+    )
+
 
 @not_banned
 def get_feed_rss(feed):
@@ -73,7 +74,7 @@ def get_feed_rss(feed):
     :param feed: feed
     :return:
     """
-    ids, _, _ = paginate(LinkQuery(feed_id=feed.id, sort='trending').fetch_ids(), 30)
+    ids, _, _ = paginate(LinkQuery(feed_id=feed.id, sort="trending").fetch_ids(), 30)
     links = Link.by_ids(ids)
     return rss_page(feed, links)
 
@@ -82,13 +83,13 @@ def get_feed_rss(feed):
 @not_banned
 def add_link(feed):
     form = LinkForm()
-    if request.method == 'POST' and form.validate():
+    if request.method == "POST" and form.validate():
         link = form.result()
         link.user_id = current_user.id
         link.feed_id = feed.id
         link.commit()
-        current_app.logger.info('new link {} ({})'.format(link.title, link.id))
-        flash('Link successfully posted', 'success')
+        current_app.logger.info("new link {} ({})".format(link.title, link.id))
+        flash("Link successfully posted", "success")
         return redirect(feed.route)
     return render_template("new_link.html", form=form, feed=feed, md_parser=True)
 
@@ -142,9 +143,9 @@ def add_admin(feed):
     :param feed: feed
     :return:
     """
-    #get new admin username
-    username = request.form.get('username')
-    if not username or username == '':
+    # get new admin username
+    username = request.form.get("username")
+    if not username or username == "":
         abort(404)
 
     # check privileges
@@ -152,8 +153,7 @@ def add_admin(feed):
         user = User.by_username(username)
         if user is None:
             abort(404)
-        feed_admin = FeedAdmin.create(user_id=user.id,
-                                      feed_id=feed.id)
+        feed_admin = FeedAdmin.create(user_id=user.id, feed_id=feed.id)
         return redirect("{}/admins".format(feed.route))
     else:
         abort(403)
@@ -167,7 +167,9 @@ def feed_admins(feed):
     :return:
     """
     admins = FeedAdmin.by_feed_id(feed.id)
-    return render_template("feed_admins.html", admins=admins, feed=feed, active_tab='admins')
+    return render_template(
+        "feed_admins.html", admins=admins, feed=feed, active_tab="admins"
+    )
 
 
 @feed_admin_required
@@ -180,7 +182,7 @@ def GET_feed_admin(feed):
     """
     form = EditFeedForm()
     form.fill(feed)
-    return render_template('feed_admin.html', feed=feed, form=form, active_tab='admin')
+    return render_template("feed_admin.html", feed=feed, form=form, active_tab="admin")
 
 
 @feed_admin_required
@@ -217,9 +219,9 @@ def POST_feed_admin(feed):
         if needs_update:
             feed.update_with_cache()
 
-        return redirect('/f/{}/admin'.format(feed.slug))
+        return redirect("/f/{}/admin".format(feed.slug))
 
-    return render_template('feed_admin.html', feed=feed, form=form, active_tab='admin')
+    return render_template("feed_admin.html", feed=feed, form=form, active_tab="admin")
 
 
 @feed_admin_required
@@ -229,26 +231,34 @@ def GET_feed_bans(feed):
     :param feed: feed
     :return:
     """
-    bans = Ban.where('feed_id', feed.id).get()
+    bans = Ban.where("feed_id", feed.id).get()
 
-    return render_template("feed_bans.html", feed=feed, bans=bans, active_tab='bans')
+    return render_template("feed_bans.html", feed=feed, bans=bans, active_tab="bans")
 
 
 @feed_admin_required
 def feed_reports(feed):
     reports = []
 
-    q = request.args.get('q', None)
+    q = request.args.get("q", None)
     if q is not None:
-        q_data = q.split(':')
+        q_data = q.split(":")
         if len(q_data) != 2:
             abort(404)
         t, d = q_data
-        reports = Report.where('feed_id', feed.id).where('reportable_type', 'comments' if t == 'c' else 'links').where('reportable_id', d).order_by('created_at', 'desc').get()
+        reports = (
+            Report.where("feed_id", feed.id)
+            .where("reportable_type", "comments" if t == "c" else "links")
+            .where("reportable_id", d)
+            .order_by("created_at", "desc")
+            .get()
+        )
     else:
-        reports = Report.where('feed_id', feed.id).order_by('created_at', 'desc').get()
+        reports = Report.where("feed_id", feed.id).order_by("created_at", "desc").get()
 
-    return render_template('feed_reports.html', feed=feed, reports=reports, active_tab='reports')
+    return render_template(
+        "feed_reports.html", feed=feed, reports=reports, active_tab="reports"
+    )
 
 
 @feed_admin_required
@@ -258,8 +268,8 @@ def ban_user(feed, username):
         abort(404)
 
     if Ban.by_user_and_feed(user, feed) is not None:
-        flash('This user is already baned', 'info')
-        return redirect(redirect_back(feed.route + '/admin/reports'))
+        flash("This user is already baned", "info")
+        return redirect(redirect_back(feed.route + "/admin/reports"))
 
     ban_form = BanForm()
     ban_form.fill(user)
@@ -278,7 +288,12 @@ def post_ban_user(feed, username):
 
     if ban_form.validate():
         expire = datetime.utcnow() + timedelta(seconds=ban_form.get_duration())
-        ban = Ban(reason=ban_form.reason.data, user_id=ban_form.user_id.data, feed_id=feed.id, until=expire)
+        ban = Ban(
+            reason=ban_form.reason.data,
+            user_id=ban_form.user_id.data,
+            feed_id=feed.id,
+            until=expire,
+        )
         ban.apply()
         return redirect(feed.route + "/bans")
 
@@ -287,18 +302,20 @@ def post_ban_user(feed, username):
 
 @feed_admin_required
 def feed_fqs(feed):
-    sources = FullyQualifiedSource.where('feed_id', feed.id).get()
-    return render_template('feed_fqs.html', feed=feed, fqs=sources, active_tab='fqs')
+    sources = FullyQualifiedSource.where("feed_id", feed.id).get()
+    return render_template("feed_fqs.html", feed=feed, fqs=sources, active_tab="fqs")
 
 
 @feed_admin_required
 def post_feed_fqs(feed):
-    period = convert_to_timedelta(request.form['period'])
-    url = request.form['url']
+    period = convert_to_timedelta(request.form["period"])
+    url = request.form["url"]
     if period and url:
-        fqs = FullyQualifiedSource(url=url, update_interval=period, feed_id=feed.id, next_update=datetime.now())
+        fqs = FullyQualifiedSource(
+            url=url, update_interval=period, feed_id=feed.id, next_update=datetime.now()
+        )
         fqs.save()
-    return redirect('{}/fqs'.format(feed.route))
+    return redirect("{}/fqs".format(feed.route))
 
 
 @feed_admin_required
@@ -310,19 +327,21 @@ def update_fqs(_, fqs_id):
 
         for article in articles:
             # skip if article already posted
-            if Link.by_slug(article['slug']) is not None:
+            if Link.by_slug(article["slug"]) is not None:
                 continue
-            link = Link(title=article['title'],
-                        slug=article['slug'],
-                        text=article['text'],
-                        url=article['url'],
-                        feed_id=source.feed_id,
-                        user_id=12345)
+            link = Link(
+                title=article["title"],
+                slug=article["slug"],
+                text=article["text"],
+                url=article["url"],
+                feed_id=source.feed_id,
+                user_id=12345,
+            )
             link.commit()
         source.next_update = datetime.now() + timedelta(seconds=source.update_interval)
         source.save()
     except Exception as e:
-        flash('Could not parse the RSS feed on URL'.format(source.url), 'error')
+        flash("Could not parse the RSS feed on URL".format(source.url), "error")
 
     return redirect(redirect_back(source.feed.route))
 

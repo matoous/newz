@@ -6,7 +6,7 @@ from news.lib.db.search import link_search, feed_search
 
 
 def search():
-    q = request.args.get('q')
+    q = request.args.get("q")
 
     start = time.perf_counter()
 
@@ -17,9 +17,8 @@ def search():
 
     hits = sum([x[0].full_count if len(x) > 0 else 0 for x in [links, feeds]])
 
-    search_info = {
-        'elapsed': "{0:.3f}".format(end - start),
-        'hits': hits,
-    }
+    search_info = {"elapsed": "{0:.3f}".format(end - start), "hits": hits}
 
-    return render_template('search.html', links=links, q=q, search_info=search_info, feeds=feeds)
+    return render_template(
+        "search.html", links=links, q=q, search_info=search_info, feeds=feeds
+    )

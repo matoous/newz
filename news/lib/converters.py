@@ -68,6 +68,7 @@ class CommentConverter(BaseConverter):
 class FeedsConverter(BaseConverter):
     def to_python(self, value):
         from news.models.feed import Feed
+
         feeds = []
         for feed_id in value.split("+"):
             feed = Feed.by_id(feed_id)
