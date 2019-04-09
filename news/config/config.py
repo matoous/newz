@@ -22,9 +22,9 @@ def load_config(app):
     app.config["SECRET_KEY"] = get_string(
         "SECRET_KEY", binascii.hexlify(os.urandom(24))
     )
-    app.config["NAME"] = get_string("NAME")
+    app.config["NAME"] = get_string("NAME", "eSource News")
     assert app.config["NAME"] is not None
-    app.config["URL"] = get_string("URL", "localhost:5000")
+    app.config["URL"] = get_string("URL", "localhost:8080")
 
     app.config["GODS"] = {"matoous"}
 
@@ -61,11 +61,11 @@ def load_config(app):
             "default": "postgres",
             "postgres": {
                 "driver": "postgres",
-                "host": "news.c4ioot2pm9qy.eu-central-1.rds.amazonaws.com",
+                "host": "db",
+                "port": 5432,
                 "database": "news",
-                "user": "newsadmin",
-                "password": "Zub5t5SeBl2z2#yolo!",
-                "prefix": "",
+                "user": "postgres",
+                "password": "postgres",
             },
         }
     )
@@ -85,7 +85,7 @@ def load_config(app):
         }
 
     # REDIS CONFIG
-    app.config["REDIS_URL"] = get_string("REDIS_URL", "redis://localhost:6379/10")
+    app.config["REDIS_URL"] = get_string("REDIS_URL", "127.0.0.1:6379")
 
     app.config["DEFAULT_FEEDS"] = (
         json.loads(os.getenv("DEFAULT_FEEDS"))
@@ -103,6 +103,19 @@ def load_config(app):
     app.config["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
 
     app.config["MAILGUN_API_KEY"] = os.getenv("MAILGUN_API_KEY")
+
+    # TODO remove
+    app.config["ORATOR_DATABASES"] = {
+            "default": "postgres",
+            "postgres": {
+                "driver": "postgres",
+                "host": "localhost",
+                "port": 5432,
+                "database": "news",
+                "user": "postgres",
+                "password": "postgres",
+            },
+        }
 
 
 def register_functions(app):

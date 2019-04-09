@@ -1,7 +1,6 @@
 import io
 
 import boto3 as boto3
-from PIL.Image import Image
 from flask import current_app
 
 
@@ -17,14 +16,8 @@ class AmazonS3:
         )
 
     def upload_to_s3(self, file, filename):
-        if isinstance(file, Image):
-            in_mem_file = io.BytesIO()
-            file.save(in_mem_file, format="PNG")
-            data = in_mem_file.getvalue()
-        else:
-            data = file
         self.s3.Bucket(current_app.config["S3_BUCKET"]).put_object(
-            Key=filename, Body=data, ACL="public-read"
+            Key=filename, Body=file, ACL="public-read"
         )
 
 

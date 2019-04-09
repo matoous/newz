@@ -21,9 +21,9 @@ from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import DataRequired, URL, Length, NumberRange
 
 from news.lib.cache import cache
-from news.lib.db.db import db
+from news.clients.db.db import db
 from news.lib.login import login_manager
-from news.lib.mail import reset_email, JOB_send_mail
+from news.clients.mail import reset_email, JOB_send_mail
 from news.lib.task_queue import q, redis_conn
 from news.lib.validators import UniqueUsername, UniqueEmail
 from news.lib.verifications import EmailVerification

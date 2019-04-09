@@ -1,6 +1,6 @@
 from rq.decorators import job
 
-from news.lib.db.query import LinkQuery
+from news.clients.db.query import LinkQuery
 from news.lib.task_queue import redis_conn
 from news.scripts.import_fqs import import_fqs
 

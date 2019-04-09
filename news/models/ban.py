@@ -3,7 +3,7 @@ from wtforms import SelectField, HiddenField, TextAreaField
 from wtforms.validators import DataRequired
 
 from news.lib.cache import cache
-from news.lib.db.db import db
+from news.clients.db.db import db
 from news.models.base import Base
 from news.models.base_form import BaseForm
 

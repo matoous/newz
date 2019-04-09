@@ -4,12 +4,12 @@ from flask import Flask
 
 from news.config.config import load_config, register_functions
 from news.config.routes import register_routes
-from news.lib.amazons3 import S3
+from news.clients.amazons3 import S3
 from news.lib.cache import cache
 from news.lib.csrf import csrf
-from news.lib.db.db import db
+from news.clients.db.db import db
 from news.lib.login import login_manager
-from news.lib.sentry import sentry
+from news.clients.sentry import sentry
 
 
 def real_make_app():

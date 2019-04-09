@@ -1,6 +1,6 @@
 from orator import Schema
 
-from news.lib.db.db import db
+from news.clients.db.db import db
 
 
 def create_subscriptions_table():

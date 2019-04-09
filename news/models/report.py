@@ -2,9 +2,9 @@ from flask_wtf import FlaskForm
 from orator import Model, accessor, Schema
 from orator.orm import morph_to
 from wtforms import TextAreaField, RadioField, IntegerField
-from wtforms.validators import Length, Required, DataRequired
+from wtforms.validators import Length, DataRequired
 
-from news.lib.db.db import db
+from news.clients.db.db import db
 
 
 class Report(Model):

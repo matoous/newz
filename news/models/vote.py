@@ -3,7 +3,7 @@ from orator.orm import belongs_to
 
 from news.lib.cache import cache, DEFAULT_CACHE_TTL
 from news.lib.comments import update_comment
-from news.lib.db.db import db
+from news.clients.db.db import db
 from news.lib.task_queue import q
 from news.lib.tasks.tasks import JOB_update_link
 from news.models.comment import Comment

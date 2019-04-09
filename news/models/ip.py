@@ -3,7 +3,7 @@ import datetime
 from flask import request
 from orator import Schema
 
-from news.lib.db.db import db
+from news.clients.db.db import db
 from news.models.base import Base
 
 TTL = datetime.timedelta(days=100).total_seconds()

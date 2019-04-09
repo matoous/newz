@@ -2,10 +2,11 @@ import heapq
 import itertools
 from datetime import datetime
 
-from news.lib.db.query import LinkQuery
+from news.clients.db.query import LinkQuery
 from news.lib.utils.time_utils import epoch_seconds
 
 MAX_LINKS = 1000
+
 
 # returns links as tuples so they can be effectively merged/sorted with heapq
 def trending_tuples(fid):

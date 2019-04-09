@@ -7,8 +7,8 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from news.lib.access import feed_admin_required, not_banned
-from news.lib.amazons3 import S3
-from news.lib.db.query import LinkQuery
+from news.clients.amazons3 import S3
+from news.clients.db.query import LinkQuery
 from news.lib.filters import min_score_filter
 from news.lib.pagination import paginate
 from news.lib.ratelimit import rate_limit

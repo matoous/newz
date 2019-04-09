@@ -2,7 +2,7 @@ import time
 
 from flask import request, render_template
 
-from news.lib.db.search import link_search, feed_search
+from news.clients.db.search import link_search, feed_search
 
 
 def search():

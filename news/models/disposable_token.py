@@ -3,7 +3,7 @@ from os import urandom
 
 from orator import Schema, Model
 
-from news.lib.db.db import db
+from news.clients.db.db import db
 
 
 class DisposableToken(Model):

@@ -1,42 +1,64 @@
 {% extends "base.html" %}
 
 {% block title %}
-    New Link
+  New Link
 {% endblock %}
 
 {% block body %}
-    <div class="page-container">
+  <div class="page-container">
     <div class="one-page-form wide">
-    <form action="/f/{{ feed.slug }}/add" method="POST">
+      <form action="/f/{{ feed.slug }}/add" method="POST">
         {{ form.csrf_token }}
         <h2>Submit to {{ feed.name }}</h2>
         <fieldset>
+          {% if form.title.errors %}
+            {% for error in form.title.errors %}
+              <div class="form-error">
+                {{ error }}
+              </div>
+            {% endfor %}
+          {% endif %}
+          <div class="f-row">
+            {{ form.title }}
+          </div>
+          <div class="additional-info">
+            Leave URL blank if you are posting question or text.
+          </div>
+          {% if form.url.errors %}
+            {% for error in form.url.errors %}
+              <div class="form-error">
+                {{ error }}
+              </div>
+            {% endfor %}
+          {% endif %}
+          <div class="f-row">
+            {{ form.url }}
+          </div>
+          {% if form.text.errors %}
+            {% for error in form.text.errors %}
+              <div class="form-error">
+                {{ error }}
+              </div>
+            {% endfor %}
+          {% endif %}
+          <div class="f-row">
+            {{ form.text }}
+          </div>
+          <div class="additional-info">
+            Be sure to follow the <a href="/rules">general rules</a>{% if feed.rules %} and feed specific rules which
+            you can find below.{% else %}.{% endif %}
+          </div>
+          <button type="submit" class="btn">Submit</button>
+          {% if feed.rules %}
             <div class="f-row">
-                {{ form.title }}
+              <h2>Feed rules</h2>
+              <div class="md">
+                {{ feed.rules_html|safe }}
+              </div>
             </div>
-            <div class="additional-info">
-                Leave URL blank if you are posting question or text.
-            </div>
-            <div class="f-row">
-                {{ form.url }}
-            </div>
-            <div class="f-row">
-                {{ form.text }}
-            </div>
-            <div class="additional-info">
-                Be sure to follow the <a href="/rules">general rules</a>{% if feed.rules %} and feed specific rules which you can find below.{% else %}.{% endif %}
-            </div>
-            <button type="submit" class="btn">Submit</button>
-            {% if feed.rules %}
-            <div class="f-row">
-                <h2>Feed rules</h2>
-                <div class="md">
-                    {{ feed.rules_html|safe }}
-                </div>
-            </div>
-            {% endif %}
+          {% endif %}
         </fieldset>
-    </form>
+      </form>
     </div>
-    </div>
+  </div>
 {% endblock %}

@@ -3,7 +3,7 @@ from secrets import token_urlsafe
 from flask import current_app
 
 from news.lib.cache import cache
-from news.lib.mail import registration_email, JOB_send_mail
+from news.clients.mail import registration_email, JOB_send_mail
 from news.lib.task_queue import q
 
 EMAIL_VERIFICATION_EXPIRE = 60 * 60 * 48  # 48 hours

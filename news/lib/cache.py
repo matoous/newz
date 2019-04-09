@@ -45,10 +45,16 @@ class Cache:
         :param raw: get objects raw or pickle-load them
         :return: objects
         """
+        if not ids:
+            return []
+
         data = self.conn.mget(ids)
+
         if raw:
             return data
-        return [loads(x) if x else None for x in data] if data else None
+        if data:
+            return [loads(x) if x else None for x in data]
+        return None
 
     def set(
         self, key: str, val: object, ttl: int = DEFAULT_CACHE_TTL, raw: bool = False

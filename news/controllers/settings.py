@@ -3,7 +3,7 @@ from flask import render_template, redirect, request, flash, url_for
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
-from news.lib.amazons3 import S3
+from news.clients.amazons3 import S3
 from news.lib.ratelimit import rate_limit
 from news.lib.utils.file_type import imagefile
 from news.lib.utils.redirect import redirect_back

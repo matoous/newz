@@ -5,12 +5,13 @@ from orator import Model, accessor, Schema
 from orator.exceptions.query import QueryException
 from orator.orm import morph_many
 from wtforms import StringField, TextAreaField
+from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, Length
 
 from news.lib.cache import cache
-from news.lib.db.db import db
-from news.lib.db.query import JOB_add_to_queries, LinkQuery
-from news.lib.db.sorts import sorts
+from news.clients.db.db import db
+from news.clients.db.query import JOB_add_to_queries, LinkQuery
+from news.clients.db.sorts import sorts
 from news.lib.sorts import hot
 from news.lib.task_queue import q
 from news.lib.utils.slugify import make_slug
@@ -294,7 +295,7 @@ class LinkForm(FlaskForm):
         [DataRequired(), Length(max=128, min=4)],
         render_kw={"placeholder": "Title", "autocomplete": "off"},
     )
-    url = StringField(
+    url = URLField(
         "Url",
         [Length(max=256)],
         render_kw={
@@ -310,11 +311,13 @@ class LinkForm(FlaskForm):
     )
 
     def result(self):
+        url = self.url.data
+        url = url[:url.find('?')]
         return Link(
             title=self.title.data,
             slug=make_slug(self.title.data),
             text=self.text.data,
-            url=self.url.data,
+            url=url,
         )
 
 

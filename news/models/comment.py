@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Optional, Length
 
 from news.lib.cache import cache
 from news.lib.comments import add_new_comment
-from news.lib.db.db import db
+from news.clients.db.db import db
 from news.lib.task_queue import q
 from news.lib.utils.confidence import confidence
 from news.models.base import Base

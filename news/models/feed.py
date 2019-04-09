@@ -9,7 +9,7 @@ from wtforms import StringField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Length
 
 from news.lib.cache import cache
-from news.lib.db.db import db
+from news.clients.db.db import db
 from news.lib.task_queue import redis_conn, q
 from news.lib.utils.slugify import make_slug
 from news.models.base import Base
