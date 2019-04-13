@@ -104,19 +104,6 @@ def load_config(app):
 
     app.config["MAILGUN_API_KEY"] = os.getenv("MAILGUN_API_KEY")
 
-    # TODO remove
-    app.config["ORATOR_DATABASES"] = {
-            "default": "postgres",
-            "postgres": {
-                "driver": "postgres",
-                "host": "localhost",
-                "port": 5432,
-                "database": "news",
-                "user": "postgres",
-                "password": "postgres",
-            },
-        }
-
 
 def register_functions(app):
     def format_datetime(value, format="medium"):
