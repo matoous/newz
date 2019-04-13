@@ -16,16 +16,3 @@ DATABASES = (
         },
     }
 )
-
-url = os.getenv("DATABASE_URL")
-f, s = url[11:].split("@")
-name, password = f.split(":")
-host, db = s.split("/")
-DATABASES = ({
-            "driver": "postgres",
-            "host": host.split(":")[0],
-            "database": db,
-            "user": name,
-            "password": password,
-            "prefix": "",
-})
