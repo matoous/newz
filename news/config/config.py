@@ -18,6 +18,8 @@ def get_string(env_name, default=None):
 
 
 def load_config(app):
+    app.logger.info("loading config")
+
     app.config["DEBUG"] = get_bool("DEBUG", True)
     app.config["SECRET_KEY"] = get_string(
         "SECRET_KEY", binascii.hexlify(os.urandom(24))
@@ -71,6 +73,7 @@ def load_config(app):
     )
 
     if os.getenv("DATABASE_URL") is not None:
+        app.logger.info("loading db config from DATABASE_URL")
         url = os.getenv("DATABASE_URL")
         f, s = url[11:].split("@")
         name, password = f.split(":")
