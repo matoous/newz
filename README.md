@@ -45,6 +45,12 @@ Instalation:
 4. Install requirements
 5. Install redis ([how to](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04))
 
+## docker-compose dev-setup
+
+1. docker-compose up
+2. docker-compose exec postgres /bin/sh -c "echo create database newz | psql -U postgres"
+3. docker-compose exec news sh -c "cd news && orator migrate"
+
 ### Tech stack
 
 * PostgreSQL
@@ -52,7 +58,7 @@ Instalation:
 * Gunicorn
 * Redis - [Info here](https://redis.io/)
 * Apache Solr - [Info here](http://lucene.apache.org/solr/)
-* StatsD - [Info here](https://github.com/statsite/statsite), 
+* StatsD - [Info here](https://github.com/statsite/statsite),
             [Python Client](http://statsd.readthedocs.io/en/v3.2.2/index.html)
 * Graphite - [Info here](https://graphite.readthedocs.io/en/latest/index.html)
 * Sentry - [Info here](https://sentry.io/)
@@ -61,7 +67,7 @@ Instalation:
 
 
 ### More
-[Kube CSS](https://imperavi.com/kube/docs/messages/)  
+[Kube CSS](https://imperavi.com/kube/docs/messages/)
 [Configuring PostgreSQL](http://thebuild.com/presentations/not-your-job.pdf)
 
 ### TODO list

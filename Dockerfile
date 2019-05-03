@@ -18,7 +18,7 @@ USER macaque
 
 WORKDIR /news/news
 
-RUN orator migrate -f
+#RUN orator migrate -f
 
 WORKDIR /news
 
