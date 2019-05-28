@@ -7,7 +7,7 @@ Flask-Login==0.4.1
 Flask-Mail==0.9.1
 Flask-WTF==0.14.2
 markdown2==2.3.7
-orator==0.9.7
+orator==0.9.8
 passlib==1.7.1
 Pillow==5.2.0
 prometheus-client==0.3.1
