@@ -14,7 +14,7 @@ prometheus-client==0.3.1
 psycopg2-binary==2.8.2
 pysolr==3.8.1
 python-dotenv==0.10.2
-python-redis-lock==3.2.0
+python-redis-lock==3.3.1
 raven==6.10.0
 redis==2.10.6
 rq==0.12.0
