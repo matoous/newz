@@ -1,7 +1,6 @@
 import io
 from datetime import datetime, timedelta
 
-from PIL import Image
 from flask import redirect, render_template, request, abort, flash, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -204,17 +203,6 @@ def POST_feed_admin(feed):
         if feed.rules != form.rules.data:
             feed.rules = form.rules.data
             needs_update = True
-
-        if form.img.data:
-            filename = secure_filename(form.img.data.filename)
-            if imagefile(filename):
-                img = Image.open(form.img.data)
-                if not img.width > 2000 and not img.height > 1000:
-                    in_mem_file = io.BytesIO()
-                    img.save(in_mem_file, format="PNG")
-                    feed.img = "{}.png".format(feed.slug)
-                    S3.upload_to_s3(in_mem_file.getvalue(), feed.img)
-                    needs_update = True
 
         if needs_update:
             feed.update_with_cache()

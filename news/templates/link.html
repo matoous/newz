@@ -56,9 +56,6 @@
                         {% endif %}
                         <div class="author">
                             {{ link.time_ago() }} by <a href="{{ link.user.route }}">{{ link.user.name }}</a>
-                            {% if link.user.profile_pic %}
-                                <img src="{{ link.user.profile_pic }}" class="profile-pic-small">
-                            {% endif %}
                         </div>
                     </div>
                 </div>

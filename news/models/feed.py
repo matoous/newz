@@ -198,7 +198,6 @@ class EditFeedForm(FlaskForm):
         [Length(max=8192)],
         render_kw={"placeholder": "Feed rules", "rows": 6, "autocomplete": "off"},
     )
-    img = FileField("Logo")
 
     def fill(self, feed):
         self.description.data = feed.description

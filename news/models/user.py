@@ -51,7 +51,6 @@ class User(Base):
         "preferred_sort",
         "bio",
         "url",
-        "profile_pic",
         "email_public",
         "feed_subs",
         "p_infinite_scrolling",
@@ -91,7 +90,6 @@ class User(Base):
             table.string("preferred_sort", 10).default("trending")
             table.text("bio").nullable()
             table.text("url").nullable()
-            table.text("profile_pic").nullable()
             table.integer("feed_subs").default(0)
 
             # preferences
@@ -607,7 +605,6 @@ class ProfileForm(FlaskForm):
         "Bio", [Length(max=8192)], render_kw={"rows": 6, "autocomplete": "off"}
     )
     url = URLField(validators=[URL()])
-    img = FileField("Avatar")
 
     def validate(self):
         return True

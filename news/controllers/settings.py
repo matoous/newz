@@ -1,13 +1,8 @@
-from PIL import Image
 from flask import render_template, redirect, request, flash, url_for
 from flask_login import current_user, login_required
-from werkzeug.utils import secure_filename
 
-from news.clients.amazons3 import S3
 from news.lib.ratelimit import rate_limit
-from news.lib.utils.file_type import imagefile
 from news.lib.utils.redirect import redirect_back
-from news.lib.utils.resize import square_crop
 from news.models.user import (
     PreferencesForm,
     ProfileForm,
@@ -31,16 +26,6 @@ def profile_settings():
             current_user.full_name = form.full_name.data
             current_user.bio = form.bio.data
             current_user.url = form.url.data
-            if form.img.data:
-                filename = secure_filename(form.img.data.filename)
-                if imagefile(filename):
-                    img = Image.open(form.img.data)
-                    img = square_crop(img)
-                    new_filename = "{}.png".format(current_user.username)
-                    S3.upload_to_s3(img, new_filename)
-                    current_user.profile_pic = "https://s3.eu-central-1.amazonaws.com/newspublic/{}".format(
-                        new_filename
-                    )
             current_user.update_with_cache()
             flash("Profile successfully updated", "info")
             return redirect("/settings/profile")
@@ -139,13 +124,6 @@ def preferences_setting():
     return render_template(
         "settings-preferences.html", form=form, active_tab="preferences"
     )
-
-
-@login_required
-def remove_avatar():
-    current_user.profile_pic = None
-    current_user.update_with_cache()
-    return redirect(redirect_back(current_user.route))
 
 
 @login_required

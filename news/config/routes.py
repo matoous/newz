@@ -153,7 +153,6 @@ def register_routes(app):
         Route("/settings/password", post_new_password, methods=["POST"]),
         Route("/settings/deactivate", post_deactivate, methods=["POST"]),
         Route("/settings/email", post_change_email, methods=["POST"]),
-        Route("/remove-avatar", remove_avatar),
         # OTHER todo remove
         Route("/metrics", metrics),
         Route("/admin", admin),

@@ -312,7 +312,7 @@ class LinkForm(FlaskForm):
 
     def result(self):
         url = self.url.data
-        url = url[:url.find('?')]
+        url = url[: url.find("?")]
         return Link(
             title=self.title.data,
             slug=make_slug(self.title.data),
