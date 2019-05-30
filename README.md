@@ -59,6 +59,12 @@ Instalation:
 * Administration - https://cockpit-project.org/
 * AWS s3 - Needs to be configured before start. for feed logos
 
+## Run locally
+
+```bash
+pip install -r requirements.txt
+python3 application.py 
+```
 
 ### More
 [Kube CSS](https://imperavi.com/kube/docs/messages/)  

@@ -1,22 +1,24 @@
-version: '2'
+version: "3.0"
 services:
-  redis:
-    image: redis
-    container_name: cache
-    expose:
-      - 6379
-
   news:
-    links:
-      - redis
+    depends_on:
+      - cache
+      - db
     build:
       context: .
-      dockerfile: Dockerfile
-      args:
-        - BUILD_REV
-        - COMMIT_DATE
     environment:
-      - REDIS_URL=redis://cache
+      - REDIS_URL=redis://cache:6379
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/news
+      - DATABASES={"postgres":{"driver":"postgres","host":"db","database":"news","user":"postgres","password":"postgres"},"default":"postgres"}
     ports:
-      - 8080
-      - 5432:5432
+      - '8080:8080'
+
+  db:
+    image: postgres:10.1-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=news
+
+  cache:
+    image: redis

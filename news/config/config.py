@@ -63,7 +63,7 @@ def load_config(app):
             "default": "postgres",
             "postgres": {
                 "driver": "postgres",
-                "host": "db",
+                "host": "localhost",
                 "port": 5432,
                 "database": "news",
                 "user": "postgres",
@@ -88,7 +88,7 @@ def load_config(app):
         }
 
     # REDIS CONFIG
-    app.config["REDIS_URL"] = get_string("REDIS_URL", "127.0.0.1:6379")
+    app.config["REDIS_URL"] = get_string("REDIS_URL")
 
     app.config["DEFAULT_FEEDS"] = (
         json.loads(os.getenv("DEFAULT_FEEDS"))

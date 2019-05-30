@@ -32,6 +32,7 @@ class CreateTables(Migration):
             # indexes
             table.index("username")
             table.index("email")
+
         with self.schema.create("feeds") as table:
             table.increments("id").unsigned()
             table.string("name", 64)
@@ -48,6 +49,7 @@ class CreateTables(Migration):
             table.string("logo", 128).nullable()
             table.boolean("reported").default(False)
             table.index("slug")
+
         with self.schema.create("links") as table:
             table.big_increments("id").unsigned()
             table.string("title", 128)
