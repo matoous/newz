@@ -10,7 +10,7 @@ markdown2==2.3.8
 orator==0.9.8
 passlib==1.7.1
 prometheus-client==0.3.1
-psycopg2-binary==2.8.2
+psycopg2-binary==2.8.3
 pysolr==3.8.1
 python-dotenv==0.10.2
 python-redis-lock==3.3.1
