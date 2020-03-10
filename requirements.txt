@@ -15,7 +15,7 @@ pysolr==3.8.1
 python-dotenv==0.12.0
 python-redis-lock==3.5.0
 raven==6.10.0
-redis==3.3.11
+redis==3.4.1
 rq==0.12.0
 python-slugify==4.0.0
 timeago==1.0.13
