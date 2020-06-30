@@ -17,7 +17,7 @@ python-redis-lock==3.5.0
 raven==6.10.0
 redis==3.5.3
 rq==0.12.0
-python-slugify==4.0.0
+python-slugify==4.0.1
 timeago==1.0.13
 WTForms==2.2.1
 bcrypt==3.1.7
