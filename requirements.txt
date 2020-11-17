@@ -9,7 +9,7 @@ Flask-WTF==0.14.3
 markdown2==2.3.9
 orator==0.9.9
 passlib==1.7.2
-prometheus-client==0.7.1
+prometheus-client==0.9.0
 psycopg2-binary==2.8.4
 pysolr==3.8.1
 python-dotenv==0.13.0
